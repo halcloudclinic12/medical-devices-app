@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.test.healthbox_app.presentation.onboarding.mPin.MPinAuthenticateViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="345dp"
+            android:layout_height="148dp"
+            android:layout_marginVertical="50dp"
+            android:src="@drawable/hal_logo_square"
+            android:tag="hal_logo"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="700dp"
+            android:layout_height="320dp"
+            android:background="@drawable/blur_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <com.noobcode.otpview.OTPView
+                android:id="@+id/otpView"
+                style="@style/ResultTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginHorizontal="20dp"
+                android:text="@={viewModel.mPin}"
+                app:borderThickness="2"
+                app:layout_constraintBottom_toTopOf="@+id/button_submit"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:otpLayoutColor="@color/app_color"
+                app:otpLayoutType="0"
+                app:otpLength="6"
+                app:spaceBetween="26" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_submit"
+                style="@style/ButtonTextStyle"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="30dp"
+                android:background="@drawable/button_style"
+                android:text="@string/submit_text"
+                android:textAllCaps="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -1,0 +1,94 @@
+[versions]
+#agp = "8.9.1"
+#agp = "8.5.2"
+agp = "8.9.1"
+kotlin = "2.0.21"
+coreKtx = "1.16.0"
+#agp = "8.6.0"
+converterMoshi = "2.9.0"
+fragmentKtx = "1.8.5"
+glide = "4.15.1"
+gson = "2.10.1"
+hiltAndroidGradlePlugin = "2.51.1"
+hiltCompiler = "1.2.0"
+#kotlin = "1.9.0"
+#kotlin = "1.9.22"
+#kotlin = "2.0.0"
+#compose-compiler = "1.5.8"
+#compose-compiler = "2.0.0"
+
+#coreKtx = "1.15.0"
+#coreKtx = "1.16.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+kotlinxCoroutinesAndroid = "1.7.3"
+kotlinxCoroutinesCore = "1.7.3"
+lifecycleRuntimeKtx = "2.8.7"
+activityCompose = "1.9.3"
+#composeBom = "2024.04.01"
+composeBom = "2024.05.00"
+loggingInterceptor = "5.0.0-alpha.3"
+material = "1.12.0"
+navigationFragmentKtx = "2.8.6"
+okhttp = "5.0.0-alpha.3"
+otpview = "1.0.3"
+picasso = "2.71828"
+retrofit = "2.9.0"
+roomRuntime = "2.6.1"
+runtime = "1.0.0-alpha01"
+
+ailinksdkparsinglibraryandroid = "1.9.7"
+ailinksdkrepositoryandroid = "1.14.20"
+
+[libraries]
+
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshi" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidGradlePlugin" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidGradlePlugin" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+otpview = { module = "com.github.criminact:OTPView", version.ref = "otpview" }
+picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+androidx-runtime = { group = "androidx.xr.runtime", name = "runtime", version.ref = "runtime" }
+
+ailinksdkparsinglibraryandroid = { module = "com.github.elinkthings:AILinkSDKParsingLibraryAndroid", version.ref = "ailinksdkparsinglibraryandroid" }
+ailinksdkrepositoryandroid = { module = "com.github.elinkthings:AILinkSDKRepositoryAndroid", version.ref = "ailinksdkrepositoryandroid" }
+
+#kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+#compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+

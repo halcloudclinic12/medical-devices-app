@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="next">Next</string>
+    <string name="connected_devices">Connected Devices</string>
+    <string name="clinic_analytics">Clinic Analytics</string>
+    <string name="clinic_profile">Clinic Profile</string>
+    <string name="bulk_register">Bulk Register</string>
+    <string name="calibration">Calibration</string>
+    <string name="support">Support</string>
+    <string name="change_language">Change Language</string>
+    <string name="about_app">About App</string>
+    <string name="logout">Logout</string>
+</resources>

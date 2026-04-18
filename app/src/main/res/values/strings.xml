@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">HAL Healthbox</string>
+    <string name="hal_cloud_clinic">HAL Cloud Clinic</string>
+    <string name="enter_your_machine_s_unique_id_below_to_access_the_system">Enter your machine\'s unique id below to access the system.</string>
+    <string name="submit_text">Submit</string>
+    <string name="machine_id">Machine ID</string>
+    <string name="machine_password">Machine Password</string>
+    <string name="are_you_sure_you_want_to_check_in_to_s">Are you sure you want to check in to %s?</string>
+
+    <string name="Authentication_failed">Authentication failed</string>
+    <string name="Authentication_error">Authentication error: </string>
+    <string name="Login_Session_Expired">Login Session Expired</string>
+
+    <string name="Biometric_login">Biometric login</string>
+    <string name="Log_in_using_your_biometric_credential">Log in using your biometric credential</string>
+    <string name="cancel">Cancel</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <!-- Step Indicator Strings -->
+    <string name="step_icon_description">Step icon</string>
+    <string name="step_completed_description">Step completed</string>
+    <string name="scan">Scan</string>
+    <string name="start">Start</string>
+    <string name="device_status">Device Status</string>
+    <string name="select_device">Select Device</string>
+    <string name="next">Next</string>
+    <string name="connected_devices">Connected Devices</string>
+    <string name="clinic_analytics">Clinic Analytics</string>
+    <string name="clinic_profile">Clinic Profile</string>
+    <string name="bulk_register">Bulk Register</string>
+    <string name="calibration">Calibration</string>
+    <string name="support">Support</string>
+    <string name="change_language">Change Language</string>
+    <string name="about_app">About App</string>
+    <string name="logout">Logout</string>
+</resources>

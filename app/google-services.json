@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "838397942812",
+    "project_id": "healthbox-d7ff6",
+    "storage_bucket": "healthbox-d7ff6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838397942812:android:bc673a730bbea471e653d9",
+        "android_client_info": {
+          "package_name": "com.test.healthbox_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhLM_Nv5unoeX6DvsfgVgOd3ax71S-2qY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838397942812:android:6af2a7796039ba24e653d9",
+        "android_client_info": {
+          "package_name": "com.test.healthbox_app.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhLM_Nv5unoeX6DvsfgVgOd3ax71S-2qY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

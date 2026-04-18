@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.test.healthbox_app.presentation.onboarding.registerPatient.RegisterPatientViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="hal logo"
+            android:padding="100dp"
+            android:src="@drawable/hal_logo_square"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/constraintLayout3"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:padding="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1.5"
+            app:layout_constraintStart_toEndOf="@+id/imageView4"
+            tools:layout_editor_absoluteY="-102dp">
+
+            <TextView
+                android:id="@+id/textView4"
+                style="@style/HeaderTextStyle2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Register Patient"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mandatory_fields_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/box_container_bg"
+                app:layout_constraintBottom_toTopOf="@+id/optional_fields_layout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView4">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/patient_name_til_field"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:hint="Patient Name *"
+                    app:layout_constraintEnd_toStartOf="@+id/date_of_birth_til_field"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/patient_name_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:inputType="textPersonName"
+                        android:text="@={viewModel.patient.name}" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/date_of_birth_til_field"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:hint="Date Of Birth *"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/patient_name_til_field"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/date_of_birth_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:inputType="number" />
+                    <!--                        android:text="@={viewModel.patient.dateOfBirth}" />-->
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/mobile_number_til_field"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:hint="Mobile Number *"
+                    app:layout_constraintEnd_toStartOf="@+id/email_til_field"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/patient_name_til_field">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/mobile_number_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:inputType="number"
+                        android:text="@={viewModel.patient.mobile}" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/email_til_field"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:hint="Email *"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/mobile_number_til_field"
+                    app:layout_constraintTop_toBottomOf="@+id/date_of_birth_til_field">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/email_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:inputType="textEmailAddress"
+                        android:text="@={viewModel.patient.email}" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/genderInputLayout"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="20dp"
+                    android:hint="Gender *"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/bloodGroupInputLayout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/mobile_number_til_field">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/gender_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:inputType="number"
+                        android:text="@={viewModel.patient.gender}" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/bloodGroupInputLayout"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:hint="Blood Group *"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/genderInputLayout"
+                    app:layout_constraintTop_toBottomOf="@+id/email_til_field">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/blood_group_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:inputType="number"
+                        android:text="@={viewModel.patient.bloodGroup}" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/optional_fields_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/box_container_bg"
+                app:layout_constraintBottom_toTopOf="@+id/button_submit"
+                app:layout_constraintTop_toBottomOf="@+id/mandatory_fields_layout"
+                tools:layout_editor_absoluteX="20dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/adhar_card_til_field"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:hint="Adhar card"
+                    app:layout_constraintEnd_toStartOf="@+id/unique_id_field"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/adhar_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:inputType="textPersonName"
+                        android:maxEms="5" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/unique_id_field"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:hint="Unique ID"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/adhar_card_til_field"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/unique_id_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/scan_qr_til_field"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="20dp"
+                    android:hint="Scan QR *"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/dummy_til_field"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/adhar_card_til_field">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/scan_qr_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:inputType="textPersonName"
+                        android:maxEms="5" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/dummy_til_field"
+                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/scan_qr_til_field"
+                    app:layout_constraintTop_toBottomOf="@+id/unique_id_field">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/dummy_input"
+                        style="@style/SubTextStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_submit"
+                style="@style/ButtonTextStyle"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_style"
+                android:text="@string/submit_text"
+                android:textAllCaps="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="com.test.healthbox_app.BleConnectionViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- User Details view -->
+        <com.test.healthbox_app.presentation.view.UserInfoView
+            android:id="@+id/userInfoView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="30dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.test.healthbox_app.presentation.view.StepsLayout
+            android:id="@+id/stepsLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.test.healthbox_app.presentation.view.DeviceStatusLayout
+            android:id="@+id/deviceStatusLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--<androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/device_status_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginVertical="30dp"
+            android:background="@drawable/blur_background"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_device_status"
+                style="@style/SubTextStyle20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/device_status"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_device_availability"
+                style="@style/SubTextStyle18"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Disconnected"
+                android:visibility="@{viewModel.selectedDevice != null ? View.VISIBLE : View.GONE }"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_device_status" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_scan"
+                style="@style/SmallButtonTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/button_style"
+                android:onClick="@{()->viewModel.startScan(10000)}"
+                android:text="@string/scan"
+                android:textAllCaps="false"
+                android:visibility="@{viewModel.selectedDevice != null ? View.GONE : View.VISIBLE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_device_availability" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_image_sample"
+            android:layout_width="0dp"
+            android:layout_height="400dp"
+            android:layout_marginStart="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/layout_blood_pressure_readings"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/stepsLayout">
+
+            <ImageView
+                android:id="@+id/imageView6"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:src="@drawable/ic_blood_pressure"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_blood_pressure_readings"
+            android:layout_width="0dp"
+            android:layout_height="400dp"
+            android:layout_marginEnd="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/layout_image_sample"
+            app:layout_constraintTop_toBottomOf="@+id/stepsLayout">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/result_layout"
+                android:layout_width="480dp"
+                android:layout_height="380dp"
+                android:background="@drawable/box_container_bg"
+                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tv_diastolic"
+                    style="@style/ResultLabelTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:text="Diastolic"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_systolic"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
+
+
+                <TextView
+                    android:id="@+id/tv_systolic"
+                    style="@style/ResultLabelTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:text="Systolic"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/tv_diastolic"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
+
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/edit_diastolic"
+                    style="@style/ResultTextStyle"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:maxEms="5"
+                    android:text=""
+                    app:layout_constraintEnd_toStartOf="@+id/edit_systolic"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_diastolic" />
+                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
+
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/edit_systolic"
+                    style="@style/ResultTextStyle"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:maxEms="5"
+                    android:text=""
+
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/edit_diastolic"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_systolic" />
+                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
+
+
+                <TextView
+                    android:id="@+id/tv_pulse"
+                    style="@style/ResultLabelTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="20dp"
+                    android:text="Heart Rate"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_diastolic" />
+                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
+
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/edit_heart_rate"
+                    style="@style/ResultTextStyle"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:maxEms="5"
+                    android:text=""
+
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_pulse" />
+
+                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/testing_layout"
+                android:layout_width="480dp"
+                android:layout_height="380dp"
+                android:background="@drawable/box_container_bg"
+                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.GONE : View.VISIBLE }"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/edit_testing_value"
+                    style="@style/ResultTextStyle"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:maxEms="5"
+                    android:text=""
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/button_next_layout"
+            style="@style/ButtonTextStyle"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="50dp"
+            android:background="@drawable/button_next_style"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_blood_pressure_readings">
+
+            <TextView
+                android:id="@+id/tv_next"
+                style="@style/SubTextStyle20"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/next"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/imageView7"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:src="@drawable/ic_arrow"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/tv_next"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>

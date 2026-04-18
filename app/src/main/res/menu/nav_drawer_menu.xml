@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_connected_device"
+            android:title="@string/connected_devices" />
+
+        <item
+            android:id="@+id/nav_clinic_analytics"
+            android:title="@string/clinic_analytics" />
+        <!--            android:icon="@drawable/ic_person"-->
+
+        <item
+            android:id="@+id/nav_clinic_profile"
+            android:title="@string/clinic_profile" />
+
+        <item
+            android:id="@+id/nav_bulk_register"
+            android:title="@string/bulk_register" />
+
+        <item
+            android:id="@+id/nav_calibration"
+            android:title="@string/calibration" />
+    </group>
+
+    <item android:title="@string/support">
+        <menu>
+          <!--  <item
+                android:id="@+id/nav_change_language"
+                android:title="@string/change_language" />-->
+
+            <item
+                android:id="@+id/nav_about_app"
+                android:title="@string/about_app" />
+
+            <item
+                android:id="@+id/nav_logout"
+                android:title="@string/logout" />
+        </menu>
+    </item>
+
+</menu>

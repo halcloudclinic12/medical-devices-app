@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_start_up"
+    app:startDestination="@id/splash_fragment">
+    <!--    app:startDestination="@id/dashboardFragment">-->
+
+    <fragment
+        android:id="@+id/splash_fragment"
+        android:name="com.test.healthbox_app.presentation.splash.SplashFragment"
+        android:label="fragment_splash"
+        tools:layout="@layout/splash_fragment">
+
+        <action
+            android:id="@+id/machine_check_in_action"
+            app:destination="@+id/machine_check_in_fragment" />
+
+        <action
+            android:id="@+id/action_splash_fragment_to_MPinAuthenticateFragment"
+            app:destination="@id/loginPatientNavFragment" />
+
+        <action
+            android:id="@+id/action_splash_fragment_to_login_patient"
+            app:destination="@id/loginPatientNavFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/machine_check_in_fragment"
+        android:name="com.test.healthbox_app.presentation.onboarding.checkin.MachineCheckInFragment"
+        android:label="fragment_machine_check_in"
+        tools:layout="@layout/machine_check_in_fragment">
+        <action
+            android:id="@+id/get_started_action"
+            app:destination="@+id/disclaimer" />
+
+        <action
+            android:id="@+id/enter_m_pin_after_check_in_action"
+            app:destination="@id/loginPatientNavFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/MPinAuthenticateFragment"
+        android:name="com.test.healthbox_app.presentation.onboarding.mPin.MPinAuthenticateFragment"
+        android:label="MPinAuthenticateFragment"
+        tools:layout="@layout/m_pin_authenticate_fragment">
+        <action
+            android:id="@+id/patient_login_m_pin_success_action"
+            app:destination="@id/loginPatientNavFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginPatientNavFragment"
+        android:name="com.test.healthbox_app.presentation.onboarding.loginPatientNav.LoginPatientNavFragment"
+        android:label="NavigationOptionsFragment"
+        tools:layout="@layout/login_patient_nav_fragment">
+        <action
+            android:id="@+id/register_patient_login_action"
+            app:destination="@id/registerPatientFragment" />
+
+        <action
+            android:id="@+id/clinic_logout_action"
+            app:destination="@id/machine_check_in_fragment" />
+
+        <action
+            android:id="@+id/connected_devices_action"
+            app:destination="@id/connected_devices_fragment" />
+
+        <action
+            android:id="@+id/calibration_devices_action"
+            app:destination="@id/calibration_devices_fragment" />
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerPatientFragment"
+        android:name="com.test.healthbox_app.presentation.onboarding.registerPatient.RegisterPatientFragment"
+        android:label="RegisterPatientFragment"
+        tools:layout="@layout/register_patient_fragment">
+        <action
+            android:id="@+id/go_to_dashboard_register_action"
+            app:destination="@id/dashboardFragment" />
+
+        <action
+            android:id="@+id/register_patient_back_button_action"
+            app:destination="@id/loginPatientNavFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.test.healthbox_app.presentation.dashboard.DashboardFragment"
+        android:label="DashboardFragment"
+        tools:layout="@layout/dashboard_fragment">
+
+        <action
+            android:id="@+id/start_health_checkup_height_action"
+            app:destination="@id/heightFragment" />
+        <!--            app:destination="@id/glucoseTestFragment" />-->
+
+        <!--<action
+            android:id="@+id/start_health_checkup_height_action"
+            app:destination="@id/glucoseTestFragment" />-->
+        <!--            app:destination="@id/HBCheckFragment" />-->
+
+        <action
+            android:id="@+id/dash_to_reports_screen_action"
+            app:destination="@id/reports_fragment" />
+
+        <action
+            android:id="@+id/dash_back_button_action"
+            app:destination="@id/loginPatientNavFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/heightFragment"
+        android:name="com.test.healthbox_app.presentation.tests.height.HeightFragment"
+        android:label="HeightFragment"
+        tools:layout="@layout/height_fragment">
+        <action
+            android:id="@+id/next_button_temperature_checkup_action"
+            app:destination="@id/temperatureFragment" />
+
+        <action
+            android:id="@+id/close_button_action_height_screen"
+            app:destination="@id/dashboardFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/temperatureFragment"
+        android:name="com.test.healthbox_app.presentation.tests.temperature.TemperatureFragment"
+        android:label="TemperatureFragment"
+        tools:layout="@layout/temperature_fragment">
+
+        <action
+            android:id="@+id/next_button_pulse_checkup_action"
+            app:destination="@id/pulseFragment" />
+
+        <action
+            android:id="@+id/temperature_to_height_screen_nav_action"
+            app:destination="@id/heightFragment" />
+
+        <action
+            android:id="@+id/close_button_action_temperature_screen"
+            app:destination="@id/dashboardFragment" />
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/pulseFragment"
+        android:name="com.test.healthbox_app.presentation.tests.spo2.PulseFragment"
+        android:label="PulseFragment"
+        tools:layout="@layout/pulse_fragment">
+
+        <action
+            android:id="@+id/next_button_weight_checkup_action"
+            app:destination="@id/bodyAnalysisFragment" />
+
+        <action
+            android:id="@+id/pulse_to_height_screen_nav_action"
+            app:destination="@id/heightFragment" />
+
+        <action
+            android:id="@+id/pulse_to_temperature_screen_nav_action"
+            app:destination="@id/temperatureFragment" />
+
+        <action
+            android:id="@+id/close_button_action_pulse_screen"
+            app:destination="@id/dashboardFragment" />
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/bodyAnalysisFragment"
+        android:name="com.test.healthbox_app.presentation.tests.bodyAnalysis.BodyAnalysisFragment"
+        android:label="BodyAnalysisFragment"
+        tools:layout="@layout/body_analysis_fragment">
+
+        <action
+            android:id="@+id/next_button_vision_action"
+            app:destination="@id/visionTestFragment" />
+
+        <action
+            android:id="@+id/weight_to_height_screen_nav_action"
+            app:destination="@id/heightFragment" />
+
+        <action
+            android:id="@+id/weight_to_temperature_screen_nav_action"
+            app:destination="@id/temperatureFragment" />
+
+        <action
+            android:id="@+id/weight_to_pulse_screen_nav_action"
+            app:destination="@id/pulseFragment" />
+
+        <action
+            android:id="@+id/close_button_action_body_analysis_screen"
+            app:destination="@id/dashboardFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/visionTestFragment"
+        android:name="com.test.healthbox_app.presentation.tests.vision.VisionTestFragment"
+        android:label="VisionTestFragment"
+        tools:layout="@layout/vision_test_fragment">
+
+        <action
+            android:id="@+id/next_button_blood_pressure_action"
+            app:destination="@id/bloodPressureFragment" />
+
+        <action
+            android:id="@+id/vision_to_height_screen_nav_action"
+            app:destination="@id/heightFragment" />
+
+        <action
+            android:id="@+id/vision_to_temperature_screen_nav_action"
+            app:destination="@id/temperatureFragment" />
+
+        <action
+            android:id="@+id/vision_to_pulse_screen_nav_action"
+            app:destination="@id/pulseFragment" />
+
+
+        <action
+            android:id="@+id/vision_to_weight_screen_nav_action"
+            app:destination="@id/bodyAnalysisFragment" />
+
+        <action
+            android:id="@+id/close_button_action_vision_screen"
+            app:destination="@id/dashboardFragment" />
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/bloodPressureFragment"
+        android:name="com.test.healthbox_app.presentation.tests.bloodPressure.BloodPressureFragment"
+        android:label="BloodPressureFragment"
+        tools:layout="@layout/blood_pressure_fragment">
+
+        <action
+            android:id="@+id/next_button_glucose_action"
+            app:destination="@id/glucoseTestFragment" />
+
+        <action
+            android:id="@+id/bp_to_height_screen_nav_action"
+            app:destination="@id/heightFragment" />
+
+        <action
+            android:id="@+id/bp_to_temperature_screen_nav_action"
+            app:destination="@id/temperatureFragment" />
+
+        <action
+            android:id="@+id/bp_to_pulse_screen_nav_action"
+            app:destination="@id/pulseFragment" />
+
+        <action
+            android:id="@+id/bp_to_weight_screen_nav_action"
+            app:destination="@id/bodyAnalysisFragment" />
+
+        <action
+            android:id="@+id/bp_to_vision_screen_nav_action"
+            app:destination="@id/visionTestFragment" />
+
+        <action
+            android:id="@+id/close_button_action_blood_pressure_screen"
+            app:destination="@id/dashboardFragment" />
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/glucoseTestFragment"
+        android:name="com.test.healthbox_app.presentation.tests.glucose.BloodSugarTestFragment"
+        android:label="GlucoseTestFragment"
+        tools:layout="@layout/blood_sugar_test_fragment">
+
+        <action
+            android:id="@+id/next_button_hemoglobin_checkup_action"
+            app:destination="@id/HBCheckFragment" />
+
+        <action
+            android:id="@+id/glucose_to_height_screen_nav_action"
+            app:destination="@id/heightFragment" />
+
+        <action
+            android:id="@+id/glucose_to_temperature_screen_nav_action"
+            app:destination="@id/temperatureFragment" />
+
+        <action
+            android:id="@+id/glucose_to_pulse_screen_nav_action"
+            app:destination="@id/pulseFragment" />
+
+        <action
+            android:id="@+id/glucose_to_weight_screen_nav_action"
+            app:destination="@id/bodyAnalysisFragment" />
+
+        <action
+            android:id="@+id/glucose_to_vision_screen_nav_action"
+            app:destination="@id/visionTestFragment" />
+
+        <action
+            android:id="@+id/glucose_to_blood_pressure_screen_nav_action"
+            app:destination="@id/bloodPressureFragment" />
+
+        <action
+            android:id="@+id/close_button_action_glucose_screen"
+            app:destination="@id/dashboardFragment" />
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/HBCheckFragment"
+        android:name="com.test.healthbox_app.presentation.tests.hbCheck.HemoglobinTestFragment"
+        android:label="HBCheckFragment"
+        tools:layout="@layout/hemoglobin_test_fragment">
+
+        <action
+            android:id="@+id/hb_check_to_height_screen_nav_action"
+            app:destination="@id/heightFragment" />
+
+        <action
+            android:id="@+id/hb_check_to_temperature_screen_nav_action"
+            app:destination="@id/temperatureFragment" />
+
+        <action
+            android:id="@+id/hb_check_to_pulse_screen_nav_action"
+            app:destination="@id/pulseFragment" />
+
+        <action
+            android:id="@+id/hb_check_to_weight_screen_nav_action"
+            app:destination="@id/bodyAnalysisFragment" />
+
+        <action
+            android:id="@+id/hb_check_to_vision_screen_nav_action"
+            app:destination="@id/visionTestFragment" />
+
+        <action
+            android:id="@+id/hb_check_to_blood_pressure_screen_nav_action"
+            app:destination="@id/bloodPressureFragment" />
+
+        <action
+            android:id="@+id/hb_check_to_glucose_test_screen_nav_action"
+            app:destination="@id/glucoseTestFragment" />
+
+        <action
+            android:id="@+id/next_button_results_action"
+            app:destination="@id/results_fragment" />
+
+        <action
+            android:id="@+id/close_button_action_hb_screen"
+            app:destination="@id/dashboardFragment" />
+
+
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/results_fragment"
+        android:name="com.test.healthbox_app.presentation.tests.results.ResultsFragment"
+        android:label="ResultsFragment"
+        tools:layout="@layout/results_fragment">
+
+        <action
+            android:id="@+id/home_button_action_results_screen"
+            app:destination="@id/dashboardFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/reports_fragment"
+        android:name="com.test.healthbox_app.presentation.reports.ReportsFragment"
+        android:label="ResultsFragment"
+        tools:layout="@layout/reports_fragment">
+
+        <action
+            android:id="@+id/back_button_action_reports_screen"
+            app:destination="@id/dashboardFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/connected_devices_fragment"
+        android:name="com.test.healthbox_app.presentation.onboarding.connectedDevices.ConnectedDevicesFragment"
+        android:label="ConnectedDevicesFragment"
+        tools:layout="@layout/connected_devices_fragment">
+
+        <action
+            android:id="@+id/back_button_action_connected_devices_screen"
+            app:destination="@id/loginPatientNavFragment" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/calibration_devices_fragment"
+        android:name="com.test.healthbox_app.presentation.onboarding.calibration.CalibrationDevicesFragment"
+        android:label="ConnectedDevicesFragment"
+        tools:layout="@layout/connected_devices_fragment">
+
+        <action
+            android:id="@+id/back_button_action_calibration_devices_screen"
+            app:destination="@id/loginPatientNavFragment" />
+
+    </fragment>
+</navigation>
