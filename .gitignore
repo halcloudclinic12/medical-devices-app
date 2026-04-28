@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/app/keystore/health_box_app.jks
+/app/keystore.properties
