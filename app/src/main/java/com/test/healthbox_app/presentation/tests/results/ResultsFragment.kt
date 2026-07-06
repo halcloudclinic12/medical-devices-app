@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -22,16 +21,18 @@ import com.test.healthbox_app.base.BaseFragment
 import com.test.healthbox_app.bluetooth.DeviceType
 import com.test.healthbox_app.data.model.BodyCheckupPref
 import com.test.healthbox_app.data.model.PatientPref
+import com.test.healthbox_app.data.model.ReportTestType
+import com.test.healthbox_app.data.model.response.CreateBasicTestResponse
 import com.test.healthbox_app.databinding.ResultsFragmentBinding
 import com.test.healthbox_app.domain.model.ApiResponse
 import com.test.healthbox_app.domain.model.BleDevice
 import com.test.healthbox_app.domain.model.ConnectionState
 import com.test.healthbox_app.domain.model.PrintState
 import com.test.healthbox_app.domain.model.ScanState
-import com.test.healthbox_app.domain.model.StepStatus
 import com.test.healthbox_app.presentation.dialog.DeviceListDialog
 import com.test.healthbox_app.presentation.util.CustomSnackBar
 import com.test.healthbox_app.presentation.util.DatePickerUtil
+import com.test.healthbox_app.presentation.util.PdfOpener
 import com.test.healthbox_app.presentation.view.StepsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -52,6 +53,9 @@ class ResultsFragment() : BaseFragment() {
 
     private var selectedPrinterDevice: BleDevice? = null
     private var printReportText: String = ""
+
+    var testResponse: CreateBasicTestResponse? = null
+    var selectedReportType = ReportTestType.typesList().find { it.title == "Basic Health" }?.testType
 
     override fun checkConnectivity() {
     }
@@ -111,15 +115,19 @@ class ResultsFragment() : BaseFragment() {
                     }
 
                     is ApiResponse.ApiSuccess -> {
-                        val apiData = state.data
-                        println("CreateBasicTestState Logs Success:: ${apiData.data}")
+                        testResponse = state.data
+                        println("CreateBasicTestState Logs Success:: ${testResponse?.data}")
                         hideDialog()
 
-                        if (apiData.data != null) {
+                        if (testResponse?.data != null) {
+                            binding.buttonViewReport.visibility = View.VISIBLE
+
                             CustomSnackBar.make(
                                 binding.root, "Data saved successfully.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.SUCCESS
                             ).show()
                         } else {
+                            binding.buttonViewReport.visibility = View.GONE
+
                             CustomSnackBar.make(
                                 binding.root, "Failed to save data.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
                             ).show()
@@ -135,50 +143,6 @@ class ResultsFragment() : BaseFragment() {
                     }
                 }
             }
-
-            /*resultsViewModel.createBasicTestState.collect { state ->
-                when (state) {
-                    is ApiResponse.ApiLoading -> {
-                        println("CreateBasicTestState Logs  :  Loading : ${state.apiData?.data}")
-                        // show loading
-                    }
-
-                    is ApiResponse.ApiSuccess -> {
-                        println("CreateBasicTestState Logs Success:: ${state.apiData?.data}")
-                        hideDialog()
-
-                        state.apiData?.let { apiData ->
-                            if (apiData.data != null) {
-
-                                hideDialog()
-
-                                CustomSnackBar.make(
-                                    binding.root, "Data saved successfully.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.SUCCESS
-                                ).show()
-
-                            } else {
-                                hideDialog()
-                                CustomSnackBar.make(
-                                    binding.root, "Failed to save data.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
-                                ).show()
-
-                            }
-                        }
-                    }
-
-                    is ApiResponse.ApiError -> {
-                        hideDialog()
-
-                        state.message?.let {
-                            CustomSnackBar.make(
-                                binding.root, it, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
-                            ).show()
-
-                        }
-
-                    }
-                }
-            }*/
         }
 
         return binding.root
@@ -191,7 +155,7 @@ class ResultsFragment() : BaseFragment() {
 
         if (bleConnectionViewModel.selectedDevice.value == null) {
             binding.buttonConnectPrinterLayout.visibility = View.VISIBLE
-            binding.buttonPrintLayout.visibility = View.INVISIBLE
+            binding.buttonPrintLayout.visibility = View.GONE
         } else {
             binding.buttonPrintLayout.visibility = View.VISIBLE
             binding.buttonConnectPrinterLayout.visibility = View.GONE
@@ -224,6 +188,8 @@ class ResultsFragment() : BaseFragment() {
         binding.buttonPrintLayout.setOnClickListener {
 
             if (!isPrinting) {
+                println("\nPrintReportTextLog   :: Printing Text:: \n$printReportText")
+
                 bleConnectionViewModel.printText(printReportText)
 
                 binding.lottieAnimationView.playAnimation()
@@ -237,9 +203,13 @@ class ResultsFragment() : BaseFragment() {
         }
 
         binding.buttonViewReport.setOnClickListener {
-            CustomSnackBar.make(
+
+            val url = PdfOpener.buildUrl(testId = testResponse?.data?.Id.toString(), testType = selectedReportType)
+            PdfOpener.openUrl(context = requireContext(), url = url)
+
+            /*CustomSnackBar.make(
                 binding.root, "Report not available.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
-            ).show()
+            ).show()*/
         }
 
         binding.buttonConnectPrinterLayout.setOnClickListener {

@@ -37,13 +37,14 @@ class ResultsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
 
             val basicRequest = BodyCheckupPref.toBasicTestRequestDto()
-            println("\ncreateBasicTestLog   :: Calling:: ${basicRequest}")
+            println("\ncreateBasicTestLog   :: Request Body:: ${Gson().toJson(basicRequest)}")
 
             patientsAPIUseCases.createBasicTest(
                 basicTestRequest = basicRequest, authToken = "Bearer ${sharedPreferenceUseCases.getToken().toString()}"
             ).collect { it ->
                 println("\ncreateBasicTestLog   :: Res Logs :: ${Gson().toJson(it)}")
                 _createBasicTestState.value = it
+
             }
 
         }

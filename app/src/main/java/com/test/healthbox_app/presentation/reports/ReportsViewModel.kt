@@ -62,7 +62,7 @@ class ReportsViewModel @Inject constructor(
                 patientsAPIUseCases.getBasicTest(
                     patientId = it.id.toString(), authToken = "Bearer ${sharedPreferenceUseCases.getToken().toString()}"
                 ).collect { it ->
-                    println("\ncreateBasicTestLog   :: Res Logs :: ${Gson().toJson(it)}")
+                    println("\ngetBasicTestLog   :: Res Logs :: ${Gson().toJson(it)}")
                     _getBasicTestState.value = it
                 }
             }

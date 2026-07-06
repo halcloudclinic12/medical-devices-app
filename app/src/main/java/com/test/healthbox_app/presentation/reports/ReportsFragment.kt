@@ -19,12 +19,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.test.healthbox_app.BleConnectionViewModel
-import com.test.healthbox_app.MainActivity
 import com.test.healthbox_app.R
 import com.test.healthbox_app.base.BaseFragment
 import com.test.healthbox_app.bluetooth.DeviceType
 import com.test.healthbox_app.data.model.BodyCheckupPref
 import com.test.healthbox_app.data.model.PatientPref
+import com.test.healthbox_app.data.model.ReportTestType
 import com.test.healthbox_app.data.model.mapper.toParametersList
 import com.test.healthbox_app.data.model.response.BasicTestData
 import com.test.healthbox_app.databinding.ReportsFragmentBinding
@@ -37,6 +37,7 @@ import com.test.healthbox_app.presentation.dialog.DeviceListDialog
 import com.test.healthbox_app.presentation.tests.results.ParametersResultsListAdapter
 import com.test.healthbox_app.presentation.util.CustomSnackBar
 import com.test.healthbox_app.presentation.util.DatePickerUtil
+import com.test.healthbox_app.presentation.util.PdfOpener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +68,8 @@ class ReportsFragment() : BaseFragment() {
     private lateinit var parametersResultsListAdapter: ParametersResultsListAdapter
 
     private var isPrinting = false
+
+    var selectedReportType = ReportTestType.typesList().find { it.title == "Basic Health" }?.testType
 
     override fun checkConnectivity() {
     }
@@ -185,10 +188,7 @@ class ReportsFragment() : BaseFragment() {
                         } else {
                             hideDialog()
                             CustomSnackBar.make(
-                                binding.root,
-                                "Failed to get data.",
-                                Snackbar.LENGTH_SHORT,
-                                CustomSnackBar.Companion.SnackBarType.ERROR
+                                binding.root, "Failed to get data.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
                             ).show()
                         }
                     }
@@ -197,69 +197,12 @@ class ReportsFragment() : BaseFragment() {
                         hideDialog()
 
                         CustomSnackBar.make(
-                            binding.root,
-                            state.message,
-                            Snackbar.LENGTH_SHORT,
-                            CustomSnackBar.Companion.SnackBarType.ERROR
+                            binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
                         ).show()
                     }
                 }
             }
         }
-
-        /*viewLifecycleOwner.lifecycleScope.launch {
-            reportsViewModel.getBasicTestState.collect { state ->
-                when (state) {
-                    is ApiResponse.ApiLoading -> {
-                        println("Get BasicTestState Logs  :  Loading : ${state.apiData?.data}")
-                        // show loading
-                    }
-
-                    is ApiResponse.ApiSuccess -> {
-                        println("Get BasicTestState Logs Success:: ${Gson().toJson(state.apiData?.data)}")
-
-                        state.apiData?.let { apiData ->
-                            if (apiData.data != null) {
-
-                                reportsList = apiData.data.records
-
-                                reportsList?.let {
-                                    selectedReport = reportsList[0]
-                                    reportsList[0].isSelected = true
-                                }
-
-
-                                setDatesList()
-
-                                setResultsList()
-
-                                delay(100)
-
-                                hideDialog()
-
-                            } else {
-                                hideDialog()
-                                CustomSnackBar.make(
-                                    binding.root, "Failed to get data.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
-                                ).show()
-
-                            }
-                        }
-                    }
-
-                    is ApiResponse.ApiError -> {
-                        hideDialog()
-
-                        state.message?.let {
-                            CustomSnackBar.make(
-                                binding.root, it, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
-                            ).show()
-
-                        }
-                    }
-                }
-            }
-        }*/
     }
 
     private fun setReportsTypesList() {
@@ -269,27 +212,21 @@ class ReportsFragment() : BaseFragment() {
                 binding.rvTestTypeList.layoutManager = LinearLayoutManager(context)
 
                 binding.rvTestTypeList.adapter = state.testTypesList.let {
-                    ReportsTypesListAdapter(reportsTypesList = it, context = context, onItemClick = { selectedReportTestType ->
-
-                        println("\nselectedReportTestType Logs print :: ${selectedReportTestType}")
-                    })
+                    ReportsTypesListAdapter(
+                        reportsTypesList = it, context = context, onItemClick = { selectedReportTestType ->
+                            println("\nselectedReportTestType Logs print :: ${selectedReportTestType}")
+//                            selectedReportType = selectedReportTestType.testType
+                        })
                 }
             }
         }
     }
 
-    private fun setDatesList() {/* binding.rvDatesList.adapter = reportsList.let {
-             selectedReport?.let { report ->
-                 ReportsDatesListAdapter(reportsResultList = it, context = context, selectedReport = report, onItemClick = { report ->
-                     selectedReport = report
-                 })
-             }
-         }*/
+    private fun setDatesList() {
+
         selectedReport?.let {
             datesAdapter = ReportsDatesListAdapter(
-                reportsResultList = reportsList,
-//                context = context,
-                selectedReport = it, onItemClick = { report ->
+                reportsResultList = reportsList, selectedReport = it, onItemClick = { report ->
 
                     println(" selected Report logs :: ${Gson().toJson(selectedReport)}")
                     println(" selected Report logs :: ${Gson().toJson(report)}")
@@ -327,7 +264,6 @@ class ReportsFragment() : BaseFragment() {
 
             binding.rvReportsList.adapter = parametersResultsListAdapter
         }
-
     }
 
     private fun nextTestCall() {
@@ -350,15 +286,18 @@ class ReportsFragment() : BaseFragment() {
                 CustomSnackBar.make(
                     binding.root, "Printing in progress.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
                 ).show()
-
             }
 
         }
 
         binding.buttonViewReport.setOnClickListener {
-            CustomSnackBar.make(
+            println("selectedReportType Logs on click :: ${selectedReport?.Id} :: $selectedReportType")
+            val url = PdfOpener.buildUrl(testId = selectedReport?.Id.toString(), testType = selectedReportType)
+            PdfOpener.openUrl(context = requireContext(), url = url)
+
+            /*CustomSnackBar.make(
                 binding.root, "Report not available.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
-            ).show()
+            ).show()*/
         }
 
         binding.buttonConnectPrinterLayout.setOnClickListener {

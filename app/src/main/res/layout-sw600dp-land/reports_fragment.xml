@@ -55,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
                 android:background="@drawable/button_next_style"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/button_connect_printer_layout"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -93,8 +93,8 @@
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/lottieAnimationView_connect_printer"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="3dp"
+                    android:layout_height="0dp"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/tv_connect_printer"

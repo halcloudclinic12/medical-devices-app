@@ -6,14 +6,16 @@ data class ReportsTestTypes(
 
 data class ReportTestType(
     var title: String? = null,
-    var isSelected: Boolean? = null
+    var isSelected: Boolean? = null,
+    var testType: String? = null
+
 ) {
     companion object {
         fun typesList() = listOf(
-            ReportTestType(title = "Basic Health", isSelected = true),
-            ReportTestType(title = "HbA1c", isSelected = false),
-            ReportTestType(title = "Lipid", isSelected = false),
-            ReportTestType(title = "Rapid", isSelected = false),
+            ReportTestType(title = "Basic Health", isSelected = true, testType = "BASIC"),
+            ReportTestType(title = "HbA1c", isSelected = false, testType = "HBA1C"),
+            ReportTestType(title = "Lipid", isSelected = false, testType = "LIPID"),
+            ReportTestType(title = "Rapid", isSelected = false, testType = "RAPID"),
         )
     }
 }

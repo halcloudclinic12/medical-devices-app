@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
                 android:background="@drawable/button_next_style"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/button_connect_printer_layout"
                 app:layout_constraintHorizontal_bias="0.5"

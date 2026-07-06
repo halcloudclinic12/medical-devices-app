@@ -31,7 +31,7 @@ class BleRepositoryImpl @Inject constructor(
     private val bluetoothAdapter = bluetoothManager.adapter
     private val scanner = bluetoothAdapter.bluetoothLeScanner
 
-    override val connectionState: Flow<Map<DeviceType, ConnectionState>>
+    override val  connectionState: Flow<Map<DeviceType, ConnectionState>>
         get() = bleConnectionManager.connectionsState
 
     override suspend fun scanForDevices(timeout: Long): Flow<List<BleDevice>> {

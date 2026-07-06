@@ -338,7 +338,9 @@ object BodyCheckupPref {
     private fun getMetaAgeResult(metaAge: Int): String? {
         var metaAgeResult: String? = null
 
-        if (metaAge <= age!!.toInt()) metaAgeResult = "Standard"
+        val actualAge = age?.toIntOrNull() ?: return null
+
+        if (metaAge <= actualAge) metaAgeResult = "Standard"
         else metaAgeResult = "Not up to Standard"
 
         return metaAgeResult
@@ -458,6 +460,8 @@ object BodyCheckupPref {
         patient_ID = null
         clinic_ID = null
         gender = null
+        meta_age = null
+        meta_age_result = null
         age = null
 
         height = null
@@ -478,8 +482,6 @@ object BodyCheckupPref {
         visceral_fat_result = null
         body_water = null
         body_water_result = null
-        meta_age = null
-        meta_age_result = null
         protein = null
         protein_result = null
         fat_level = null

@@ -159,6 +159,10 @@ class BloodPressureFragment() : BaseFragment() {
         binding.editDiastolic.text.toString().let { diastolic ->
             BodyCheckupPref.blood_pressure_diastolic = diastolic
         }
+
+        binding.editHeartRate.text.toString().let { pulse ->
+            BodyCheckupPref.pulse = pulse
+        }
     }
 
 

@@ -1,9 +1,7 @@
 package com.test.healthbox_app.presentation.onboarding.loginPatientNav
 
 import android.bluetooth.BluetoothDevice
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -36,6 +34,7 @@ import com.test.healthbox_app.presentation.dialog.DeviceListDialog
 import com.test.healthbox_app.presentation.util.BluetoothPermissionHandler
 import com.test.healthbox_app.presentation.util.CustomSnackBar
 import com.test.healthbox_app.presentation.util.DatePickerUtil
+import com.test.healthbox_app.presentation.util.PdfOpener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -131,14 +130,19 @@ class LoginPatientNavFragment() : BaseFragment() {
 
         binding.buttonSubmit.setOnClickListener {
             mActivity?.let {
-                val url = "https://dev-api.halcloudclinic.com/api/v1/tests/download-pdf?test_id=69d3e15e9b3ed26210da827a&test_type=BASIC"
+                /*val url = "https://dev-api.halcloudclinic.com/api/v1/tests/download-pdf?test_id=69d3e15e9b3ed26210da827a&test_type=BASIC"
 
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                PdfOpener.openUrl(
+                    context = requireContext(),
+                    url = url
+                )*/
+
+                /*val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
+                startActivity(intent)*/
 
-//                showDialog()
-//                viewModel.loginPatient()
+                showDialog()
+                viewModel.loginPatient()
             }
         }
 

@@ -51,7 +51,7 @@ class SplashViewModel @Inject constructor(
             onBoardingAPIUseCases.refreshToken(
                 refreshTokenRequest = refreshTokenRequest, authToken = "Bearer ${sharedPreferenceUseCases.getToken().toString()}"
             ).collect { it ->
-                println("\ncreateBasicTestLog   :: Res Logs :: ${Gson().toJson(it)}")
+                println("\nrefreshTokenLog   :: Res Logs :: ${Gson().toJson(it)}")
                 _refreshTokenState.value = it
 
                 sharedPreferenceUseCases.saveVerificationTime()
@@ -65,7 +65,7 @@ class SplashViewModel @Inject constructor(
             onBoardingAPIUseCases.verifyToken(
                 token = token, authToken = "Bearer ${sharedPreferenceUseCases.getToken().toString()}"
             ).collect { it ->
-                println("\ncreateBasicTestLog   :: Res Logs :: ${Gson().toJson(it)}")
+                println("\nrefreshTokenLog   :: Res Logs :: ${Gson().toJson(it)}")
                 _verifyTokenState.value = it
 
                 sharedPreferenceUseCases.saveVerificationTime()

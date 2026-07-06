@@ -46,6 +46,8 @@ data class BasicTestData(
     @SerializedName("body_water_result") var bodyWaterResult: String? = null,
     @SerializedName("protein") var protein: String? = null,
     @SerializedName("protein_result") var proteinResult: String? = null,
+    @SerializedName("oxygen") var oxygen: String? = null,
+    @SerializedName("oxygen_result") var oxygenResult: String? = null,
     @SerializedName("pulse") var pulse: String? = null,
     @SerializedName("pulse_result") var pulseResult: String? = null,
     @SerializedName("meta_age") var metaAge: String? = null,

@@ -139,7 +139,7 @@ class PulseFragment() : BaseFragment() {
     private fun nextTestCall() {
         binding.buttonNextLayout.setOnClickListener { view ->
             mActivity?.let {
-                println("Body checkup response :: -> ${BodyCheckupPref.pulse} ")
+                println("Body checkup response :: -> ${BodyCheckupPref.oxygen} ")
 
                 disconnectDevice()
 
@@ -154,7 +154,7 @@ class PulseFragment() : BaseFragment() {
 
     fun savePulseData() {
         binding.editPulse.text.toString().let {
-            BodyCheckupPref.pulse = binding.editPulse.text.toString()
+            BodyCheckupPref.oxygen = binding.editPulse.text.toString()
         }
     }
 
