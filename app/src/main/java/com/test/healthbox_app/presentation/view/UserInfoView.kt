@@ -49,9 +49,14 @@ class UserInfoView @JvmOverloads constructor(
 
             tvPatientGender.text = "$gender"
 
-            if (patient.gender == "Male") {
+            // Case-insensitive: RegisterPatientViewModel.updatePatient() sends
+            // gender.lowercase() to the server, so a patient re-fetched after an edit can come
+            // back as "male"/"female" instead of the "Male"/"Female" the registration dropdown
+            // originally wrote — an exact-match check here silently mis-shows the female icon
+            // for a male patient in that case.
+            if (gender.equals("Male", ignoreCase = true)) {
                 ivUserIcon.setImageResource(R.drawable.male_icon)
-            } else {
+            } else if (gender.equals("Female", ignoreCase = true)) {
                 ivUserIcon.setImageResource(R.drawable.female_icon)
             }
 
