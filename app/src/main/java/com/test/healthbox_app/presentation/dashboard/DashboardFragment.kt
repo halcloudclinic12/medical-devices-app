@@ -22,6 +22,7 @@ import com.test.healthbox_app.MainActivity
 import com.test.healthbox_app.R
 import com.test.healthbox_app.base.BaseFragment
 import com.test.healthbox_app.bluetooth.DeviceType
+import com.test.healthbox_app.data.model.BodyCheckupPref
 import com.test.healthbox_app.data.model.PatientPref
 import com.test.healthbox_app.databinding.DashboardFragmentBinding
 import com.test.healthbox_app.di.factory.PermissionHandlerFactory
@@ -102,6 +103,13 @@ class DashboardFragment() : BaseFragment() {
                     // 👇 Your custom back press logic here
                     println("on Back Press clicked on Dashboard  ::  ")
 
+                    // Leaving Dashboard for the login screen means switching away from
+                    // the current patient — clear identity (kept alive across tests
+                    // within a session by clearAll()) so the next patient can't inherit
+                    // a leftover patient_id/clinic_id/age or see the previous name.
+                    BodyCheckupPref.clearPatientIdentity()
+                    PatientPref.patient = null
+
                     findNavController().navigate(R.id.dash_back_button_action)
                 }
             })
@@ -129,6 +137,10 @@ class DashboardFragment() : BaseFragment() {
 
         binding.reportLayout.setOnClickListener {
             mActivity?.navController?.navigate(R.id.dash_to_reports_screen_action)
+        }
+
+        binding.hba1cLayout.setOnClickListener {
+            mActivity?.navController?.navigate(R.id.dash_to_hba1c_screen_action)
         }
 
         val patient = PatientPref.patient

@@ -374,6 +374,10 @@ class TemperatureFragment() : BaseFragment() {
                     // Show empty state or message
                     if (bleConnectionViewModel.selectedDevice.value == null) Toast.makeText(requireContext(), "No devices found", Toast.LENGTH_SHORT)
                         .show()
+                    // deviceStatusViewModel is activity-scoped (shared across every test screen),
+                    // so this terminal empty result must be consumed or it replays on the next
+                    // screen/subscribe.
+                    deviceStatusViewModel.clearScanState()
                 }
             }
 

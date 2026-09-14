@@ -25,6 +25,21 @@
     <string name="device_status">Device Status</string>
     <string name="select_device">Select Device</string>
     <string name="next">Next</string>
+
+    <!-- HbA1c test -->
+    <string name="retest">Retest</string>
+    <string name="hba1c_title">HbA1c Test</string>
+    <string name="hba1c_unit_ngsp">%</string>
+    <string name="hba1c_step_one">Insert the code chip supplied with the cartridge box</string>
+    <string name="hba1c_step_two">Insert a new test cartridge into the meter</string>
+    <string name="hba1c_step_three">Collect the blood sample and apply it to the cartridge</string>
+    <string name="hba1c_step_four">Wait for the meter to finish — the result appears here automatically</string>
+    <string name="hba1c_status_idle">Connect the meter to begin</string>
+    <string name="hba1c_status_connected">Connected — run the test on the meter</string>
+    <string name="hba1c_status_waiting">Waiting for result from the meter…</string>
+    <string name="hba1c_status_disconnected">Meter disconnected</string>
+    <string name="hba1c_help_title">HbA1c Meter Error Codes</string>
+
     <string name="connected_devices">Connected Devices</string>
     <string name="clinic_analytics">Clinic Analytics</string>
     <string name="clinic_profile">Clinic Profile</string>

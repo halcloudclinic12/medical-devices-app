@@ -2,6 +2,7 @@ package com.test.healthbox_app.data.repository
 
 import android.util.Log
 import com.test.healthbox_app.bluetooth.DeviceType
+import com.test.healthbox_app.data.ble.A1cRecordParser
 import com.test.healthbox_app.domain.model.BloodPressureMeasurement
 import com.test.healthbox_app.domain.model.GlucoseMeasurement
 import com.test.healthbox_app.domain.model.HeightMeasurement
@@ -22,6 +23,14 @@ class MeasurementRepositoryImpl @Inject constructor() : MeasurementRepository {
 
     private val packetBuffers = mutableMapOf<DeviceType, StringBuilder>()
 
+    /**
+     * A1cEZ 2.0 records arrive as ~3 fragments of a 49-byte binary frame, so the
+     * parser is stateful and must be a single long-lived instance.
+     */
+    private val hba1cParser = A1cRecordParser { message ->
+        Log.w("A1cRecordParser", message)
+    }
+
     override fun parseMeasurement(deviceType: DeviceType, rawData: ByteArray): Measurement? {
         return when (deviceType) {
             DeviceType.HEIGHT -> parseHeightData(rawData)
@@ -29,9 +38,16 @@ class MeasurementRepositoryImpl @Inject constructor() : MeasurementRepository {
             DeviceType.PULSE -> parsePulseData(rawData)
             DeviceType.BLOOD_PRESSURE_MONITOR -> parseBloodPressureData(rawData)
             DeviceType.GLUCOSE_METER -> parseGlucoseData(rawData)
+            DeviceType.HBA1C_METER -> hba1cParser.accept(rawData)
             else -> null
         }
     }
+
+    /**
+     * Drops any partially received HbA1c frame. Call on connect and on disconnect so
+     * a truncated record can never be spliced onto the next test's data.
+     */
+    override fun resetHba1cBuffer() = hba1cParser.reset()
 
     private fun parseHeightData(rawData: ByteArray): HeightMeasurement {
         val heightString = rawData.toString(Charset.defaultCharset()).trim()

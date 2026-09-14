@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.test.healthbox_app.data.model.BodyCheckupPref
 import com.test.healthbox_app.data.model.mapper.toBasicTestRequestDto
+import com.test.healthbox_app.data.model.mapper.toHba1cTestRequestDto
 import com.test.healthbox_app.data.model.response.CreateBasicTestResponse
+import com.test.healthbox_app.data.model.response.CreateHba1cTestResponse
 import com.test.healthbox_app.data.model.response.Patient
 import com.test.healthbox_app.domain.model.ApiResponse
 import com.test.healthbox_app.domain.use_cases.PatientsAPIUseCases
@@ -45,6 +47,25 @@ class ResultsViewModel @Inject constructor(
                 println("\ncreateBasicTestLog   :: Res Logs :: ${Gson().toJson(it)}")
                 _createBasicTestState.value = it
 
+            }
+
+        }
+    }
+
+    private val _createHba1cTestState = MutableStateFlow<ApiResponse<CreateHba1cTestResponse>>(ApiResponse.ApiLoading())
+    val createHba1cTestState: StateFlow<ApiResponse<CreateHba1cTestResponse>> get() = _createHba1cTestState
+
+    fun createHba1cTest() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val hba1cRequest = BodyCheckupPref.toHba1cTestRequestDto()
+            println("\ncreateHba1cTestLog   :: Request Body:: ${Gson().toJson(hba1cRequest)}")
+
+            patientsAPIUseCases.createHba1cTest(
+                hba1cTestRequest = hba1cRequest, authToken = "Bearer ${sharedPreferenceUseCases.getToken().toString()}"
+            ).collect { it ->
+                println("\ncreateHba1cTestLog   :: Res Logs :: ${Gson().toJson(it)}")
+                _createHba1cTestState.value = it
             }
 
         }

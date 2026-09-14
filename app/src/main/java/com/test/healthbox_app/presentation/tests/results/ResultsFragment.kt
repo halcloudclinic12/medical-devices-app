@@ -21,8 +21,9 @@ import com.test.healthbox_app.base.BaseFragment
 import com.test.healthbox_app.bluetooth.DeviceType
 import com.test.healthbox_app.data.model.BodyCheckupPref
 import com.test.healthbox_app.data.model.PatientPref
-import com.test.healthbox_app.data.model.ReportTestType
+import com.test.healthbox_app.data.model.TestFlowType
 import com.test.healthbox_app.data.model.response.CreateBasicTestResponse
+import com.test.healthbox_app.data.model.response.CreateHba1cTestResponse
 import com.test.healthbox_app.databinding.ResultsFragmentBinding
 import com.test.healthbox_app.domain.model.ApiResponse
 import com.test.healthbox_app.domain.model.BleDevice
@@ -55,7 +56,16 @@ class ResultsFragment() : BaseFragment() {
     private var printReportText: String = ""
 
     var testResponse: CreateBasicTestResponse? = null
-    var selectedReportType = ReportTestType.typesList().find { it.title == "Basic Health" }?.testType
+    var hba1cTestResponse: CreateHba1cTestResponse? = null
+
+    /**
+     * Which flow produced the data being shown, read once at load time from the
+     * shared BleConnectionViewModel (see TestFlowType doc for why it lives there
+     * rather than a nav-arg Bundle). Defaults to BASIC so the existing basic-checkup
+     * entry point, which never sets this, is unaffected.
+     */
+    private lateinit var testFlow: TestFlowType
+    var selectedReportType: String? = null
 
     override fun checkConnectivity() {
     }
@@ -73,6 +83,10 @@ class ResultsFragment() : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = ResultsFragmentBinding.inflate(inflater)
+
+        // Which flow got us here — read once, before anything below depends on it.
+        testFlow = bleConnectionViewModel.currentTestFlow.value ?: TestFlowType.BASIC
+        selectedReportType = testFlow.apiCode
 
         // Get ViewModel from activity
 //        bleConnectionViewModel = (activity as MainActivity).bleViewModel
@@ -95,51 +109,100 @@ class ResultsFragment() : BaseFragment() {
 
         setResultsList()
 
-        showDialog()
-
-        resultsViewModel.createBasicTest()
-
         printReportText = getPrintText()
 
         observePrintStatus()
 
         nextTestCall()
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        // Each flow calls its own endpoint against its own retaining StateFlow — collecting
+        // the wrong one would either submit stale basic-checkup fields under the HbA1c
+        // screen, or replay a *previous* result's ApiSuccess (activity-scoped ViewModel)
+        // onto the wrong screen with a View Report button pointing at the wrong testId.
+        if (testFlow == TestFlowType.BASIC) {
+            showDialog()
 
-            resultsViewModel.createBasicTestState.collect { state ->
-                when (state) {
-                    is ApiResponse.ApiLoading -> {
-                        println("CreateBasicTestState Logs  :  Loading")
-                        // show loading
-                    }
+            resultsViewModel.createBasicTest()
 
-                    is ApiResponse.ApiSuccess -> {
-                        testResponse = state.data
-                        println("CreateBasicTestState Logs Success:: ${testResponse?.data}")
-                        hideDialog()
+            viewLifecycleOwner.lifecycleScope.launch {
 
-                        if (testResponse?.data != null) {
-                            binding.buttonViewReport.visibility = View.VISIBLE
+                resultsViewModel.createBasicTestState.collect { state ->
+                    when (state) {
+                        is ApiResponse.ApiLoading -> {
+                            println("CreateBasicTestState Logs  :  Loading")
+                            // show loading
+                        }
+
+                        is ApiResponse.ApiSuccess -> {
+                            testResponse = state.data
+                            println("CreateBasicTestState Logs Success:: ${testResponse?.data}")
+                            hideDialog()
+
+                            if (testResponse?.data != null) {
+                                binding.buttonViewReport.visibility = View.VISIBLE
+
+                                CustomSnackBar.make(
+                                    binding.root, "Data saved successfully.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.SUCCESS
+                                ).show()
+                            } else {
+                                binding.buttonViewReport.visibility = View.GONE
+
+                                CustomSnackBar.make(
+                                    binding.root, "Failed to save data.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
+                                ).show()
+                            }
+                        }
+
+                        is ApiResponse.ApiError -> {
+                            hideDialog()
 
                             CustomSnackBar.make(
-                                binding.root, "Data saved successfully.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.SUCCESS
-                            ).show()
-                        } else {
-                            binding.buttonViewReport.visibility = View.GONE
-
-                            CustomSnackBar.make(
-                                binding.root, "Failed to save data.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
+                                binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
                             ).show()
                         }
                     }
+                }
+            }
+        } else if (testFlow == TestFlowType.HBA1C) {
+            showDialog()
 
-                    is ApiResponse.ApiError -> {
-                        hideDialog()
+            resultsViewModel.createHba1cTest()
 
-                        CustomSnackBar.make(
-                            binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
-                        ).show()
+            viewLifecycleOwner.lifecycleScope.launch {
+
+                resultsViewModel.createHba1cTestState.collect { state ->
+                    when (state) {
+                        is ApiResponse.ApiLoading -> {
+                            println("CreateHba1cTestState Logs  :  Loading")
+                        }
+
+                        is ApiResponse.ApiSuccess -> {
+                            hba1cTestResponse = state.data
+                            println("CreateHba1cTestState Logs Success:: ${hba1cTestResponse?.data}")
+                            hideDialog()
+
+                            if (hba1cTestResponse?.data != null) {
+                                binding.buttonViewReport.visibility = View.VISIBLE
+
+                                CustomSnackBar.make(
+                                    binding.root, "Data saved successfully.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.SUCCESS
+                                ).show()
+                            } else {
+                                binding.buttonViewReport.visibility = View.GONE
+
+                                CustomSnackBar.make(
+                                    binding.root, "Failed to save data.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
+                                ).show()
+                            }
+                        }
+
+                        is ApiResponse.ApiError -> {
+                            hideDialog()
+
+                            CustomSnackBar.make(
+                                binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
+                            ).show()
+                        }
                     }
                 }
             }
@@ -173,8 +236,12 @@ class ResultsFragment() : BaseFragment() {
 
     private fun setResultsList() {
 
-        println("\nBodyCheckupPref Logs print :: ${BodyCheckupPref.toParameterList()}")
-        val parametersResultList = BodyCheckupPref.toParameterList()
+        val parametersResultList = if (testFlow == TestFlowType.HBA1C) {
+            BodyCheckupPref.toHba1cParameterList()
+        } else {
+            BodyCheckupPref.toParameterList()
+        }
+        println("\nBodyCheckupPref Logs print (testFlow=$testFlow) :: $parametersResultList")
 
         binding.rvResults.layoutManager = LinearLayoutManager(context)
         binding.rvResults.adapter = parametersResultList.let {
@@ -204,7 +271,12 @@ class ResultsFragment() : BaseFragment() {
 
         binding.buttonViewReport.setOnClickListener {
 
-            val url = PdfOpener.buildUrl(testId = testResponse?.data?.Id.toString(), testType = selectedReportType)
+            val testId = if (testFlow == TestFlowType.HBA1C) {
+                hba1cTestResponse?.data?.Id.toString()
+            } else {
+                testResponse?.data?.Id.toString()
+            }
+            val url = PdfOpener.buildUrl(testId = testId, testType = selectedReportType)
             PdfOpener.openUrl(context = requireContext(), url = url)
 
             /*CustomSnackBar.make(
@@ -230,6 +302,10 @@ class ResultsFragment() : BaseFragment() {
             stepsViewModel.resetSteps()
 
             BodyCheckupPref.clearAll()
+
+            // Consumed — clear so a future flow that doesn't set this explicitly
+            // (the basic checkup never does) can't inherit this session's value.
+            bleConnectionViewModel.setTestFlow(null)
 
             findNavController().navigate(R.id.home_button_action_results_screen)
         }
@@ -346,7 +422,6 @@ class ResultsFragment() : BaseFragment() {
                             binding.buttonPrintLayout.visibility = View.GONE
                             binding.buttonConnectPrinterLayout.visibility = View.VISIBLE
                         }
-
                     }
 
                     PrintState.Idle -> {
@@ -480,7 +555,14 @@ class ResultsFragment() : BaseFragment() {
         sb.appendLine("------------------------")
 
         // ----- Dynamically build parameters -----
-        BodyCheckupPref.toParameterList().filter { !it.value.isNullOrBlank() } // ✅ Only print non-null & non-empty
+        // testFlow-aware: printing the basic-checkup list on the HbA1c screen (or vice
+        // versa) would emit whatever stale values are still sitting in the other list.
+        val parameterList = if (testFlow == TestFlowType.HBA1C) {
+            BodyCheckupPref.toHba1cParameterList()
+        } else {
+            BodyCheckupPref.toParameterList()
+        }
+        parameterList.filter { !it.value.isNullOrBlank() } // ✅ Only print non-null & non-empty
             .forEach { param ->
                 sb.appendLine("${param.parameterName}: ${param.value}")
 

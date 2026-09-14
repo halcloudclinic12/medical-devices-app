@@ -1,6 +1,7 @@
 package com.test.healthbox_app.domain.use_cases
 
 import com.test.healthbox_app.domain.model.request.BasicTestRequest
+import com.test.healthbox_app.domain.model.request.Hba1cTestRequest
 import com.test.healthbox_app.domain.model.request.PatientCreateRequest
 import com.test.healthbox_app.domain.model.request.PatientLoginRequest
 import com.test.healthbox_app.domain.model.request.PatientUpdateRequest
@@ -32,6 +33,11 @@ class PatientsAPIUseCases @Inject constructor(
 
     suspend fun getBasicTest(patientId: String, authToken: String) = patientsAPIRepository.getBasicTests(
         patientId = patientId,
+        token = authToken,
+    ).flowOn(Dispatchers.IO)
+
+    suspend fun createHba1cTest(hba1cTestRequest: Hba1cTestRequest, authToken: String) = patientsAPIRepository.createHba1cTest(
+        hba1cTestRequest = hba1cTestRequest,
         token = authToken,
     ).flowOn(Dispatchers.IO)
 

@@ -3,11 +3,13 @@ package com.test.healthbox_app.data.network
 import com.test.healthbox_app.data.model.response.BasicTestsResponse
 import com.test.healthbox_app.data.model.response.ClinicLoginResponse
 import com.test.healthbox_app.data.model.response.CreateBasicTestResponse
+import com.test.healthbox_app.data.model.response.CreateHba1cTestResponse
 import com.test.healthbox_app.data.model.response.PatientLoginResponse
 import com.test.healthbox_app.data.model.response.RefreshTokenResponse
 import com.test.healthbox_app.data.model.response.VerifyTokenResponse
 import com.test.healthbox_app.domain.model.request.BasicTestRequest
 import com.test.healthbox_app.domain.model.request.ClinicLoginRequest
+import com.test.healthbox_app.domain.model.request.Hba1cTestRequest
 import com.test.healthbox_app.domain.model.request.PatientCreateRequest
 import com.test.healthbox_app.domain.model.request.PatientLoginRequest
 import com.test.healthbox_app.domain.model.request.PatientUpdateRequest
@@ -52,6 +54,12 @@ interface ApiService {
 //        @Header("Authorization") token: String,
         @Query("patient_id") patientId: String
     ): BasicTestsResponse
+
+    @POST("api/v1/test/hba1c")
+    suspend fun createHba1cTest(
+//        @Header("Authorization") token: String,
+        @Body request: Hba1cTestRequest
+    ): CreateHba1cTestResponse
 
     @POST("api/v1/auth/refresh")
     suspend fun refreshToken(

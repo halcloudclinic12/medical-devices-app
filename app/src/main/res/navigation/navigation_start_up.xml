@@ -110,6 +110,10 @@
             app:destination="@id/reports_fragment" />
 
         <action
+            android:id="@+id/dash_to_hba1c_screen_action"
+            app:destination="@id/hba1cTestFragment" />
+
+        <action
             android:id="@+id/dash_back_button_action"
             app:destination="@id/loginPatientNavFragment" />
     </fragment>
@@ -312,6 +316,33 @@
             android:id="@+id/close_button_action_glucose_screen"
             app:destination="@id/dashboardFragment" />
 
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/hba1cTestFragment"
+        android:name="com.test.healthbox_app.presentation.tests.hba1c.Hba1cTestFragment"
+        android:label="Hba1cTestFragment"
+        tools:layout="@layout/hba1c_test_fragment">
+
+        <!-- popUpTo keeps the back stack from growing on every
+             dashboard -> hba1c -> dashboard round trip -->
+        <action
+            android:id="@+id/close_button_action_hba1c_screen"
+            app:destination="@id/dashboardFragment"
+            app:popUpTo="@id/dashboardFragment"
+            app:popUpToInclusive="true" />
+
+        <!-- popUpTo removes this screen itself from the back stack — without it, Back
+             from Results would re-enter a torn-down Hba1cTestFragment, whose
+             setAndObserveDeviceAvailability() re-runs on every entry and would both
+             null out the result just saved (BodyCheckupPref.hba1c = null) and kick off
+             a fresh BLE reconnect the user never asked for. -->
+        <action
+            android:id="@+id/next_button_action_hba1c_screen"
+            app:destination="@id/results_fragment"
+            app:popUpTo="@id/hba1cTestFragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
 

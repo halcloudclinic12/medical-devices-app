@@ -282,6 +282,18 @@ object BodyCheckupPref {
         }
     var hemoglobin_result: String? = null
 
+    // HbA1c — always stored normalised to NGSP %; the parser converts mmol/mol for us
+    var hba1c: String? = null
+        set(value) {
+            field = value
+            hba1c_result = value?.toDoubleOrNull()?.let { getResultFromRange(it, ParameterRanges.HBA1C) }
+        }
+    var hba1c_result: String? = null
+
+    /** Classifies an NGSP % value without mutating stored state — for live UI display. */
+    fun classifyHba1c(ngspPercent: Double?): String? =
+        ngspPercent?.let { getResultFromRange(it, ParameterRanges.HBA1C) }
+
     // ----------------- Special Case: Weight -----------------
     private fun getWeightResult(value: String?, height: Double?): String? {
         val w = value?.toDoubleOrNull() ?: return null
@@ -453,16 +465,53 @@ object BodyCheckupPref {
             Parameters("Pulse", pulse_result, pulse, "60-100 bpm"),
             Parameters("Sugar", sugar_result, sugar, "70-110 mg/dL (fasting)"),
             Parameters("Hemoglobin", hemoglobin_result, hemoglobin, if (gender == "M") "13.5-17.5 g/dL" else "12-16 g/dL")
+            // NOTE: HbA1c is deliberately NOT listed here. This list feeds the *basic
+            // health checkup* results screen and printout, and clearAll() only runs at
+            // the end of that flow (ResultsFragment "Home" button). The HbA1c test is a
+            // separate standalone flow, so including it would let a value captured in an
+            // earlier session — possibly for a different patient — appear in the next
+            // patient's basic report. HbA1c belongs to the HBA1C report type instead.
         ).filter { it.value != null } // optional: hide null values
     }
 
-    fun clearAll() {
+    /**
+     * Parameter row(s) for the standalone HbA1c results screen. Deliberately separate
+     * from [toParameterList] — see the NOTE above explaining why HbA1c is excluded
+     * from that one (avoids a value from an earlier, possibly different patient's
+     * HbA1c session leaking into the next patient's basic-checkup report).
+     */
+    fun toHba1cParameterList(): List<Parameters> = listOfNotNull(
+        hba1c?.let { Parameters("HbA1c", hba1c_result, it, ParameterRanges.HBA1C["Normal"]) }
+    )
+
+    /**
+     * Clears the fields identifying the *currently active patient* — patient_ID,
+     * clinic_ID, age (set once at login/registration, not by any test) — plus (via the
+     * caller) [PatientPref.patient], the other half of "who's active" state. Call this
+     * when actually switching away from the current patient (e.g. Dashboard's back
+     * button returning to the login screen), not between tests for the same patient —
+     * that's what [clearAll] is for.
+     */
+    fun clearPatientIdentity() {
         patient_ID = null
         clinic_ID = null
+        age = null
+    }
+
+    /**
+     * Clears the *test values* from a completed checkup, ready for the next test.
+     * Deliberately does NOT clear patient_ID / clinic_ID / age — those identify the
+     * currently active patient (set once at login/registration), not a test result,
+     * and the patient stays active across multiple tests in the same session (e.g.
+     * Basic checkup, then HbA1c, without re-logging in). Clearing them here used to
+     * mean any test performed after a Results "Home" tap silently submitted a blank
+     * patient_id/clinic_id — see the HbA1c integration session, 2026-09-14.
+     * Use [clearPatientIdentity] instead when actually switching patients.
+     */
+    fun clearAll() {
         gender = null
         meta_age = null
         meta_age_result = null
-        age = null
 
         height = null
         height_result = null
@@ -513,6 +562,8 @@ object BodyCheckupPref {
         sugar_result = null
         hemoglobin = null
         hemoglobin_result = null
+        hba1c = null
+        hba1c_result = null
     }
 
 }

@@ -2,9 +2,11 @@ package com.test.healthbox_app.domain.repository
 
 import com.test.healthbox_app.data.model.response.BasicTestsResponse
 import com.test.healthbox_app.data.model.response.CreateBasicTestResponse
+import com.test.healthbox_app.data.model.response.CreateHba1cTestResponse
 import com.test.healthbox_app.data.model.response.PatientLoginResponse
 import com.test.healthbox_app.domain.model.ApiResponse
 import com.test.healthbox_app.domain.model.request.BasicTestRequest
+import com.test.healthbox_app.domain.model.request.Hba1cTestRequest
 import com.test.healthbox_app.domain.model.request.PatientCreateRequest
 import com.test.healthbox_app.domain.model.request.PatientLoginRequest
 import com.test.healthbox_app.domain.model.request.PatientUpdateRequest
@@ -21,4 +23,6 @@ interface PatientsAPIRepository {
     suspend fun createBasicTest(basicTestRequest: BasicTestRequest, token: String): Flow<ApiResponse<CreateBasicTestResponse>>
 
     suspend fun getBasicTests(patientId: String, token: String): Flow<ApiResponse<BasicTestsResponse>>
+
+    suspend fun createHba1cTest(hba1cTestRequest: Hba1cTestRequest, token: String): Flow<ApiResponse<CreateHba1cTestResponse>>
 }

@@ -32,7 +32,7 @@
             android:layout_height="300dp"
             android:background="@drawable/box_container_bg"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/report_layout"
+            app:layout_constraintEnd_toStartOf="@+id/hba1c_layout"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -65,6 +65,44 @@
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/hba1c_layout"
+            android:layout_width="280dp"
+            android:layout_height="300dp"
+            android:background="@drawable/box_container_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/report_layout"
+            android:visibility="gone"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/health_checkup_layout"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/iv_hba1c"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:src="@drawable/ic_hba1c"
+                app:layout_constraintBottom_toTopOf="@+id/tv_hba1c"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_hba1c"
+                style="@style/ResultTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HbA1C Test"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_hba1c" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/report_layout"
             android:layout_width="280dp"
             android:layout_height="300dp"
@@ -72,7 +110,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/health_checkup_layout"
+            app:layout_constraintStart_toEndOf="@+id/hba1c_layout"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView

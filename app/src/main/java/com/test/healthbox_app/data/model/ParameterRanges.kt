@@ -156,4 +156,13 @@ object ParameterRanges {
         "Normal" to "12.1-15.1",
         "High" to "15.2-30"
     )
+
+    // ---------------- HbA1c (NGSP %) ----------------
+    // ADA diagnostic thresholds: < 5.7 normal, 5.7-6.4 prediabetes, >= 6.5 diabetes
+    // Bounds are contiguous (5.69 / 6.49) so a decimal reading can never fall in a gap.
+    val HBA1C = mapOf(
+        "Normal" to "0-5.69",
+        "Prediabetes" to "5.7-6.49",
+        "Diabetes" to "6.5-30"
+    )
 }

@@ -7,9 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.test.healthbox_app.bluetooth.DeviceType
+import com.test.healthbox_app.data.model.TestFlowType
 import com.test.healthbox_app.domain.model.BleDevice
 import com.test.healthbox_app.domain.model.BleResult
 import com.test.healthbox_app.domain.model.ConnectionState
+import com.test.healthbox_app.domain.model.Hba1cMeasurement
 import com.test.healthbox_app.domain.model.Measurement
 import com.test.healthbox_app.domain.model.PrintState
 import com.test.healthbox_app.domain.model.PrinterError
@@ -77,6 +79,19 @@ class BleConnectionViewModel @Inject constructor(
 
     private val _selectedDeviceType = MutableStateFlow<DeviceType?>(null)
     val selectedDeviceType: StateFlow<DeviceType?> = _selectedDeviceType.asStateFlow()
+
+    /**
+     * Which test flow is in progress, tracked for the session so ResultsFragment
+     * (activity-scoped, same as this ViewModel) knows which API to call and which
+     * parameter list to show without needing a nav-arg Bundle. Set on entry to a test
+     * screen, read once Results loads.
+     */
+    private val _currentTestFlow = MutableStateFlow<TestFlowType?>(null)
+    val currentTestFlow: StateFlow<TestFlowType?> = _currentTestFlow.asStateFlow()
+
+    fun setTestFlow(testFlowType: TestFlowType?) {
+        _currentTestFlow.value = testFlowType
+    }
 
     private val _commandResult = MutableStateFlow<BleResult<Unit>>(BleResult.Loading)
     val commandResult: StateFlow<BleResult<Unit>> = _commandResult
@@ -617,6 +632,130 @@ class BleConnectionViewModel @Inject constructor(
                 connectToDevice(selectedDevice.value!!, selectedDeviceType.value!!)
             }
         }
+    }
+
+    // ─── HbA1c (A1cEZ 2.0) ──────────────────────────────────────────────────
+    //
+    // Deliberately does NOT follow the getGlucoseData() shape:
+    //  - no forEach over the whole connection map (would react to other devices)
+    //  - no connectToDevice() fallback (would fire a reconnect for an unrelated type)
+    //  - no !! assertions (state is nulled when leaving the screen)
+    //  - the notification collector is held in a Job so a repeated call cannot
+    //    stack duplicate collectors, which would feed every fragment to the
+    //    stateful record parser twice and corrupt reassembly.
+
+    private var hba1cNotificationJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * Guards against waiting forever when the meter aborts a test on its own screen
+     * (E-7 "delay in adding blood sample", E-3 used strip, HI/LO out-of-range, etc.).
+     * Per the vendor's BLE dev manual, only the successful 49-byte record is ever
+     * pushed over BLE — error states shown on the meter's LCD have no BLE equivalent
+     * (confirmed against the manual: its BLE section defines no other message, and its
+     * error-code table lives entirely in the LCD/USB-troubleshooting section). So a
+     * failed test is indistinguishable from "still running" until this fires.
+     */
+    private var hba1cTimeoutJob: kotlinx.coroutines.Job? = null
+
+    /** Manual specs the full cycle at 6±1 min; padded generously for a slow operator. */
+    private val hba1cTestTimeoutMs = 8 * 60 * 1000L
+
+    private val _hba1cMeasurement = MutableStateFlow<Hba1cMeasurement?>(null)
+    val hba1cMeasurement: StateFlow<Hba1cMeasurement?> = _hba1cMeasurement.asStateFlow()
+
+    /** One-shot "no result" signal for the HbA1c screen. Cleared once shown/consumed. */
+    private val _hba1cError = MutableStateFlow<String?>(null)
+    val hba1cError: StateFlow<String?> = _hba1cError.asStateFlow()
+
+    fun clearHba1cError() {
+        _hba1cError.value = null
+    }
+
+    /**
+     * Starts listening for HbA1c records. Safe to call repeatedly — any previous
+     * collector (and timeout) is cancelled first.
+     *
+     * The A1cEZ pushes its record unsolicited once the operator completes the test
+     * on the meter, so there is nothing to "start" beyond enabling notifications.
+     * If hardware sniffing later shows a start command is required, write it to
+     * BleConstants.HBA1C_WRITE at the marked point below.
+     */
+    fun getHba1cData() {
+        val deviceType = selectedDeviceType.value ?: return
+        if (deviceType != DeviceType.HBA1C_METER) return
+        if (connectionState.value[deviceType] != ConnectionState.Connected) {
+            Log.w(TAG, "getHba1cData ignored — $deviceType is not connected")
+            return
+        }
+
+        // Clear any half-received frame left over from a previous session.
+        parseMeasurementUseCase.resetHba1cBuffer()
+        _hba1cError.value = null
+
+        hba1cNotificationJob?.cancel()
+        hba1cTimeoutJob?.cancel()
+
+        hba1cNotificationJob = viewModelScope.launch {
+            val serviceUuid = UUID.fromString(BleConstants.HBA1C_SERVICE)
+            val characteristicUuid = UUID.fromString(BleConstants.HBA1C_MEASUREMENT)
+
+            bleUseCases.startNotifications(deviceType, serviceUuid, characteristicUuid).fold(
+                onSuccess = {
+                    Log.d(TAG, "HbA1c notifications enabled")
+
+                    // If the meter turns out to need a kick, send it here:
+                    // bleUseCases.sendCommand("<cmd>", deviceType, serviceUuid,
+                    //     UUID.fromString(BleConstants.HBA1C_WRITE))
+
+                    startHba1cTimeout()
+
+                    bleUseCases.observeNotifications(deviceType, characteristicUuid)
+                        .catch { e -> Log.e(TAG, "HbA1c notification stream failed: ${e.message}") }
+                        .collect { data ->
+                            val parsed = parseMeasurementUseCase.invoke(deviceType, data)
+                                    as? Hba1cMeasurement ?: return@collect
+
+                            // A genuine record decoded — stop the "no result" clock.
+                            hba1cTimeoutJob?.cancel()
+
+                            _hba1cMeasurement.value = parsed
+                            _deviceResponses.update { current -> current + (deviceType to parsed) }
+                        }
+                },
+                onFailure = { error ->
+                    Log.e(TAG, "Failed to enable HbA1c notifications: ${error.message}")
+                    _commandResult.value = BleResult.Error(error)
+                    _hba1cError.value = error.message ?: "Failed to enable HbA1c notifications"
+                }
+            )
+        }
+    }
+
+    /**
+     * Fires once if no valid record has arrived within [hba1cTestTimeoutMs]. This is the
+     * only failure signal the app has — see [hba1cTimeoutJob] for why.
+     */
+    private fun startHba1cTimeout() {
+        hba1cTimeoutJob = viewModelScope.launch {
+            delay(hba1cTestTimeoutMs)
+            if (_hba1cMeasurement.value == null) {
+                Log.w(TAG, "HbA1c test timed out with no result — meter may have shown an error")
+                _hba1cError.value =
+                    "No result received from the meter. Check its display for an error code and retry."
+            }
+        }
+    }
+
+    /** Stops listening and clears the last result. Call when leaving the HbA1c screen. */
+    fun stopHba1cListening() {
+        hba1cNotificationJob?.cancel()
+        hba1cNotificationJob = null
+        hba1cTimeoutJob?.cancel()
+        hba1cTimeoutJob = null
+        _hba1cMeasurement.value = null
+        _hba1cError.value = null
+        parseMeasurementUseCase.resetHba1cBuffer()
+        _deviceResponses.update { current -> current - DeviceType.HBA1C_METER }
     }
 
     fun startScanning() {

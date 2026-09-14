@@ -142,26 +142,30 @@ class BloodSugarTestFragment() : BaseFragment() {
         }
 
         binding.buttonStart.setOnClickListener {
-            showDialog()
+            ensureBluetoothEnabled(binding.root) {
+                showDialog()
 
-            val device = bleConnectionViewModel.selectedDevice.value
+                val device = bleConnectionViewModel.selectedDevice.value
 
-            if (device != null) {
-                binding.deviceStatusLayout.setUpDeviceAvailability(true)
+                if (device != null) {
+                    binding.deviceStatusLayout.setUpDeviceAvailability(true)
 
-                bleConnectionViewModel.connectToDevice(device, bleConnectionViewModel.selectedDeviceType.value!!)
+                    bleConnectionViewModel.connectToDevice(device, bleConnectionViewModel.selectedDeviceType.value!!)
+                }
             }
         }
 
         binding.buttonRetest.setOnClickListener {
-            showDialog()
+            ensureBluetoothEnabled(binding.root) {
+                showDialog()
 
-            val device = bleConnectionViewModel.selectedDevice.value
+                val device = bleConnectionViewModel.selectedDevice.value
 
-            if (device != null) {
-                binding.deviceStatusLayout.setUpDeviceAvailability(true)
+                if (device != null) {
+                    binding.deviceStatusLayout.setUpDeviceAvailability(true)
 
-                bleConnectionViewModel.connectToDevice(device, bleConnectionViewModel.selectedDeviceType.value!!)
+                    bleConnectionViewModel.connectToDevice(device, bleConnectionViewModel.selectedDeviceType.value!!)
+                }
             }
         }
 
@@ -444,6 +448,10 @@ class BloodSugarTestFragment() : BaseFragment() {
                 } else {
                     // Show empty state or message
                     Toast.makeText(requireContext(), "No devices found", Toast.LENGTH_SHORT).show()
+                    // deviceStatusViewModel is activity-scoped (shared across every test screen),
+                    // so this terminal empty result must be consumed or it replays on the next
+                    // screen/subscribe.
+                    deviceStatusViewModel.clearScanState()
                 }
             }
 

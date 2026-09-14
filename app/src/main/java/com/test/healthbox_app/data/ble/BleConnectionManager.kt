@@ -912,6 +912,12 @@ class BleConnectionManager @Inject constructor(
                 DeviceType.GLUCOSE_METER -> {
                     // Configure glucose meter services
                 }
+
+                DeviceType.HBA1C_METER -> {
+                    // A1cEZ 2.0 pushes its record unsolicited once a test completes.
+                    // Notifications are enabled on demand from the HbA1c screen, so
+                    // there is nothing to configure at service-discovery time.
+                }
                 // Add other device types as needed
                 DeviceType.HEIGHT -> {
 

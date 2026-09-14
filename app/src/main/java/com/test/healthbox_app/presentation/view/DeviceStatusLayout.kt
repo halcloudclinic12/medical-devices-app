@@ -1,6 +1,7 @@
 package com.test.healthbox_app.presentation.view
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +9,8 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.findViewTreeLifecycleOwner
+import com.google.android.material.snackbar.Snackbar
+import com.test.healthbox_app.MainActivity
 import com.test.healthbox_app.R
 import com.test.healthbox_app.databinding.DeviceStatusLayoutBinding
 import com.test.healthbox_app.presentation.view.deviceStatus.DeviceStatusViewModel
@@ -95,7 +98,37 @@ class DeviceStatusLayout : ConstraintLayout {
     }
 
     // Add a method to set up click listeners that can be configured from the fragment
+    //
+    // This is the single choke point every screen's Scan button routes through, so it also
+    // doubles as the universal "Bluetooth is off" gate: before the fragment's own listener
+    // runs, Bluetooth is confirmed on (or the user is prompted to turn it on via the system
+    // dialog). Without this, screens see an empty scan result and misreport it as
+    // "No devices found" instead of asking the user to enable Bluetooth.
     fun setOnScanClickListener(listener: OnClickListener) {
-        binding.buttonScan.setOnClickListener(listener)
+        binding.buttonScan.setOnClickListener { view ->
+            val activity = findHostActivity()
+            if (activity == null) {
+                listener.onClick(view)
+                return@setOnClickListener
+            }
+            activity.ensureBluetoothEnabled { enabled ->
+                if (enabled) {
+                    listener.onClick(view)
+                } else {
+                    Snackbar.make(this, "Bluetooth is turned off. Please turn it on to scan for devices.", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    /** A custom view's `context` is usually the hosting Activity, but data-binding inflation
+     *  can hand back a themed ContextWrapper around it, so unwrap defensively. */
+    private fun findHostActivity(): MainActivity? {
+        var ctx: Context? = context
+        while (ctx != null) {
+            if (ctx is MainActivity) return ctx
+            ctx = (ctx as? ContextWrapper)?.baseContext
+        }
+        return null
     }
 }

@@ -276,10 +276,12 @@ class ReportsFragment() : BaseFragment() {
         binding.buttonPrintLayout.setOnClickListener {
 
             if (!isPrinting) {
-                bleConnectionViewModel.printText(getPrintText())
+                ensureBluetoothEnabled(binding.root) {
+                    bleConnectionViewModel.printText(getPrintText())
 
-                binding.lottieAnimationView.playAnimation()
-                binding.lottieAnimationView.visibility = View.VISIBLE
+                    binding.lottieAnimationView.playAnimation()
+                    binding.lottieAnimationView.visibility = View.VISIBLE
+                }
 
             } else {
 
@@ -320,47 +322,49 @@ class ReportsFragment() : BaseFragment() {
     private fun observePrintStatus() {
 
         viewLifecycleOwner.lifecycleScope.launch {
-            bleConnectionViewModel.printState.collect { state ->
-                when (state) {
-                    is PrintState.Error -> {
-                        isPrinting = false
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                bleConnectionViewModel.printState.collect { state ->
+                    when (state) {
+                        is PrintState.Error -> {
+                            isPrinting = false
 
-                        binding.lottieAnimationView.cancelAnimation()
-                        binding.lottieAnimationView.visibility = View.GONE
+                            binding.lottieAnimationView.cancelAnimation()
+                            binding.lottieAnimationView.visibility = View.GONE
 
-                        CustomSnackBar.make(
-                            binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
-                        ).show()
+                            CustomSnackBar.make(
+                                binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
+                            ).show()
 
-                        if (state.message == "Device not connected") {
-                            binding.buttonPrintLayout.visibility = View.GONE
-                            binding.buttonConnectPrinterLayout.visibility = View.VISIBLE
+                            if (state.message == "Device not connected") {
+                                binding.buttonPrintLayout.visibility = View.GONE
+                                binding.buttonConnectPrinterLayout.visibility = View.VISIBLE
+                            }
+
+                        }
+
+                        PrintState.Idle -> {
+                            isPrinting = false
+
+                            binding.lottieAnimationView.cancelAnimation()
+                            binding.lottieAnimationView.visibility = View.GONE
+                        }
+
+                        PrintState.Loading -> {
+
+                        }
+
+                        is PrintState.Success -> {
+                            isPrinting = false
+
+                            binding.lottieAnimationView.cancelAnimation()
+                            binding.lottieAnimationView.visibility = View.GONE
+
+                            CustomSnackBar.make(
+                                binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.SUCCESS
+                            ).show()
                         }
 
                     }
-
-                    PrintState.Idle -> {
-                        isPrinting = false
-
-                        binding.lottieAnimationView.cancelAnimation()
-                        binding.lottieAnimationView.visibility = View.GONE
-                    }
-
-                    PrintState.Loading -> {
-
-                    }
-
-                    is PrintState.Success -> {
-                        isPrinting = false
-
-                        binding.lottieAnimationView.cancelAnimation()
-                        binding.lottieAnimationView.visibility = View.GONE
-
-                        CustomSnackBar.make(
-                            binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.SUCCESS
-                        ).show()
-                    }
-
                 }
             }
         }

@@ -61,6 +61,31 @@ abstract class BaseFragment : Fragment() {
     }
 
     /**
+     * Universal guard for any user-initiated Bluetooth action (scan, connect, print, ...).
+     * If Bluetooth is already on, [onEnabled] runs immediately. If it's off, the user is shown
+     * the system "Turn on Bluetooth?" prompt; [onEnabled] runs only if they accept, otherwise
+     * [rootView] gets a snackbar explaining why nothing happened.
+     *
+     * Call this at the entry point of the action (a button click), not from a passive observer
+     * (e.g. a saved-device auto-connect on screen entry) — that would pop the system dialog
+     * unprompted just from navigating to the screen.
+     */
+    fun ensureBluetoothEnabled(rootView: View, onEnabled: () -> Unit) {
+        val activity = mActivity ?: return
+        activity.ensureBluetoothEnabled { enabled ->
+            if (enabled) {
+                onEnabled()
+            } else {
+                showSnackBar(
+                    rootView,
+                    "Bluetooth is turned off. Please turn it on to continue.",
+                    CustomSnackBar.Companion.SnackBarType.ERROR
+                )
+            }
+        }
+    }
+
+    /**
      * Call this inside onViewCreated of child fragments
      * and pass the included user info view root.
      */

@@ -42,7 +42,13 @@ private fun resolveDeviceType(scanResult: ScanResult): DeviceType? {
 
         deviceName.contains("JPD BPM", ignoreCase = true) || deviceName.contains("Blood", ignoreCase = true) -> DeviceType.BLOOD_PRESSURE_MONITOR
 
-        deviceName.contains("HbCheck", ignoreCase = true) || deviceName.contains("Hb", ignoreCase = true) -> DeviceType.HB_CHECK
+        // HbA1c meter (A1cEZ 2.0). MUST stay above the HbCheck branch — the meter
+        // identifies itself as "HbA1c-…", so any loose "Hb" match would swallow it.
+        // Confirmed against a real meter (adv name "HbA1c-EJB24510443") on 2026-09-13.
+        deviceName.contains("A1cEZ", ignoreCase = true) ||
+                deviceName.contains("HbA1c", ignoreCase = true) -> DeviceType.HBA1C_METER
+
+        deviceName.contains("HbCheck", ignoreCase = true) -> DeviceType.HB_CHECK
 
         deviceName.contains("LYSUN", ignoreCase = true) || deviceName.contains("LYSUN BGM", ignoreCase = true) -> DeviceType.GLUCOSE_METER
 

@@ -270,13 +270,15 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
 
     private fun nextTestCall() {
         binding.buttonStartWeight.setOnClickListener { view ->
+            ensureBluetoothEnabled(binding.root) {
 //            showDialog()
 
-            binding.rvWeightResults.visibility = View.GONE
+                binding.rvWeightResults.visibility = View.GONE
 
-            weightMeasurementsList = emptyList()
+                weightMeasurementsList = emptyList()
 
-            scan()
+                scan()
+            }
         }
 
         binding.buttonNextLayout.setOnClickListener { view ->
@@ -507,6 +509,10 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
                 } else {
                     // Show empty state or message
                     Toast.makeText(requireContext(), "No devices found", Toast.LENGTH_SHORT).show()
+                    // deviceStatusViewModel is activity-scoped (shared across every test screen),
+                    // so this terminal empty result must be consumed or it replays on the next
+                    // screen/subscribe.
+                    deviceStatusViewModel.clearScanState()
                 }
             }
 

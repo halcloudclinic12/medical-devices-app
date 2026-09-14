@@ -62,32 +62,44 @@ class BleScanner @Inject constructor(
         val scanResults = CopyOnWriteArrayList<ScanResult>()
 
         scanCallback = object : ScanCallback() {
+            // Android's very first advertisement packet from a device very often arrives
+            // without a name (the name comes in a later packet/scan response), so most scans
+            // start with one or more callbacks that add nothing. Previously trySend() ran
+            // unconditionally here, so that first no-op callback emitted scanResults.toList()
+            // while it was still empty — the UI read that as "scan finished, 0 devices" and
+            // showed "No devices found" a split second after Scan was pressed, well before the
+            // scan actually finished. Only emit when a named device was actually added/updated.
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 Log.i("scanCallBackDevice", "  : 59  : ${result.device.name}   :   ${result.device.address}   :   ${result.device.type}")
+                if (result.device.name.isNullOrEmpty()) return
+
                 val existingPosition = scanResults.indexOfFirst { it.device.address == result.device.address }
-                if (existingPosition >= 0 && !result.device.name.isNullOrEmpty()) {
-                    Log.i("scanCallBackDevice", "  : 62  : ${result.device.name}   :   ${result.device.address}   :   ${result.device.type}")
+                if (existingPosition >= 0) {
                     scanResults[existingPosition] = result
+                } else if (!scanResults.contains(result)) {
+                    scanResults.add(result)
                 } else {
-                    Log.e("scanCallBackDevice", "  : 67 : ${result.device.name}   :   ${result.device.address}   :   ${result.device.type}")
-                    if (!scanResults.contains(result) && !result.device.name.isNullOrEmpty())
-                        scanResults.add(result)
+                    return
                 }
                 trySend(scanResults.toList())
             }
 
             override fun onBatchScanResults(results: MutableList<ScanResult>) {
+                var changed = false
                 for (result in results) {
-                    val existingPosition = scanResults.indexOfFirst { it.device.address == result.device.address }
                     Log.e("scanCallBackDevice", "  : 82 : ${result.device.name}   :   ${result.device.address}   :   ${result.device.type}")
-                    if (existingPosition >= 0 && !result.device.name.isNullOrEmpty()) {
+                    if (result.device.name.isNullOrEmpty()) continue
+
+                    val existingPosition = scanResults.indexOfFirst { it.device.address == result.device.address }
+                    if (existingPosition >= 0) {
                         scanResults[existingPosition] = result
-                    } else {
-                        if (!scanResults.contains(result))
-                            scanResults.add(result)
+                        changed = true
+                    } else if (!scanResults.contains(result)) {
+                        scanResults.add(result)
+                        changed = true
                     }
                 }
-                trySend(scanResults.toList())
+                if (changed) trySend(scanResults.toList())
             }
 
             override fun onScanFailed(errorCode: Int) {
@@ -108,6 +120,11 @@ class BleScanner @Inject constructor(
         launch {
             delay(timeout)
             Log.d(tag, "Scan timeout reached, closing channel")
+            // Emit the definitive final result before closing — including an empty list when
+            // nothing was ever found — so a genuine "scanned the full duration, no devices"
+            // outcome is actually reported instead of leaving the collector (and its progress
+            // dialog) waiting forever with no final emission.
+            trySend(scanResults.toList())
             close() // ← triggers awaitClose below
         }
 

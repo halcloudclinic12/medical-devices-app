@@ -1,9 +1,18 @@
 package com.test.healthbox_app
 
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.test.healthbox_app.base.BaseActivity
@@ -19,6 +28,84 @@ class MainActivity : BaseActivity() {
     val bleViewModel: BleConnectionViewModel by viewModels()
 
     var navController: NavController? = null
+
+    // ── Universal "Bluetooth is off" gate ──────────────────────────────────────
+    //
+    // Every Bluetooth operation anywhere in the app (BLE scan, BLE connect, classic
+    // Bluetooth printer, ...) should call ensureBluetoothEnabled() first instead of
+    // assuming the adapter is on. This is the single place that can show the system
+    // "Turn on Bluetooth?" dialog, since only an Activity can register an
+    // ActivityResultLauncher, and MainActivity is the only Activity in this app.
+
+    private var pendingBluetoothEnableCallback: ((Boolean) -> Unit)? = null
+
+    private val enableBluetoothLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val adapter = bluetoothAdapter()
+        // Some OEM builds report RESULT_CANCELED from this dialog even though the user
+        // accepted and the adapter did turn on, so trust the adapter's own state too.
+        val enabled = result.resultCode == Activity.RESULT_OK || adapter?.isEnabled == true
+        pendingBluetoothEnableCallback?.invoke(enabled)
+        pendingBluetoothEnableCallback = null
+    }
+
+    private val bluetoothConnectPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            launchEnableBluetoothDialog()
+        } else {
+            pendingBluetoothEnableCallback?.invoke(false)
+            pendingBluetoothEnableCallback = null
+        }
+    }
+
+    private fun bluetoothAdapter(): BluetoothAdapter? =
+        (getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter
+
+    /**
+     * Ensures Bluetooth is on before a Bluetooth operation runs.
+     *  - Already on: [onResult] fires immediately with `true`.
+     *  - Off: shows the system "Turn on Bluetooth?" prompt (requesting the BLUETOOTH_CONNECT
+     *    runtime permission first on Android 12+ if it isn't granted yet) and [onResult] fires
+     *    once with the outcome — `true` only if the user accepted.
+     *  - No adapter on this device: fires `false` immediately.
+     *
+     * Only one request is tracked at a time; a second call before the first resolves replaces
+     * the pending callback, which is fine since the system dialog is modal.
+     */
+    fun ensureBluetoothEnabled(onResult: (Boolean) -> Unit) {
+        val adapter = bluetoothAdapter()
+        if (adapter == null) {
+            onResult(false)
+            return
+        }
+        if (adapter.isEnabled) {
+            onResult(true)
+            return
+        }
+
+        pendingBluetoothEnableCallback = onResult
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            bluetoothConnectPermissionLauncher.launch(android.Manifest.permission.BLUETOOTH_CONNECT)
+        } else {
+            launchEnableBluetoothDialog()
+        }
+    }
+
+    private fun launchEnableBluetoothDialog() {
+        try {
+            enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+        } catch (e: SecurityException) {
+            pendingBluetoothEnableCallback?.invoke(false)
+            pendingBluetoothEnableCallback = null
+        }
+    }
 
     interface onBackPressListener {
         fun onBackPress()

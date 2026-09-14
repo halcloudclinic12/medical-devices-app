@@ -67,6 +67,10 @@ class ConnectedDevicesListAdapter @Inject constructor(
                     title = "Glucose Meter"
                 }
 
+                DeviceType.HBA1C_METER -> {
+                    title = "HbA1c Meter"
+                }
+
                 DeviceType.BT_PRINTER -> {
                     title = "Printer"
                 }

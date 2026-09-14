@@ -48,6 +48,16 @@ class DeviceStatusViewModel @Inject constructor(
     }
 
     fun startScan(scanDuration: Long = 10000) {
+        // Defensive net only: callers are expected to gate on MainActivity.ensureBluetoothEnabled()
+        // before invoking this (see DeviceStatusLayout.setOnScanClickListener and
+        // BaseFragment.ensureBluetoothEnabled), which prompts the user to turn Bluetooth on.
+        // If one of those is ever bypassed, silently no-op rather than starting a scan that
+        // BleScanner would immediately fail anyway.
+        if (!bluetoothUseCases.isBluetoothEnabled()) {
+            Log.w("DeviceStatusViewModel", "startScan() called while Bluetooth is disabled")
+            return
+        }
+
         viewModelScope.launch {
             _scanState.value = ScanState.Scanning
 
@@ -77,10 +87,29 @@ class DeviceStatusViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Clears the scanned-devices list after a device is picked/connected (called from each test
+     * fragment's onXConnected()). This must reset to Idle, not DevicesFound(emptyList()) — every
+     * fragment's scanState observer treats DevicesFound(emptyList()) as "scan finished, found
+     * nothing" and shows a "No devices found" message, which would misfire here even though no
+     * scan ever ran and the connection actually succeeded.
+     */
     fun updateScannedDevicesList() {
-        _scanState.value = ScanState.DevicesFound(emptyList())
+        _scanState.value = ScanState.Idle
     }
 
+    /**
+     * Consumes a terminal DevicesFound(emptyList()) result after the fragment has already shown
+     * "No devices found" for it. This ViewModel is activity-scoped (shared across every test
+     * screen via activityViewModels()), so without this, the StateFlow keeps holding that value
+     * and replays it — misfiring the same message — to any collector that (re)subscribes later:
+     * navigating back to this screen, backgrounding/foregrounding, or opening a different test
+     * screen that never scanned at all. Call this only from the empty-DevicesFound branch, right
+     * after showing the message; never from Error or a non-empty DevicesFound branch.
+     */
+    fun clearScanState() {
+        _scanState.value = ScanState.Idle
+    }
 
 //    https://claude.ai/share/7ff5eb17-3a33-425f-8ced-cd6aa8586cd2
 

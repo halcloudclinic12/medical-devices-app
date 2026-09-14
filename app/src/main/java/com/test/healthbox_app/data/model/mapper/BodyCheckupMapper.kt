@@ -2,6 +2,7 @@ package com.test.healthbox_app.data.model.mapper
 
 import com.test.healthbox_app.data.model.BodyCheckupPref
 import com.test.healthbox_app.domain.model.request.BasicTestRequest
+import com.test.healthbox_app.domain.model.request.Hba1cTestRequest
 
 fun BodyCheckupPref.toBasicTestRequestDto(): BasicTestRequest {
     return BasicTestRequest(
@@ -79,5 +80,15 @@ fun BodyCheckupPref.toBasicTestRequestDto(): BasicTestRequest {
 
         hemoglobin = hemoglobin,
         hemoglobinResult = hemoglobin_result
+    )
+}
+
+fun BodyCheckupPref.toHba1cTestRequestDto(): Hba1cTestRequest {
+    return Hba1cTestRequest(
+        patientId = patient_ID ?: "",
+        clinicId = clinic_ID ?: "",
+
+        hba1c = hba1c,
+        hba1cResult = hba1c_result
     )
 }

@@ -9,5 +9,6 @@ enum class DeviceType {
     BLOOD_PRESSURE_MONITOR,
     HB_CHECK,
     GLUCOSE_METER,
+    HBA1C_METER,
     BT_PRINTER
 }

@@ -133,6 +133,10 @@ class ConnectedDevicesFragment() : BaseFragment() {
                     deviceTypeName = "Glucose Meter"
                 }
 
+                DeviceType.HBA1C_METER -> {
+                    deviceTypeName = "HbA1c Meter"
+                }
+
                 DeviceType.BT_PRINTER -> {
                     deviceTypeName = "Printer"
                 }

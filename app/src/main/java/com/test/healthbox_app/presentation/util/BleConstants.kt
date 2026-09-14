@@ -42,6 +42,19 @@ object BleConstants {
 //    const val GLUCOSE_RECORD_ACCESS_POINT_CHARACTERISTIC_UUID = "00002A52-0000-1000-8000-00805f9b34fb"
 //    const val GLUCOSE_MEASUREMENT_CONTEXT_CHARACTERISTIC_UUID = "00002A34-0000-1000-8000-00805f9b34fb"
 
+    // HbA1c Service — A1cEZ 2.0 meter
+    // Confirmed against GlucoA1c_BLE_DevManual.pdf (LightBlue screenshots, pages 2-3) and
+    // against a real HbA1c-EJB24510443 meter on 2026-09-13: service FFE0, single
+    // characteristic FFE1 (properties: Read, Write Without Response, Notify) — the meter
+    // has no separate write characteristic, unlike the FFF0/FFF1/FFF2 family guessed
+    // earlier from the other meters in the box, which is why the first connect attempt
+    // failed with "Service not found: 0000fff0-...".
+    // Deliberately separate constants from GLUCOSE_QPP_* — the HbA1c meter must NOT go
+    // through QppManager.
+    const val HBA1C_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb"
+    const val HBA1C_MEASUREMENT = "0000ffe1-0000-1000-8000-00805f9b34fb"  // notify
+    const val HBA1C_WRITE = "0000ffe1-0000-1000-8000-00805f9b34fb"        // same characteristic; no start command is documented, so unused today
+
     // Battery Service
     const val BATTERY_SERVICE = "0000180f-0000-1000-8000-00805f9b34fb"
     const val BATTERY_LEVEL = "00002a19-0000-1000-8000-00805f9b34fb"
