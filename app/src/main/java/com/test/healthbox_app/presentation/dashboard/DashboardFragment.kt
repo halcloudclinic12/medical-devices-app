@@ -129,8 +129,17 @@ class DashboardFragment() : BaseFragment() {
 
         binding.healthCheckupLayout.setOnClickListener {
 
-            //Setting Height Screen as current Step
-            stepsViewModel.updateStepStatus(stepId = 0, status = StepStatus.CURRENT)
+            // stepsViewModel is activity-scoped and survives across a whole completed
+            // Basic Tests run. updateStepStatus(CURRENT) only demotes whichever step was
+            // CURRENT to COMPLETED and sets Height CURRENT — every OTHER step from a
+            // previous completed run (Temperature, Pulse, Weight, Vision, BP, Sugar,
+            // Hemoglobin) was already COMPLETED and stays that way, so restarting from
+            // here used to show a stale, already-"finished" sidebar instead of a fresh
+            // one. resetSteps() puts Height back to CURRENT and every other step back to
+            // PENDING, matching an actual fresh start. This is also the entry point users
+            // reach without going through Results' "Home" button (which already does its
+            // own resetSteps()), e.g. after a system back-press chain.
+            stepsViewModel.resetSteps()
 
             mActivity?.navController?.navigate(R.id.start_health_checkup_height_action)
         }

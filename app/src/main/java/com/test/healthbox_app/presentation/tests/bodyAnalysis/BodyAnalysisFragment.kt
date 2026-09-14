@@ -22,6 +22,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import cn.net.aicare.algorithmutil.AlgorithmUtil
 import cn.net.aicare.modulelibrary.module.utils.AicareBleConfig
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.test.healthbox_app.BleConnectionViewModel
 import com.test.healthbox_app.BroadcastDataParsing
@@ -228,8 +229,18 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
 
         stopScan()
 
-        AILinkBleManager.getInstance().startScan(1000, emptyList())
-//        AILinkBleManager.getInstance().startScan(0)
+        // The first argument is a scan TIMEOUT in ms, not an interval — 1000 stopped the scan
+        // after 1s. That's long enough to catch the scale's early real-time (weightStatus=0x00)
+        // broadcasts (which is why the live weight field on screen was updating fine), but a
+        // body-fat scale typically takes several seconds to settle before it sends the final
+        // stable reading (weightStatus=0x01, handled in getWeightData() below) — so that one
+        // was arriving after the scan had already stopped and was silently missed. Pressing
+        // "Retest" started a fresh 1s scan later, by which point the scale was already sending
+        // its settled value, so it looked like Retest was needed to "fetch" the result. The
+        // vendor SDK's own reference sample (pingwang bodyfat demo) uses 0 here — scan with no
+        // timeout — and relies on initBodyFatDataCalculation() below to call stopScan() once the
+        // stable result actually arrives, which this file already does.
+        AILinkBleManager.getInstance().startScan(0, emptyList())
     }
 
     private fun startWeighingProcess() {
@@ -704,10 +715,29 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
 
         if (weightStatus == 0x01 && weight > 0) {
 
+            // BodyCheckupPref.height is saved verbatim from the Height screen's edit field,
+            // which is set to "Err" when that device reports a failed reading (error == "F")
+            // — the Height screen only blocks Next on an EMPTY field, not on "Err". An
+            // uncaught NumberFormatException here (this runs on the vendor SDK's broadcast
+            // callback thread, not a place that shows a crash dialog) silently aborts before
+            // setWeightResults() is ever called, so nothing gets saved to BodyCheckupPref and
+            // the Results screen shows a blank Weight/BMI/etc. row with no visible error.
+            val heightCm = BodyCheckupPref.height?.toIntOrNull()
+            if (heightCm == null) {
+                Log.e(TAG, "WeighingScaleLogs  : BodyFat  ::::  Skipped — invalid height '${BodyCheckupPref.height}', cannot compute body fat data")
+
+                mActivity?.runOnUiThread {
+                    CustomSnackBar.make(
+                        binding.root, "Height reading was invalid. Please redo the Height test before weighing.", Snackbar.LENGTH_LONG, CustomSnackBar.Companion.SnackBarType.ERROR
+                    ).show()
+                }
+                return
+            }
+
             initBodyFatDataCalculation(
                 sex = if (PatientPref.patient?.gender == "Male") 1 else 2,
                 age = DatePickerUtil.getAgeFromDob(PatientPref.patient?.dateOfBirth.toString()),
-                height = BodyCheckupPref.height.toString().toInt(),
+                height = heightCm,
                 weight = weight,
                 adc = adc
             )

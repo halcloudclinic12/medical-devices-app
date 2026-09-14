@@ -116,6 +116,14 @@ class HeightFragment() : BaseFragment() {
     private fun setAndObserveDeviceAvailability() {
         bleConnectionViewModel.setDeviceType(DeviceType.HEIGHT)
 
+        // selectedDevice is a single, activity-scoped StateFlow shared by every test
+        // screen. A StateFlow replays its current value to a new collector immediately,
+        // so without this clear, the collect{} below fires first with whatever device the
+        // PREVIOUS screen left behind and connects to it under the HEIGHT device type —
+        // then fires again once getDevice() below resolves the real one. That double/wrong
+        // connect is what made reconnecting on return visits unreliable.
+        bleConnectionViewModel.setSelectedDevice(null)
+
         bleConnectionViewModel.getDevice()
 
         if (bleConnectionViewModel.selectedDevice.value == null) {
@@ -142,7 +150,12 @@ class HeightFragment() : BaseFragment() {
         binding.buttonNextLayout.setOnClickListener { view ->
             mActivity?.let {
 
-                if (binding.editHeight.text.toString().isEmpty()) {
+                // editHeight can also hold "Err" (device reported a failed reading — see
+                // observeDataState()) or a stale value left over from before a reconnect.
+                // Both used to pass this check since it only tested for empty, and would get
+                // written verbatim into BodyCheckupPref.height — which later crashed the
+                // Weight screen's height.toInt() and silently dropped its results.
+                if (binding.editHeight.text.toString().isEmpty() || binding.editHeight.text.toString().toIntOrNull() == null) {
                     CustomSnackBar.make(
                         binding.root, "Perform Height test first", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.WARNING
                     ).show()
@@ -238,56 +251,68 @@ class HeightFragment() : BaseFragment() {
                 bleConnectionViewModel.connectionState.collect { connectionStateMap ->
                     Log.e("connectionState", "   :   " + connectionStateMap)
 
-                    connectionStateMap.forEach { (deviceType, state) ->
-                        when (state) {
+                    // connectionStateMap is shared/activity-scoped and accumulates one entry
+                    // per device type ever visited (HEIGHT, THERMOMETER, PULSE, ...). This used
+                    // to iterate every entry and, for Disconnected, check the CURRENT SCREEN's
+                    // selectedDeviceType instead of THIS entry's own deviceType — so a stale
+                    // THERMOMETER=Disconnected (or any other non-HEIGHT) entry from a previous
+                    // run would still pass that check while on the Height screen and immediately
+                    // flip the UI back to "Disconnected" right after the real HEIGHT=Connected
+                    // entry had just set it to "Connected" moments earlier in the same forEach.
+                    // Net effect: the device would genuinely connect (proven by getHeight()
+                    // successfully sending/receiving) but the status label stayed stuck on
+                    // Disconnected. Only react to the entry that's actually this screen's device.
+                    val state = connectionStateMap[DeviceType.HEIGHT] ?: return@collect
 
-                            is ConnectionState.Connected -> {
-                                Log.e("scanStateHeight :  conn", "  :  ${ScanState.Connected}")
+                    when (state) {
 
-                                //To clear the scanned devices list
-                                deviceStatusViewModel.updateScannedDevicesList()
+                        is ConnectionState.Connected -> {
+                            Log.e("scanStateHeight :  conn", "  :  ${ScanState.Connected}")
 
-                                //Close BLE device dialog
-                                deviceListDialog.dismissDialog()
+                            //To clear the scanned devices list
+                            deviceStatusViewModel.updateScannedDevicesList()
 
-                                //Close loader after device connected
-                                hideDialog()
+                            //Close BLE device dialog
+                            deviceListDialog.dismissDialog()
 
-                                // Save the connected device in shared pref
-                                bleConnectionViewModel.selectedDevice.value?.let {
+                            //Close loader after device connected
+                            hideDialog()
 
-                                    bleConnectionViewModel.saveDevice(it)
-                                }
+                            // Save the connected device in shared pref
+                            bleConnectionViewModel.selectedDevice.value?.let {
 
-                                binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, true)
+                                bleConnectionViewModel.saveDevice(it)
+                            }
+
+                            binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, true)
 //                                binding.tvDeviceAvailability.text = "Connected"
 //                                binding.tvDeviceAvailability.setTextColor(mActivity?.resources!!.getColor(R.color.green))
-                            }
-
-                            is ConnectionState.Connecting -> {
-
-                            }
-
-                            is ConnectionState.Disconnected -> {
-//                                binding.tvDeviceAvailability.text = "Disconnected"
-                                if (bleConnectionViewModel.selectedDeviceType.value!!.equals(DeviceType.HEIGHT)) {
-
-                                    binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, false)
-
-                                    /*bleConnectionViewModel.connectToDevice(
-                                        bleConnectionViewModel.selectedDevice.value!!, bleConnectionViewModel.selectedDeviceType.value!!
-                                    )*/
-                                }
-
-                            }
-
-                            is ConnectionState.Error -> {
-                            }
-
-                            is ConnectionState.Paired -> TODO()
-
-                            is ConnectionState.PairedFailed -> TODO()
                         }
+
+                        is ConnectionState.Connecting -> {
+
+                        }
+
+                        is ConnectionState.Disconnected -> {
+//                                binding.tvDeviceAvailability.text = "Disconnected"
+                            binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, false)
+
+                            /*bleConnectionViewModel.connectToDevice(
+                                bleConnectionViewModel.selectedDevice.value!!, bleConnectionViewModel.selectedDeviceType.value!!
+                            )*/
+                        }
+
+                        is ConnectionState.Error -> {
+                        }
+
+                        // BT_PRINTER can reach these states from the Results screen and the
+                        // map is shared/activity-scoped, so entries for OTHER device types
+                        // keep arriving here forever. TODO() used to crash this collector
+                        // permanently the first time that happened, which looked like
+                        // "device never reconnects" on every screen after Results.
+                        is ConnectionState.Paired -> Unit
+
+                        is ConnectionState.PairedFailed -> Unit
                     }
                 }
             }

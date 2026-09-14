@@ -111,6 +111,14 @@ class BloodSugarTestFragment() : BaseFragment() {
     private fun setAndObserveDeviceAvailability() {
         bleConnectionViewModel.setDeviceType(DeviceType.GLUCOSE_METER)
 
+        // selectedDevice is a single, activity-scoped StateFlow shared by every test
+        // screen. A StateFlow replays its current value to a new collector immediately,
+        // so without this clear, the collect{} below fires first with whatever device the
+        // PREVIOUS screen left behind and connects to it under this device type — then
+        // fires again once getDevice() below resolves the real one. That double/wrong
+        // connect is what made reconnecting on return visits unreliable.
+        bleConnectionViewModel.setSelectedDevice(null)
+
         bleConnectionViewModel.getDevice()
 
         if (bleConnectionViewModel.selectedDevice.value == null) {
@@ -123,7 +131,12 @@ class BloodSugarTestFragment() : BaseFragment() {
             bleConnectionViewModel.selectedDevice.collect { device ->
                 Log.i(TAG, "selectedGluDeviceLogsObs : Device ::  $device")
 
-                if (device != null) {
+                // selectedDevice is shared across every screen. Even with the clear above, a
+                // later screen can push a new value into this same StateFlow while this
+                // collector is still alive; guard on the device's own deviceType (rather than
+                // the shared selectedDeviceType field, which can be raced the same way) so we
+                // never connect to a device that belongs to a different screen.
+                if (device != null && device.deviceType == DeviceType.GLUCOSE_METER) {
                     binding.deviceStatusLayout.setUpDeviceAvailability(true)
 
                     bleConnectionViewModel.connectToDevice(device, bleConnectionViewModel.selectedDeviceType.value!!)
@@ -200,6 +213,15 @@ class BloodSugarTestFragment() : BaseFragment() {
     }
 
     fun disconnectDevice() {
+        // Unlike the Next-button path above, this used to only null the ViewModel state
+        // without ever closing the GATT connection — so jumping to another screen via the
+        // steps sidebar left the glucose meter's BLE link open in the background.
+        bleConnectionViewModel.selectedDevice.value?.let { device ->
+            bleConnectionViewModel.selectedDeviceType.value?.let { deviceType ->
+                bleConnectionViewModel.disconnect(device, deviceType)
+            }
+        }
+
         bleConnectionViewModel.setSelectedDevice(null)
 
         bleConnectionViewModel.setDeviceType(null)
@@ -268,78 +290,90 @@ class BloodSugarTestFragment() : BaseFragment() {
                 bleConnectionViewModel.connectionState.collect { connectionStateMap ->
                     Log.i("connectionState Glucose Logs :", "   :   " + connectionStateMap)
 
-                    connectionStateMap.forEach { (deviceType, state) ->
-                        when (state) {
+                    // connectionStateMap is shared/activity-scoped and accumulates one entry
+                    // per device type ever visited (HEIGHT, THERMOMETER, PULSE, ...). This used
+                    // to iterate every entry: the Disconnected branch checked the CURRENT
+                    // SCREEN's selectedDeviceType instead of THIS entry's own deviceType (so a
+                    // stale non-GLUCOSE_METER Disconnected/Error entry could flip the UI back to
+                    // "Disconnected" right after a real GLUCOSE_METER=Connected had just set it
+                    // to Connected), and the Connected branch called getGlucoseData() once per
+                    // Connected entry in the whole map — not just for the glucose meter. Only
+                    // react to this screen's own entry.
+                    val state = connectionStateMap[DeviceType.GLUCOSE_METER] ?: return@collect
 
-                            is ConnectionState.Connected -> {
-                                Log.i("scanStateGlucose :  conn", "  :  ${ScanState.Connected}")
+                    when (state) {
 
-                                hideDialog()
+                        is ConnectionState.Connected -> {
+                            Log.i("scanStateGlucose :  conn", "  :  ${ScanState.Connected}")
 
-                                //To clear the scanned devices list
-                                deviceStatusViewModel.updateScannedDevicesList()
+                            hideDialog()
 
-                                //Close BLE device dialog
-                                deviceListDialog.dismissDialog()
+                            //To clear the scanned devices list
+                            deviceStatusViewModel.updateScannedDevicesList()
 
-                                //Close loader after device connected
+                            //Close BLE device dialog
+                            deviceListDialog.dismissDialog()
+
+                            //Close loader after device connected
 //                                hideDialog()
 
-                                // Save the connected device in shared pref
-                                bleConnectionViewModel.selectedDevice.value?.let { bleConnectionViewModel.saveDevice(it) }
+                            // Save the connected device in shared pref
+                            bleConnectionViewModel.selectedDevice.value?.let { bleConnectionViewModel.saveDevice(it) }
 
-                                binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, true)
+                            binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, true)
 //                                binding.tvDeviceAvailability.text = "Connected"
 //                                binding.tvDeviceAvailability.setTextColor(mActivity?.resources!!.getColor(R.color.green))
 
-                                bleConnectionViewModel.getGlucoseData()
-                            }
+                            bleConnectionViewModel.getGlucoseData()
+                        }
 
-                            is ConnectionState.Connecting -> {
+                        is ConnectionState.Connecting -> {
 
-                            }
+                        }
 
-                            is ConnectionState.Disconnected -> {
+                        is ConnectionState.Disconnected -> {
 
-                                hideDialog()
+                            hideDialog()
 //                                binding.tvDeviceAvailability.text = "Disconnected"
-                                if (bleConnectionViewModel.selectedDeviceType.value!!.equals(DeviceType.GLUCOSE_METER)) {
 
 //                                    binding.buttonStart.visibility = View.GONE
 
-                                    binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, false)
+                            binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, false)
 
-                                    if (binding.editBloodSugar.text.toString().isNotEmpty()) {
-                                        binding.buttonRetest.visibility = View.VISIBLE
-                                    } else {
-                                        binding.buttonStart.visibility = View.VISIBLE
-                                    }
-
-
-                                    /*bleConnectionViewModel.connectToDevice(
-                                        bleConnectionViewModel.selectedDevice.value!!, bleConnectionViewModel.selectedDeviceType.value!!
-                                    )*/
-                                }
+                            if (binding.editBloodSugar.text.toString().isNotEmpty()) {
+                                binding.buttonRetest.visibility = View.VISIBLE
+                            } else {
+                                binding.buttonStart.visibility = View.VISIBLE
                             }
 
-                            is ConnectionState.Error -> {
-                                println("device connection error :: ${state.message}")
 
-                                Toast.makeText(mActivity, state.message, Toast.LENGTH_LONG).show()
-
-                                hideDialog()
-
-                                if (binding.editBloodSugar.text.toString().isNotEmpty()) {
-                                    binding.buttonRetest.visibility = View.VISIBLE
-                                } else {
-                                    binding.buttonStart.visibility = View.VISIBLE
-                                }
-                            }
-
-                            is ConnectionState.Paired -> TODO()
-
-                            is ConnectionState.PairedFailed -> TODO()
+                            /*bleConnectionViewModel.connectToDevice(
+                                bleConnectionViewModel.selectedDevice.value!!, bleConnectionViewModel.selectedDeviceType.value!!
+                            )*/
                         }
+
+                        is ConnectionState.Error -> {
+                            println("device connection error :: ${state.message}")
+
+                            Toast.makeText(mActivity, state.message, Toast.LENGTH_LONG).show()
+
+                            hideDialog()
+
+                            if (binding.editBloodSugar.text.toString().isNotEmpty()) {
+                                binding.buttonRetest.visibility = View.VISIBLE
+                            } else {
+                                binding.buttonStart.visibility = View.VISIBLE
+                            }
+                        }
+
+                        // BT_PRINTER can reach these states from the Results screen and the
+                        // map is shared/activity-scoped, so entries for OTHER device types
+                        // keep arriving here forever. TODO() used to crash this collector
+                        // permanently the first time that happened, which looked like
+                        // "device never reconnects" on every screen after Results.
+                        is ConnectionState.Paired -> Unit
+
+                        is ConnectionState.PairedFailed -> Unit
                     }
 
                 }

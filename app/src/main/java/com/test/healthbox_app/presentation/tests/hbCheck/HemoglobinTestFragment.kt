@@ -120,6 +120,17 @@ class HemoglobinTestFragment() : BaseFragment() {
     private fun setAndObserveDeviceAvailability() {
         bleConnectionViewModel.setDeviceType(DeviceType.HB_CHECK)
 
+        // selectedDevice is a single, activity-scoped StateFlow shared by every test
+        // screen. A StateFlow replays its current value to a new collector immediately,
+        // so without this clear, the collect{} below fires first with whatever device the
+        // PREVIOUS screen left behind and calls connectHBDevice() on it — then fires again
+        // once getDevice() below resolves the real HB_CHECK device. Each call spins up a
+        // brand-new ControlCentre/BluetoothLeService from the vendor SDK without tearing
+        // down the previous one, so two GATT clients end up racing to connect to the same
+        // meter address — which is exactly what produced the endless
+        // "onClientConnectionState() status=133 / Disconnected" loop in logcat.
+        bleConnectionViewModel.setSelectedDevice(null)
+
         bleConnectionViewModel.getDevice()
 
         if (bleConnectionViewModel.selectedDevice.value == null) {
@@ -132,7 +143,16 @@ class HemoglobinTestFragment() : BaseFragment() {
             bleConnectionViewModel.selectedDevice.collect { device ->
                 print("selectedHBDeviceLogsObs : Device ::  $device")
 
-                if (device != null) {
+                // selectedDevice is shared across every screen. Even with the clear above,
+                // a later screen (e.g. Results, setting BT_PRINTER) can push a new value into
+                // this same StateFlow while this collector is still alive, and it would be
+                // wrongly treated as "the HB_CHECK device is now available" — spinning up a
+                // second, wrong-protocol ControlCentre against that device's address (this is
+                // what produced the endless status=133 reconnect loop seen in logcat, where
+                // connectHBDevice() was called with the BT_PRINTER's BleDevice). Guard on the
+                // device's own deviceType rather than the shared selectedDeviceType field,
+                // since that field can be raced the same way.
+                if (device != null && device.deviceType == DeviceType.HB_CHECK) {
                     binding.deviceStatusLayout.setUpDeviceAvailability(true)
 
                     bleConnectionViewModel.connectHBDevice(device, mActivity!!)

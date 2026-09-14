@@ -49,7 +49,6 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/imageView6" />
 
-
                     <ImageView
                         android:id="@+id/imageView6"
                         android:layout_width="0dip"

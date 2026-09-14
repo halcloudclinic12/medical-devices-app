@@ -184,22 +184,27 @@ class BleConnectionViewModel @Inject constructor(
 
         Log.e("getHeightLogs", "   :  " + connectedDevices.values + "  :  ${connectionState.value}")
 
-        connectionState.value.forEach { deviceType, connectionState ->
-            if (deviceType.equals(selectedDeviceType.value) && connectionState.equals(ConnectionState.Connected)) {
-                val serviceUuid = UUID.fromString(BleConstants.HEIGHT_SERVICE)
-                val characteristicUuid = UUID.fromString(BleConstants.HEIGHT_MEASUREMENT)
+        // NOTE: previously this did `connectionState.value.forEach { ... }`, iterating every
+        // device-type entry ever accumulated in the map (from other screens visited earlier
+        // in the flow). Any entry that wasn't (HEIGHT, Connected) fell into the `else` branch
+        // and called connectToDevice() again — redundantly reconnecting the Height device once
+        // per stale entry (e.g. 4x in a row). Look up only the HEIGHT entry directly instead,
+        // matching the pattern already used by getHba1cData().
+        val deviceType = selectedDeviceType.value ?: return
+        if (connectionState.value[deviceType] == ConnectionState.Connected) {
+            val serviceUuid = UUID.fromString(BleConstants.HEIGHT_SERVICE)
+            val characteristicUuid = UUID.fromString(BleConstants.HEIGHT_MEASUREMENT)
 
-                startListeningForResponses(serviceUuid, characteristicUuid, selectedDeviceType.value!!)
+            startListeningForResponses(serviceUuid, characteristicUuid, deviceType)
 
-                viewModelScope.launch {
-                    delay(1000)
+            viewModelScope.launch {
+                delay(1000)
 
-                    // Send "1" as the command
-                    sendCommand("1", serviceUuid, characteristicUuid, selectedDeviceType.value!!)
-                }
-            } else {
-                connectToDevice(selectedDevice.value!!, selectedDeviceType.value!!)
+                // Send "1" as the command
+                sendCommand("1", serviceUuid, characteristicUuid, deviceType)
             }
+        } else {
+            selectedDevice.value?.let { connectToDevice(it, deviceType) }
         }
     }
 
@@ -617,20 +622,20 @@ class BleConnectionViewModel @Inject constructor(
     fun getGlucoseData() {
         Log.e("getGlucoseDataLogs", "   : Get Glucose :  " + connectedDevices.values + "  :  ${connectionState.value}")
 
-        connectionState.value.forEach { deviceType, connectionState ->
+        // Same fix as getHeight(): don't forEach the whole connectionState map (it accumulates
+        // one entry per device type ever visited this session) — look up only this screen's
+        // entry directly, so stale entries from other screens don't trigger redundant
+        // connectToDevice() calls for the glucose meter.
+        val deviceType = selectedDeviceType.value ?: return
+        Log.e("getGlucoseDataLogs", "   : Get Glucose Device type :  " + deviceType + "  :  ${connectionState.value[deviceType]}")
 
-            Log.e("getGlucoseDataLogs", "   : Get Glucose Device type :  " + deviceType + "  :  ${selectedDeviceType.value}")
+        if (connectionState.value[deviceType] == ConnectionState.Connected) {
+            val serviceUuid = UUID.fromString(BleConstants.GLUCOSE_QPP_SERVICE)
+            val characteristicUuid = UUID.fromString(BleConstants.GLUCOSE_QPP_CHAR_NOTIFY)
 
-            if (deviceType.equals(selectedDeviceType.value) && connectionState.equals(ConnectionState.Connected)) {
-
-                val serviceUuid = UUID.fromString(BleConstants.GLUCOSE_QPP_SERVICE)
-                val characteristicUuid = UUID.fromString(BleConstants.GLUCOSE_QPP_CHAR_NOTIFY)
-
-                startListeningForResponses(serviceUuid, characteristicUuid, selectedDeviceType.value!!)
-
-            } else {
-                connectToDevice(selectedDevice.value!!, selectedDeviceType.value!!)
-            }
+            startListeningForResponses(serviceUuid, characteristicUuid, deviceType)
+        } else {
+            selectedDevice.value?.let { connectToDevice(it, deviceType) }
         }
     }
 
