@@ -177,13 +177,20 @@ class HeightFragment() : BaseFragment() {
 
                     delay(100)
 
+                    // Save before advancing the shared step list — goToNextStep() fires an
+                    // immediate LiveData update that the collapsed pill (still on-screen for
+                    // this fragment until navigate() below actually completes) reacts to. In
+                    // the other order, that pill would briefly count Height as "skipped"
+                    // rather than completed, for the instant between these two calls where
+                    // the step list already says Temperature is current but
+                    // BodyCheckupPref.height hasn't been written yet.
+                    saveHeightData()
+
                     stepsViewModel.goToNextStep()
 
                     bleConnectionViewModel.setSelectedDevice(null)
 
                     bleConnectionViewModel.setDeviceType(null)
-
-                    saveHeightData()
 
                     it.navController?.navigate(R.id.next_button_temperature_checkup_action)
                 }
@@ -202,8 +209,6 @@ class HeightFragment() : BaseFragment() {
         deviceListDialog = mActivity?.let {
             DeviceListDialog(it, onDeviceClose = {
                 deviceListDialog.dismissDialog()
-
-
             })
         }!!
 

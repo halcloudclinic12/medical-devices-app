@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Full-screen radial view of every step, opened from StepsLayout's "N Steps" toggle
+     (see StepsOrbitDialog.kt). The 8 nodeSlot views below are positioned once, here, using
+     ConstraintLayout's circular constraints (angle 0 = up, clockwise) around hubCenter;
+     StepsOrbitDialog only sets colors/text/visibility on top of them at runtime, it never
+     computes a position. Steps are matched to slots by StepItem.id, not list order.
+
+     The connector lines between them are drawn by OrbitConnectorView, not declared as
+     separate Views here — see that class for why and for the hub/node radius geometry. -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <FrameLayout
+        android:id="@+id/orbitRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingTop="32dp"
+        android:paddingBottom="32dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <!-- Top status pill. box_rounded_white, not bg_steps_pill — that one is shared
+                 with the always-visible collapsed header on every test screen, which should
+                 stay solid; this dialog's own surfaces (this bar and the canvas below) are
+                 translucent instead. -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="760dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/box_rounded_white"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="12dp">
+
+                <TextView
+                    android:id="@+id/tvOrbitTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_regular"
+                    android:text="Checkup Steps"
+                    android:textColor="@color/step_title_color"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvOrbitSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="@color/green"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@id/tvOrbitTitle"
+                    app:layout_constraintStart_toEndOf="@id/tvOrbitTitle"
+                    app:layout_constraintTop_toTopOf="@id/tvOrbitTitle"
+                    tools:text="Step 2 of 8 Active" />
+
+                <TextView
+                    android:id="@+id/btnCloseOrbit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_orbit_close_btn"
+                    android:fontFamily="@font/roboto_regular"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="6dp"
+                    android:text="Close (Esc)"
+                    android:textColor="@color/step_title_color"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Radial canvas. Height must clear, on every side, the farthest content a node
+                 can have: circle center at 190dp from hub + circle radius 34dp + (for the
+                 top/bottom nodes specifically) their title+status label below, ~50dp more.
+                 At 480dp the top node's circle and the bottom node's label both touched this
+                 card's edge; 600dp leaves a real margin on both. -->
+            <FrameLayout
+                android:id="@+id/orbitCanvas"
+                android:layout_width="760dp"
+                android:layout_height="600dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/box_rounded_white"
+                android:clickable="true"
+                android:focusable="true">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/orbitStage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <!-- Radiating connector lines, all 8 drawn by one view (see
+                         OrbitConnectorView) — must fill this exact ConstraintLayout region so
+                         its center coincides with hubCenter's. Declared first so hubCenter and
+                         the node slots below draw on top of it, covering the tail ends that
+                         would otherwise run under those circles. -->
+                    <com.test.healthbox_app.presentation.view.OrbitConnectorView
+                        android:id="@+id/orbitConnector"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <!-- Center hub: current step, no live measurement value (this dialog is
+                         shared by all 8 test screens, which each measure something different).
+                         Content is a single vertically-centered column, not top-anchored, so
+                         it sits in the middle of the circle regardless of how many lines wrap. -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/hubCenter"
+                        android:layout_width="128dp"
+                        android:layout_height="128dp"
+                        android:background="@drawable/bg_orbit_hub"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:id="@+id/tvHubEyebrow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_regular"
+                                android:gravity="center"
+                                android:text="CURRENT STATION"
+                                android:textColor="@color/green"
+                                android:textSize="8sp"
+                                android:textStyle="bold"
+                                tools:ignore="SmallSp" />
+
+                            <TextView
+                                android:id="@+id/tvHubStepTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/roboto_regular"
+                                android:gravity="center"
+                                android:maxLines="1"
+                                android:textColor="@color/step_title_color"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                tools:text="Temperature" />
+
+                            <TextView
+                                android:id="@+id/tvHubStepLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:background="@drawable/bg_chip_active"
+                                android:fontFamily="@font/roboto_regular"
+                                android:gravity="center"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="2dp"
+                                android:textColor="@color/green"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                tools:text="Step 2/8" />
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- 8 fixed node slots. StepsOrbitDialog inflates item_orbit_node.xml into
+                         whichever slot matches each StepItem.id, and hides unused slots. -->
+                    <FrameLayout
+                        android:id="@+id/nodeSlot1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintCircle="@id/hubCenter"
+                        app:layout_constraintCircleAngle="315"
+                        app:layout_constraintCircleRadius="190dp" />
+
+                    <FrameLayout
+                        android:id="@+id/nodeSlot2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintCircle="@id/hubCenter"
+                        app:layout_constraintCircleAngle="0"
+                        app:layout_constraintCircleRadius="190dp" />
+
+                    <FrameLayout
+                        android:id="@+id/nodeSlot3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintCircle="@id/hubCenter"
+                        app:layout_constraintCircleAngle="45"
+                        app:layout_constraintCircleRadius="190dp" />
+
+                    <FrameLayout
+                        android:id="@+id/nodeSlot4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintCircle="@id/hubCenter"
+                        app:layout_constraintCircleAngle="90"
+                        app:layout_constraintCircleRadius="190dp" />
+
+                    <FrameLayout
+                        android:id="@+id/nodeSlot5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintCircle="@id/hubCenter"
+                        app:layout_constraintCircleAngle="135"
+                        app:layout_constraintCircleRadius="190dp" />
+
+                    <FrameLayout
+                        android:id="@+id/nodeSlot6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintCircle="@id/hubCenter"
+                        app:layout_constraintCircleAngle="180"
+                        app:layout_constraintCircleRadius="190dp" />
+
+                    <FrameLayout
+                        android:id="@+id/nodeSlot7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintCircle="@id/hubCenter"
+                        app:layout_constraintCircleAngle="225"
+                        app:layout_constraintCircleRadius="190dp" />
+
+                    <FrameLayout
+                        android:id="@+id/nodeSlot8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintCircle="@id/hubCenter"
+                        app:layout_constraintCircleAngle="270"
+                        app:layout_constraintCircleRadius="190dp" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</layout>

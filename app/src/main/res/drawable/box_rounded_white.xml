@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translucent white card, used by the steps orbit dialog's radial canvas — lets the
+     dimmed screen behind the dialog show through rather than sitting on a solid white block. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="#CCFFFFFF" />
+
+    <corners android:radius="24dp" />
+
+</shape>

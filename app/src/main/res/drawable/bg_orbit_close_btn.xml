@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neutral pill for the orbit dialog's "Close" affordance — deliberately not the app's
+     teal/green accent, since it isn't a confirming action. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="#F1F5F9" />
+
+    <corners android:radius="20dp" />
+
+</shape>

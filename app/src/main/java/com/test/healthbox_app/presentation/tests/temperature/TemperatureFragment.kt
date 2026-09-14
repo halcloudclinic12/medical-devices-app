@@ -162,9 +162,11 @@ class TemperatureFragment() : BaseFragment() {
 
                 disconnectDevice()
 
-                stepsViewModel.goToNextStep()
-
+                // Save before advancing the shared step list — see the matching comment in
+                // HeightFragment.nextTestCall() for why the order matters here.
                 saveTemperatureData()
+
+                stepsViewModel.goToNextStep()
 
                 println("Body checkup response : Temp : -> ${BodyCheckupPref.temperature} ")
 

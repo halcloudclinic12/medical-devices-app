@@ -5,13 +5,146 @@
     android:layout_height="wrap_content"
     tools:ignore="MissingDefaultResource">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewSteps"
-        android:layout_width="match_parent"
+    <!-- Collapsed summary pill: current step, its status, the next step, and a toggle that
+         opens StepsOrbitDialog (a full-screen radial view of all steps). Bound from the
+         same List<StepItem> passed to setSteps().
+
+         Deliberately plain LinearLayouts, not ConstraintLayout: an earlier version anchored
+         tvActiveChip between tvCollapsedStepTitle's end and expandToggle's start, while the
+         row below it (tvNextStep/tvCompletedCount) had no connection to that same edge — so
+         whichever row's content was wider drove this pill's wrap_content width, and the
+         other row's anchors ended up in the wrong place, overlapping. A LinearLayout can't
+         do that: each child is placed strictly after the previous one's bounds. -->
+    <LinearLayout
+        android:id="@+id/collapsedHeader"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clipToPadding="false"
+        android:background="@drawable/bg_steps_pill"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp" />
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:id="@+id/tvStepBadge"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_step_current"
+            android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
+            android:textColor="@color/step_current"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="2/8" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvCollapsedStepTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="@color/step_title_color"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:text="Body Temperature" />
+
+                <TextView
+                    android:id="@+id/tvActiveChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_chip_active"
+                    android:fontFamily="@font/roboto_regular"
+                    android:paddingStart="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:text="Active"
+                    android:textColor="@color/green"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvNextStep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="@color/step_pending"
+                    android:textSize="12sp"
+                    tools:text="Next: SPO2" />
+
+                <TextView
+                    android:id="@+id/tvCompletedCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="@color/step_pending"
+                    android:textSize="12sp"
+                    tools:text="· 1 Completed" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/expandToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/bg_chip_active"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="6dp">
+
+            <TextView
+                android:id="@+id/tvStepsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:textColor="@color/green"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="8 Steps" />
+
+            <ImageView
+                android:id="@+id/ivExpandChevron"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_chevron_down"
+                android:tint="@color/green"
+                tools:ignore="UseAppTint" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </merge>

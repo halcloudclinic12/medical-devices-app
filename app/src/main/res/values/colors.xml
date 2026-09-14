@@ -32,6 +32,11 @@
     <color name="step_current">#2196F3</color>
     <color name="step_pending">#BDBDBD</color>
     <color name="step_pending_border">#E0E0E0</color>
+    <!-- Collapsed steps header (pill) -->
+    <color name="chip_active_bg">#1A009C63</color>
+    <!-- Steps orbit dialog: "next up" node accent -->
+    <color name="orbit_next">#F59E0B</color>
+    <color name="orbit_next_bg">#1AF59E0B</color>
 
 
     <!--    ***************-->

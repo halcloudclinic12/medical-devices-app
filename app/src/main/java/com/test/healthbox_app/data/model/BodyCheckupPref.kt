@@ -1,5 +1,7 @@
 package com.test.healthbox_app.data.model
 
+import com.test.healthbox_app.presentation.util.BasicHealthTestsType
+
 /*{
     "patient_id": "string",
     "clinic_id": "string",
@@ -293,6 +295,36 @@ object BodyCheckupPref {
     /** Classifies an NGSP % value without mutating stored state — for live UI display. */
     fun classifyHba1c(ngspPercent: Double?): String? =
         ngspPercent?.let { getResultFromRange(it, ParameterRanges.HBA1C) }
+
+    /**
+     * Whether a real value has been captured for the given Basic Health Checkup step, keyed
+     * by [BasicHealthTestsType.stepNumber] (== StepItem.id). Backs the steps header's
+     * completed count instead of tallying StepStatus.COMPLETED: that tally overcounts,
+     * because StepsViewModel.updateStepStatus(id, CURRENT) demotes whatever step *was*
+     * CURRENT to COMPLETED even when a step-chip tap navigates backward past it, rather than
+     * forward through it.
+     */
+    fun isStepComplete(stepId: Int): Boolean = when (stepId) {
+        BasicHealthTestsType.HEIGHT.stepNumber -> !height.isNullOrBlank()
+        BasicHealthTestsType.TEMPERATURE.stepNumber -> !temperature.isNullOrBlank()
+        BasicHealthTestsType.SPO2.stepNumber -> !oxygen.isNullOrBlank()
+        BasicHealthTestsType.WEIGHT.stepNumber -> !weight.isNullOrBlank()
+        BasicHealthTestsType.VISION.stepNumber -> !eye_left_vision.isNullOrBlank() || !eye_right_vision.isNullOrBlank()
+        BasicHealthTestsType.BLOOD_PRESSURE.stepNumber -> !blood_pressure_systolic.isNullOrBlank() || !blood_pressure_diastolic.isNullOrBlank()
+        BasicHealthTestsType.BLOOD_SUGAR.stepNumber -> !sugar.isNullOrBlank()
+        BasicHealthTestsType.HEMOGLOBIN.stepNumber -> !hemoglobin.isNullOrBlank()
+        else -> false
+    }
+
+    /** Count of [stepIds] with a captured value — see [isStepComplete]. */
+    fun completedStepCount(stepIds: List<Int>): Int = stepIds.count { isStepComplete(it) }
+
+    /**
+     * Count of [stepIds] with no captured value — see [isStepComplete]. Only meaningful for
+     * ids the checkup has already moved past (i.e. before the current step): a step not yet
+     * reached isn't "skipped", it's simply pending, so callers should pass only visited ids.
+     */
+    fun skippedStepCount(stepIds: List<Int>): Int = stepIds.count { !isStepComplete(it) }
 
     // ----------------- Special Case: Weight -----------------
     private fun getWeightResult(value: String?, height: Double?): String? {

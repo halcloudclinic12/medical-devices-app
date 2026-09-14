@@ -151,9 +151,11 @@ class PulseFragment() : BaseFragment() {
 
                 disconnectDevice()
 
-                stepsViewModel.goToNextStep()
-
+                // Save before advancing the shared step list — see the matching comment in
+                // HeightFragment.nextTestCall() for why the order matters here.
                 savePulseData()
+
+                stepsViewModel.goToNextStep()
 
                 it.navController?.navigate(R.id.next_button_weight_checkup_action)
             }
