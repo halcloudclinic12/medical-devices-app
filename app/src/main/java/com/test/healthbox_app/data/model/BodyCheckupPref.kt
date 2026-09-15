@@ -60,8 +60,18 @@ object BodyCheckupPref {
     var patient_ID: String? = null
     var clinic_ID: String? = null
 
+    // Unused — nothing in the app ever assigns this. isMale reads PatientPref.patient.gender
+    // instead, which is the field actually populated at login/registration. Left in place
+    // rather than removed since it's a public var; a future caller may still set it.
     var gender: String? = null
-    private val isMale: Boolean get() = gender == "Male"
+
+    // Case-insensitive: RegisterPatientViewModel.updatePatient() sends gender.lowercase() to
+    // the server, so a patient re-fetched after an edit can come back "male"/"female" instead
+    // of the "Male"/"Female" the registration dropdown originally wrote. An exact-match check
+    // here previously also read the `gender` field above, which nothing ever assigns — every
+    // isMale-gated range (BMR, body fat, muscle/bone mass, hemoglobin) was silently always
+    // false, i.e. always the female range, regardless of the actual patient.
+    private val isMale: Boolean get() = PatientPref.patient?.gender.equals("Male", ignoreCase = true)
 
     //    var age: String? = DatePickerUtil.getAgeFromDob(PatientPref.patient?.dateOfBirth.toString()).toString() // required for BMR classification
     var age: String? = null
@@ -477,7 +487,7 @@ object BodyCheckupPref {
             Parameters("BMI", bmi_result, bmi, "18.5 - 24.9"),
             Parameters("BMR", bmr_result, bmr, "Normal based on age/sex"),
             Parameters("Bone Mass", bone_mass_result, bone_mass, "2.5 - 4.0 kg"),
-            Parameters("Body Fat", body_fat_result, body_fat, if (gender == "M") "10-20%" else "18-30%"),
+            Parameters("Body Fat", body_fat_result, body_fat, if (isMale) "10-20%" else "18-30%"),
             Parameters("Lean Body Weight", lean_body_weight_result, lean_body_weight, "Healthy Range"),
             Parameters("Muscle Mass", muscle_mass_result, muscle_mass, "Varies by sex/age"),
             Parameters("Muscle Rate", muscle_rate_result, muscle_rate, "Normal: 33-39%"),
@@ -496,7 +506,7 @@ object BodyCheckupPref {
             Parameters("Oxygen Saturation", oxygen_result, oxygen, "95-100%"),
             Parameters("Pulse", pulse_result, pulse, "60-100 bpm"),
             Parameters("Sugar", sugar_result, sugar, "70-110 mg/dL (fasting)"),
-            Parameters("Hemoglobin", hemoglobin_result, hemoglobin, if (gender == "M") "13.5-17.5 g/dL" else "12-16 g/dL")
+            Parameters("Hemoglobin", hemoglobin_result, hemoglobin, if (isMale) "13.5-17.5 g/dL" else "12-16 g/dL")
             // NOTE: HbA1c is deliberately NOT listed here. This list feeds the *basic
             // health checkup* results screen and printout, and clearAll() only runs at
             // the end of that flow (ResultsFragment "Home" button). The HbA1c test is a

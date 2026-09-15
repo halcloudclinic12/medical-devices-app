@@ -735,7 +735,11 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
             }
 
             initBodyFatDataCalculation(
-                sex = if (PatientPref.patient?.gender == "Male") 1 else 2,
+                // Case-insensitive: a patient re-fetched after an edit can come back with a
+                // lowercased gender (RegisterPatientViewModel sends gender.lowercase() to the
+                // server) — an exact match here silently misclassified male patients as
+                // female (sex=2) for this body-fat calculation.
+                sex = if (PatientPref.patient?.gender.equals("Male", ignoreCase = true)) 1 else 2,
                 age = DatePickerUtil.getAgeFromDob(PatientPref.patient?.dateOfBirth.toString()),
                 height = heightCm,
                 weight = weight,
