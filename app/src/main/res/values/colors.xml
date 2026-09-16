@@ -101,6 +101,22 @@
     <color name="md_theme_dark_inversePrimary">#6750A4</color>
 
 
+    <!-- Patient Check-in (kiosk login) screen -->
+    <color name="patient_login_heading_text">#16302F</color>
+    <color name="patient_login_muted_text">#57706F</color>
+    <color name="patient_login_label">#3C5C5B</color>
+    <color name="patient_login_chip_bg">#1A3A8F98</color>
+    <color name="patient_login_chip_border">#333A8F98</color>
+    <color name="patient_login_bg_top">#F3F8F8</color>
+    <color name="patient_login_bg_bottom">#E7F1F0</color>
+
+    <!-- Dashboard: featured card border/accent (reuses the "next up" amber accent) -->
+    <color name="dash_featured_border">@color/orbit_next</color>
+
+    <!-- User info chip: gender-tinted avatar ring -->
+    <color name="user_info_male_accent">@color/active_step</color>
+    <color name="user_info_female_accent">#EC4899</color>
+
     <!-- Result Category Colors -->
     <color name="result_indicative">#D32F2F</color> <!-- Dark Red -->
     <color name="result_low">#F57C00</color>        <!-- Orange -->

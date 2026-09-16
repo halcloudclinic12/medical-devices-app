@@ -127,7 +127,7 @@ class DashboardFragment() : BaseFragment() {
             }
         }
 
-        binding.healthCheckupLayout.setOnClickListener {
+        binding.buttonStartCheckup.setOnClickListener {
 
             // stepsViewModel is activity-scoped and survives across a whole completed
             // Basic Tests run. updateStepStatus(CURRENT) only demotes whichever step was
@@ -144,11 +144,11 @@ class DashboardFragment() : BaseFragment() {
             mActivity?.navController?.navigate(R.id.start_health_checkup_height_action)
         }
 
-        binding.reportLayout.setOnClickListener {
+        binding.buttonViewReports.setOnClickListener {
             mActivity?.navController?.navigate(R.id.dash_to_reports_screen_action)
         }
 
-        binding.hba1cLayout.setOnClickListener {
+        binding.buttonStartHba1c.setOnClickListener {
             mActivity?.navController?.navigate(R.id.dash_to_hba1c_screen_action)
         }
 
@@ -163,10 +163,6 @@ class DashboardFragment() : BaseFragment() {
         observeScanState()
 
         observeConnectionState()
-
-        binding.buttonSubmit.setOnClickListener { view ->
-            bleConnectionViewModel.startBTDeviceScanning()
-        }
     }
 
     override fun onCreateView(

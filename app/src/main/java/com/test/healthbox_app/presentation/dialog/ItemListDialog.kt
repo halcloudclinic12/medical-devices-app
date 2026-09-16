@@ -2,9 +2,13 @@ package com.test.healthbox_app.presentation.dialog
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.test.healthbox_app.databinding.ItemListDialogBinding
 import com.test.healthbox_app.domain.model.StringValues
@@ -37,20 +41,35 @@ class ItemListDialog @Inject constructor(
 
         binding.tvHeader.text = label
 
-        // Set fixed width and height
+        binding.ivClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Width is fixed to a fraction of the screen; height is left to wrap the actual
+        // item count instead of forcing a tall fixed box — a 2-item list (e.g. Plus/Minus)
+        // used to be stretched to 60% of the screen height, leaving a large empty gap
+        // below the last row.
         dialog.window?.let { window ->
-            // Set width to 80% of screen width
-            val width = (context.resources.displayMetrics.widthPixels * 0.3).toInt()
-            // Set height to 70% of screen height
-            val height = (context.resources.displayMetrics.heightPixels * 0.6).toInt()
+            val width = (context.resources.displayMetrics.widthPixels * 0.34).toInt()
 
-            window.setLayout(width, height)
+            window.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-            // Optional: Set dialog position to center
             window.setGravity(Gravity.CENTER)
 
-            // Optional: Add animations
-            // window.setWindowAnimations(R.style.DialogAnimation)
+            // The Dialog's own window decor paints an opaque rectangular background behind
+            // whatever content view is set, so the rounded corners of item_list_dialog's
+            // bg_solid_card showed a square grey box peeking out around them. Making the
+            // window itself transparent leaves only the rounded card visible.
+            window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            // Theme_Translucent_NoTitleBar_Fullscreen does not dim the screen behind the
+            // dialog, so the calibration form's own white bg_solid_card panel sitting right
+            // behind this (now much smaller, wrap-content) dialog stays fully visible and
+            // peeks out around its edges — two white rounded shapes overlapping read as a
+            // stray "grey rounded corner". Dimming behind the dialog, like every standard
+            // Android dialog does, visually separates the two instead.
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            window.setDimAmount(0.45f)
         }
 
         if (this.valuesList!!.isNotEmpty()) {

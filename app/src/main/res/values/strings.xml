@@ -40,13 +40,95 @@
     <string name="hba1c_status_disconnected">Meter disconnected</string>
     <string name="hba1c_help_title">HbA1c Meter Error Codes</string>
 
-    <string name="connected_devices">Connected Devices</string>
+    <string name="connected_devices">Devices</string>
     <string name="clinic_analytics">Clinic Analytics</string>
     <string name="clinic_profile">Clinic Profile</string>
     <string name="bulk_register">Bulk Register</string>
     <string name="calibration">Calibration</string>
     <string name="support">Support</string>
-    <string name="change_language">Change Language</string>
+    <string name="change_language">Language</string>
     <string name="about_app">About App</string>
     <string name="logout">Logout</string>
+
+    <!-- Patient Check-in (kiosk login) screen -->
+    <string name="patient_login_badge">Patient Check-in</string>
+    <string name="patient_login_heading">Step up to your health checkup</string>
+    <string name="patient_login_subtext">Enter the valid mobile number to begin the health checkup. The report syncs directly to patient records.</string>
+    <string name="patient_login_badge_paperless">100% Paperless</string>
+    <string name="patient_login_badge_encrypted">Encrypted Session</string>
+    <string name="patient_login_badge_sync">Doctor OPD Sync</string>
+    <string name="patient_login_badge_encrypted_full">Encrypted Clinical Session</string>
+    <string name="patient_login_badge_sync_full">Direct Doctor OPD Sync</string>
+    <string name="patient_login_mobile_label">Mobile Number</string>
+    <string name="patient_login_mobile_placeholder">Enter 10 digit number</string>
+    <string name="patient_login_cta">Begin Health Vitals</string>
+    <string name="patient_login_security_note">AES-256 Encrypted Session</string>
+    <string name="patient_login_footer">Hindustan Aeronautics Limited</string>
+
+    <!-- Patient Registration screen -->
+    <string name="patient_register_badge">Patient Registration</string>
+    <string name="patient_register_heading">Complete your patient profile</string>
+    <string name="patient_register_subtext">These details help us keep accurate health records and connect every report to the right patient.</string>
+    <string name="patient_register_badge_records">Accurate Records</string>
+    <string name="patient_register_badge_one_time">One-time Setup</string>
+    <string name="patient_register_details_label">Patient Details</string>
+    <string name="patient_register_name_label">Patient Name</string>
+    <string name="patient_register_name_placeholder">Enter full name</string>
+    <string name="patient_register_dob_label">Date of Birth</string>
+    <string name="patient_register_dob_placeholder">Select date of birth</string>
+    <string name="patient_register_mobile_label">Mobile Number</string>
+    <string name="patient_register_mobile_placeholder">Enter 10 digit number</string>
+    <string name="patient_register_email_label">Email Address</string>
+    <string name="patient_register_email_placeholder">Enter email address</string>
+    <string name="patient_register_gender_label">Gender</string>
+    <string name="patient_register_gender_placeholder">Select gender</string>
+    <string name="patient_register_bloodgroup_label">Blood Group</string>
+    <string name="patient_register_bloodgroup_placeholder">Select blood group</string>
+    <string name="patient_register_cta">Save &amp; Continue</string>
+
+    <!-- Calibrate Device screen -->
+    <string name="calibration_badge">Device Calibration</string>
+    <string name="calibration_heading">Keep every reading accurate</string>
+    <string name="calibration_subtext">Apply a small offset to a connected device so its future readings match a trusted reference measurement.</string>
+    <string name="calibration_check_drift">Corrects Sensor Drift</string>
+    <string name="calibration_check_future">Applies To Future Readings</string>
+    <string name="calibration_details_label">Calibration Details</string>
+    <string name="calibration_device_type_placeholder">Device Type *</string>
+    <string name="calibration_operation_type_placeholder">Operator *</string>
+    <string name="calibration_value_placeholder">Value *</string>
+
+    <!-- Connected Devices screen -->
+    <string name="connected_devices_title">Devices</string>
+    <string name="connected_devices_subtext">Manage the paired vitals devices connected to this kiosk.</string>
+    <string name="connected_devices_paired_badge">Paired Device</string>
+    <string name="connected_devices_empty_title">No device paired for this category yet</string>
+
+    <!-- Dashboard: user info bar -->
+    <string name="user_info_eyebrow">Patient</string>
+    <string name="user_info_checked_in">Checked In</string>
+
+    <!-- Dashboard screen -->
+    <string name="dash_section_heading">Select a Clinical Module</string>
+    <string name="dash_section_subtext">Choose a checkup below to begin your automated health screening.</string>
+
+    <string name="dash_body_checkup_badge">Recommended Routine</string>
+    <string name="dash_body_checkup_title">Body Checkup</string>
+    <string name="dash_body_checkup_description">A guided, step-by-step vitals scan covering height, temperature, pulse, weight, vision and blood pressure.</string>
+    <string name="dash_body_checkup_chip_1">Guided Walkthrough</string>
+    <string name="dash_body_checkup_chip_2">Multiple Vitals</string>
+    <string name="dash_body_checkup_cta">Start Body Checkup →</string>
+
+    <string name="dash_hba1c_badge">Lab-Grade Test</string>
+    <string name="dash_hba1c_title">HbA1C Test</string>
+    <string name="dash_hba1c_description">Quick glucose marker test using a cartridge-based meter and a small blood sample.</string>
+    <string name="dash_hba1c_chip_1">Cartridge-Based</string>
+    <string name="dash_hba1c_chip_2">Blood Sample Required</string>
+    <string name="dash_hba1c_cta">Start HbA1c Test →</string>
+
+    <string name="dash_reports_badge">Anytime Access</string>
+    <string name="dash_reports_title">Reports &amp; Records</string>
+    <string name="dash_reports_description">View and print your saved health checkup and test reports, synced directly with doctor OPD records.</string>
+    <string name="dash_reports_chip_1">View &amp; Print</string>
+    <string name="dash_reports_chip_2">OPD Synced</string>
+    <string name="dash_reports_cta">View Reports →</string>
 </resources>

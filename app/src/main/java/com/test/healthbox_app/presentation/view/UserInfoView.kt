@@ -17,6 +17,7 @@ class UserInfoView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
+    private val avatarFrame: android.widget.FrameLayout
     private val ivUserIcon: ImageView
     private val tvPatientNameAge: TextView
     private val tvPatientGender: TextView
@@ -29,6 +30,7 @@ class UserInfoView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_user_info, this, true)
+        avatarFrame = findViewById(R.id.avatar_frame)
         ivUserIcon = findViewById(R.id.iv_user_icon)
         tvPatientNameAge = findViewById(R.id.tv_patient_name_age)
         tvPatientGender = findViewById(R.id.tv_patient_gender)
@@ -56,8 +58,10 @@ class UserInfoView @JvmOverloads constructor(
             // for a male patient in that case.
             if (gender.equals("Male", ignoreCase = true)) {
                 ivUserIcon.setImageResource(R.drawable.male_icon)
+                avatarFrame.setBackgroundResource(R.drawable.bg_avatar_ring_male)
             } else if (gender.equals("Female", ignoreCase = true)) {
                 ivUserIcon.setImageResource(R.drawable.female_icon)
+                avatarFrame.setBackgroundResource(R.drawable.bg_avatar_ring_female)
             }
 
         }

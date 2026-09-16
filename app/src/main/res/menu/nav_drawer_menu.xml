@@ -6,38 +6,43 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_connected_device"
+            android:icon="@drawable/ic_nav_device"
             android:title="@string/connected_devices" />
 
         <item
             android:id="@+id/nav_clinic_analytics"
+            android:icon="@drawable/ic_nav_analytics"
+            android:visible="false"
             android:title="@string/clinic_analytics" />
-        <!--            android:icon="@drawable/ic_person"-->
 
         <item
             android:id="@+id/nav_clinic_profile"
+            android:icon="@drawable/ic_nav_profile"
+            android:visible="false"
             android:title="@string/clinic_profile" />
 
         <item
             android:id="@+id/nav_bulk_register"
+            android:icon="@drawable/ic_nav_register"
+            android:visible="false"
             android:title="@string/bulk_register" />
 
         <item
             android:id="@+id/nav_calibration"
+            android:icon="@drawable/ic_nav_calibration"
             android:title="@string/calibration" />
     </group>
 
     <item android:title="@string/support">
         <menu>
-          <!--  <item
-                android:id="@+id/nav_change_language"
-                android:title="@string/change_language" />-->
-
             <item
                 android:id="@+id/nav_about_app"
+                android:icon="@drawable/ic_info"
                 android:title="@string/about_app" />
 
             <item
                 android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_nav_logout"
                 android:title="@string/logout" />
         </menu>
     </item>

@@ -12,6 +12,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -533,27 +535,76 @@ class LoginPatientNavFragment() : BaseFragment() {
             setSupportActionBar(binding.toolbar)
             binding.toolbar.setTitle("")
 
-            supportActionBar?.apply {
-                setDisplayHomeAsUpEnabled(true)
-                setHomeButtonEnabled(true)
-            }
+            // Intentionally NOT calling setDisplayHomeAsUpEnabled/setHomeButtonEnabled here:
+            // this toolbar's icon is a persistent drawer toggle, not "up" navigation, and
+            // mixing the two makes the ActionBar wrapper fight the Toolbar over the icon.
         }
     }
 
-
     private fun setupDrawer() {
+
+        // android:background's automatic outline only supports ONE uniform corner
+        // radius; our panel is rounded on the right side only, so clipToOutline
+        // needs an explicit convex-path outline instead, or it silently clips to
+        // the full rectangle (no rounding at all).
+        val cornerRadiusPx = resources.displayMetrics.density * 28f
+        binding.navDrawerPanel.outlineProvider = object : android.view.ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: android.graphics.Outline) {
+                val path = android.graphics.Path().apply {
+                    addRoundRect(
+                        android.graphics.RectF(0f, 0f, view.width.toFloat(), view.height.toFloat()),
+                        floatArrayOf(
+                            0f, 0f,
+                            cornerRadiusPx, cornerRadiusPx,
+                            cornerRadiusPx, cornerRadiusPx,
+                            0f, 0f
+                        ),
+                        android.graphics.Path.Direction.CW
+                    )
+                }
+                @Suppress("DEPRECATION")
+                outline.setConvexPath(path)
+            }
+        }
 
         actionBarDrawerToggle = ActionBarDrawerToggle(
             activity, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_close
         )
 
+        // We set the navigation icon ourselves (below), so stop the toggle from
+        // repainting its own drawer-arrow icon over ours on drawer slide/state events.
+        actionBarDrawerToggle.isDrawerIndicatorEnabled = false
+
         // Add toggle to DrawerLayout
         binding.drawerLayout.addDrawerListener(actionBarDrawerToggle)
 
+        // Push/scale/dim the content behind the drawer as it slides open, so the
+        // floating drawer feels like it's sliding over the screen rather than a
+        // flat panel just appearing.
+        binding.drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                val moveFactor = drawerView.width * slideOffset
+                binding.contentFrame.apply {
+                    translationX = moveFactor * 0.15f
+                    scaleX = 1f - (0.06f * slideOffset)
+                    scaleY = 1f - (0.06f * slideOffset)
+                    alpha = 1f - (0.25f * slideOffset)
+                }
+            }
+
+            override fun onDrawerOpened(drawerView: View) = animateDrawerHeaderEntrance()
+            override fun onDrawerClosed(drawerView: View) = Unit
+            override fun onDrawerStateChanged(newState: Int) = Unit
+        })
+
         actionBarDrawerToggle.syncState()  // This is crucial!
 
-        // Override the back arrow with hamburger
-        (requireActivity() as AppCompatActivity).supportActionBar?.setHomeAsUpIndicator(null)
+        // The icon itself is set declaratively via app:navigationIcon in XML;
+        // wire the click here since isDrawerIndicatorEnabled = false stops the
+        // toggle from doing it for us.
+        binding.toolbar.setNavigationOnClickListener {
+            binding.drawerLayout.openDrawer(GravityCompat.START)
+        }
 
         // Setup the NavigationView
         binding.navigationView.setNavigationItemSelectedListener { menuItem ->
@@ -592,12 +643,6 @@ class LoginPatientNavFragment() : BaseFragment() {
                 else -> false
             }
         }
-
-        // Enable the toggle button in the ActionBar
-        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeButtonEnabled(true)
-        }
     }
 
     fun setupNavHeader() {
@@ -615,6 +660,51 @@ class LoginPatientNavFragment() : BaseFragment() {
                 }
             }
         }
+    }
+
+    /**
+     * A small staggered "pop in" for the drawer header — logo scales up with an
+     * overshoot bounce, then the clinic name/id slide up and fade in right after.
+     * Runs every time the drawer is opened, not just once.
+     */
+    private fun animateDrawerHeaderEntrance() {
+        val headerView = binding.navigationView.getHeaderView(0)
+        val logo = headerView.findViewById<View>(R.id.nav_header_image)
+        val tvClinicName = headerView.findViewById<View>(R.id.tv_clinic_name)
+        val tvClinicId = headerView.findViewById<View>(R.id.tv_clinic_id)
+
+        listOf(logo, tvClinicName, tvClinicId).forEach {
+            it.alpha = 0f
+        }
+        logo.scaleX = 0.4f
+        logo.scaleY = 0.4f
+        tvClinicName.translationY = 24f
+        tvClinicId.translationY = 24f
+
+        logo.animate()
+            .alpha(1f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setStartDelay(60)
+            .setDuration(320)
+            .setInterpolator(android.view.animation.OvershootInterpolator(2.5f))
+            .start()
+
+        tvClinicName.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setStartDelay(160)
+            .setDuration(240)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .start()
+
+        tvClinicId.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setStartDelay(220)
+            .setDuration(240)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .start()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

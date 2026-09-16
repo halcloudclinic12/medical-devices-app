@@ -2,8 +2,6 @@ package com.test.healthbox_app.presentation.splash
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.test.healthbox_app.R
@@ -79,9 +78,19 @@ class SplashFragment() : BaseFragment() {
             if (viewModel.isVerificationExpired() == true) {
                 viewModel.refreshToken()
             } else {
-                Handler(Looper.getMainLooper()).postDelayed({
-                    mActivity?.navController?.navigate(R.id.action_splash_fragment_to_login_patient)
-                }, 500)
+                // viewLifecycleOwner-scoped (not a raw Handler) so this is auto-cancelled if
+                // this view is torn down and recreated before the delay elapses (e.g. a
+                // rotation on the tablet mid-splash) — a bare Handler(Looper.getMainLooper())
+                // survives that recreation and fires a second, now-stale navigate() call from
+                // a destination that has already moved on, crashing with "action cannot be
+                // found from the current destination". The current-destination check below is
+                // a second line of defense against that same class of race.
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(500)
+                    if (mActivity?.navController?.currentDestination?.id == R.id.splash_fragment) {
+                        mActivity?.navController?.navigate(R.id.action_splash_fragment_to_login_patient)
+                    }
+                }
             }
         }
         observeTokenState()

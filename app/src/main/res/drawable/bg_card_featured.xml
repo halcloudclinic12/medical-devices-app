@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Body Checkup card: same as bg_solid_card but with a highlighted border to mark it
+     as the recommended/featured module. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="@color/white" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/dash_featured_border" />
+    <corners android:radius="20dp" />
+
+</shape>

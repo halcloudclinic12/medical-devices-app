@@ -17,7 +17,7 @@ class ConnectedDevicesListAdapter @Inject constructor(
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.reports_types_llayout_row, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.row_connected_device_type, parent, false)
         return DeviceViewHolder(view)
     }
 

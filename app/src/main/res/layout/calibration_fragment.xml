@@ -13,149 +13,325 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_login_gradient">
 
         <ImageView
             android:id="@+id/iv_back"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_marginHorizontal="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_circle_back_button"
+            android:elevation="2dp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
             android:src="@drawable/ic_back_arrow"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_title"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tv_title" />
-
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/app_color" />
 
         <TextView
             android:id="@+id/tv_title"
-            style="@style/ResultLabelTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="10dp"
-            android:gravity="center"
+            android:layout_marginStart="14dp"
+            android:fontFamily="@font/roboto_bold"
             android:text="Calibrate Device"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textColor="@color/patient_login_heading_text"
+            android:textSize="21sp"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_back"
+            app:layout_constraintStart_toEndOf="@+id/iv_back"
+            app:layout_constraintTop_toTopOf="@+id/iv_back" />
 
-        <!--        ****************-->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_reports"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:visibility="visible"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fillViewport="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_title">
-
+            app:layout_constraintTop_toBottomOf="@+id/iv_back">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_calibrate"
-                android:layout_width="550dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/blur_background"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/deviceTypeLayout"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:id="@+id/card_outer"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="50dp"
-                    android:layout_marginVertical="20dp"
-                    android:hint="Device Type *"
-                    app:layout_constraintBottom_toTopOf="@+id/operationTypeLayout"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/bg_outer_card"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:elevation="6dp"
+                    android:gravity="top"
+                    android:orientation="vertical"
+                    android:padding="28dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/device_type_input"
+                    <!-- What calibration does -->
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:text="" />
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:orientation="vertical">
 
-                </com.google.android.material.textfield.TextInputLayout>
+                        <FrameLayout
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/bg_circle_teal">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/operationTypeLayout"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="50dp"
-                    android:layout_marginVertical="20dp"
-                    android:hint="Operation Type *"
-                    app:layout_constraintBottom_toTopOf="@+id/calibration_value_til_field"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/deviceTypeLayout">
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_nav_calibration"
+                                app:tint="@color/app_color" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/operation_type_input"
+                        </FrameLayout>
+
+                        <TextView
+                            style="@style/TrustChipStyle"
+                            android:layout_marginTop="16dp"
+                            android:layout_gravity="start"
+                            android:fontFamily="@font/roboto_semibold"
+                            android:text="@string/calibration_badge"
+                            android:textColor="@color/app_color"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:gravity="start"
+                            android:lineSpacingExtra="2dp"
+                            android:text="@string/calibration_heading"
+                            android:textColor="@color/patient_login_heading_text"
+                            android:textSize="22sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:gravity="start"
+                            android:lineSpacingExtra="4dp"
+                            android:text="@string/calibration_subtext"
+                            android:textColor="@color/patient_login_muted_text"
+                            android:textSize="13sp" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/ic_check"
+                                    app:tint="@color/app_color" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="@string/calibration_check_drift"
+                                    android:textColor="@color/patient_login_label"
+                                    android:textSize="13sp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/ic_check"
+                                    app:tint="@color/app_color" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="@string/calibration_check_future"
+                                    android:textColor="@color/patient_login_label"
+                                    android:textSize="13sp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Calibration form -->
+                    <LinearLayout
+                        android:id="@+id/layout_calibrate"
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:text="" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="26dp"
+                        android:background="@drawable/bg_solid_card"
+                        android:elevation="3dp"
+                        android:orientation="vertical"
+                        android:padding="22dp">
 
-                </com.google.android.material.textfield.TextInputLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_semibold"
+                            android:letterSpacing="0.05"
+                            android:text="@string/calibration_details_label"
+                            android:textColor="@color/patient_login_label"
+                            android:textSize="12sp" />
 
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/deviceTypeLayout"
+                            style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:endIconDrawable="@drawable/ic_chevron_down"
+                            app:endIconMode="custom"
+                            app:endIconTint="@color/patient_login_muted_text"
+                            app:hintEnabled="false"
+                            app:startIconDrawable="@drawable/ic_nav_device"
+                            app:startIconTint="@color/app_color">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/calibration_value_til_field"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="50dp"
-                    android:layout_marginVertical="20dp"
-                    android:hint="Calibration Value *"
-                    app:layout_constraintBottom_toTopOf="@+id/button_submit"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/operationTypeLayout">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/device_type_input"
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:clickable="false"
+                                android:focusableInTouchMode="false"
+                                android:fontFamily="@font/roboto_regular"
+                                android:hint="@string/calibration_device_type_placeholder"
+                                android:includeFontPadding="false"
+                                android:textColor="@color/patient_login_heading_text"
+                                android:textColorHint="@color/patient_login_muted_text"
+                                android:textSize="14sp" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/calibration_value_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:inputType="numberDecimal"
-                        android:text="" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                </com.google.android.material.textfield.TextInputLayout>
+                        <!-- Operator + Value -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal">
 
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/operationTypeLayout"
+                                style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_weight="0.4"
+                                app:boxCornerRadiusBottomEnd="14dp"
+                                app:boxCornerRadiusBottomStart="14dp"
+                                app:boxCornerRadiusTopEnd="14dp"
+                                app:boxCornerRadiusTopStart="14dp"
+                                app:endIconDrawable="@drawable/ic_chevron_down"
+                                app:endIconMode="custom"
+                                app:endIconTint="@color/patient_login_muted_text"
+                                app:hintEnabled="false">
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/button_submit"
-                    style="@style/ButtonTextStyle"
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:background="@drawable/button_style"
-                    android:text="@string/submit_text"
-                    android:textAllCaps="false"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/calibration_value_til_field" />
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/operation_type_input"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="52dp"
+                                    android:clickable="false"
+                                    android:focusableInTouchMode="false"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:gravity="center"
+                                    android:hint="@string/calibration_operation_type_placeholder"
+                                    android:includeFontPadding="false"
+                                    android:textColor="@color/patient_login_heading_text"
+                                    android:textColorHint="@color/patient_login_muted_text"
+                                    android:textSize="14sp" />
 
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/calibration_value_til_field"
+                                style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="0.6"
+                                app:boxCornerRadiusBottomEnd="14dp"
+                                app:boxCornerRadiusBottomStart="14dp"
+                                app:boxCornerRadiusTopEnd="14dp"
+                                app:boxCornerRadiusTopStart="14dp"
+                                app:hintEnabled="false">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/calibration_value_input"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="52dp"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:hint="@string/calibration_value_placeholder"
+                                    android:includeFontPadding="false"
+                                    android:inputType="numberDecimal"
+                                    android:textColor="@color/patient_login_heading_text"
+                                    android:textColorHint="@color/patient_login_muted_text"
+                                    android:textSize="14sp"
+                                    android:text="@={viewModel.calibrationValue}" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/button_submit"
+                            style="@style/ButtonTextStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:layout_marginTop="18dp"
+                            android:background="@drawable/button_style"
+                            android:drawableEnd="@drawable/ic_arrow"
+                            android:drawablePadding="8dp"
+                            android:gravity="center"
+                            android:text="@string/submit_text"
+                            android:textAllCaps="false" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

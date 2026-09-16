@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
-    android:background="@color/app_color"
+    android:layout_height="230dp"
+    android:background="@drawable/bg_nav_header"
     android:gravity="bottom"
     android:orientation="vertical"
     android:padding="24dp"
@@ -11,35 +11,39 @@
 
     <ImageView
         android:id="@+id/nav_header_image"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_gravity="center"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="start"
+        android:background="@drawable/bg_solid_card"
         android:contentDescription="nav_header_image"
+        android:padding="10dp"
         android:src="@drawable/hal_logo_square" />
 
     <TextView
         android:id="@+id/tv_clinic_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="18dp"
         android:ellipsize="marquee"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:fontFamily="@font/roboto_bold"
         android:lines="2"
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
         android:singleLine="true"
         android:text="John Doe"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="20sp" />
+        android:textColor="@color/white"
+        android:textSize="19sp" />
 
     <TextView
         android:id="@+id/tv_clinic_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="johndoe@example.com"
-        android:textSize="16sp" />
+        android:textColor="#CCFFFFFF"
+        android:textSize="14sp" />
 
 </LinearLayout>
 

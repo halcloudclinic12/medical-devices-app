@@ -13,317 +13,403 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_login_gradient">
 
-        <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:contentDescription="hal logo"
-            android:padding="100dp"
-            android:src="@drawable/hal_logo_square"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/constraintLayout3"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout3"
-            android:layout_width="0dp"
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_weight="1.5"
-            app:layout_constraintStart_toEndOf="@+id/imageView4"
-            tools:layout_editor_absoluteY="-102dp">
-
-            <TextView
-                android:id="@+id/textView4"
-                style="@style/HeaderTextStyle2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Register Patient"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/mandatory_fields_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/box_container_bg"
-                app:layout_constraintBottom_toTopOf="@+id/optional_fields_layout"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView4">
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/patient_name_til_field"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                <LinearLayout
+                    android:id="@+id/card_outer"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="5dp"
-                    android:hint="Patient Name *"
-                    app:layout_constraintEnd_toStartOf="@+id/date_of_birth_til_field"
-                    app:layout_constraintHorizontal_bias="0.5"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/bg_outer_card"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:elevation="6dp"
+                    android:gravity="top"
+                    android:orientation="vertical"
+                    android:padding="40dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/patient_name_input"
+                    <ImageView
+                        android:id="@+id/iv_hal_logo"
+                        android:layout_width="300dp"
+                        android:layout_height="110dp"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="@string/app_name"
+                        android:src="@drawable/hal_logo_square" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_split_row"
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:inputType="textPersonName"
-                        android:text="@={viewModel.patient.name}" />
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal">
 
-                </com.google.android.material.textfield.TextInputLayout>
+                        <!-- LEFT: branding / value proposition -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="32dp"
+                            android:layout_weight="0.42"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/date_of_birth_til_field"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:hint="Date Of Birth *"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/patient_name_til_field"
-                    app:layout_constraintTop_toTopOf="parent">
+                            <TextView
+                                android:id="@+id/tv_register_badge"
+                                style="@style/TrustChipStyle"
+                                android:layout_gravity="start"
+                                android:fontFamily="@font/roboto_semibold"
+                                android:text="@string/patient_register_badge"
+                                android:textColor="@color/app_color"
+                                android:textSize="13sp" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/date_of_birth_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:inputType="number" />
-                    <!--                        android:text="@={viewModel.patient.dateOfBirth}" />-->
+                            <TextView
+                                android:id="@+id/tv_register_heading"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="24dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:gravity="start"
+                                android:lineSpacingExtra="3dp"
+                                android:text="@string/patient_register_heading"
+                                android:textColor="@color/patient_login_heading_text"
+                                android:textSize="34sp" />
 
-                </com.google.android.material.textfield.TextInputLayout>
+                            <TextView
+                                android:id="@+id/tv_register_subtext"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="18dp"
+                                android:fontFamily="@font/roboto_regular"
+                                android:gravity="start"
+                                android:lineSpacingExtra="6dp"
+                                android:text="@string/patient_register_subtext"
+                                android:textColor="@color/patient_login_muted_text"
+                                android:textSize="17sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/mobile_number_til_field"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="5dp"
-                    android:hint="Mobile Number *"
-                    app:layout_constraintEnd_toStartOf="@+id/email_til_field"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/patient_name_til_field">
+                            <LinearLayout
+                                android:id="@+id/ll_register_trust_list"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="32dp"
+                                android:orientation="vertical">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/mobile_number_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:inputType="number"
-                        android:maxLength="10"
-                        android:text="@={viewModel.patient.mobile}" />
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
-                </com.google.android.material.textfield.TextInputLayout>
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:contentDescription="@null"
+                                        android:src="@drawable/ic_check"
+                                        app:tint="@color/app_color" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/email_til_field"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:hint="Email *"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/mobile_number_til_field"
-                    app:layout_constraintTop_toBottomOf="@+id/date_of_birth_til_field">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="12dp"
+                                        android:fontFamily="@font/roboto_medium"
+                                        android:text="@string/patient_register_badge_records"
+                                        android:textColor="@color/patient_login_label"
+                                        android:textSize="16sp" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/email_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:inputType="textEmailAddress"
-                        android:text="@={viewModel.patient.email}" />
+                                </LinearLayout>
 
-                </com.google.android.material.textfield.TextInputLayout>
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="18dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/genderInputLayout"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="20dp"
-                    android:hint="Gender *"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/bloodGroupInputLayout"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/mobile_number_til_field">
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:contentDescription="@null"
+                                        android:src="@drawable/ic_check"
+                                        app:tint="@color/app_color" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/gender_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:inputType="textPersonName"
-                        android:text="@={viewModel.patient.gender}" />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="12dp"
+                                        android:fontFamily="@font/roboto_medium"
+                                        android:text="@string/patient_register_badge_one_time"
+                                        android:textColor="@color/patient_login_label"
+                                        android:textSize="16sp" />
 
-                </com.google.android.material.textfield.TextInputLayout>
+                                </LinearLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/bloodGroupInputLayout"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="20dp"
-                    android:hint="Blood Group *"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/genderInputLayout"
-                    app:layout_constraintTop_toBottomOf="@+id/email_til_field">
+                            </LinearLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/blood_group_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:inputType="textPersonName"
-                        android:text="@={viewModel.patient.bloodGroup}" />
+                        </LinearLayout>
 
-                </com.google.android.material.textfield.TextInputLayout>
+                        <!-- RIGHT: patient details form -->
+                        <LinearLayout
+                            android:id="@+id/patient_details_card"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.58"
+                            android:background="@drawable/bg_solid_card"
+                            android:elevation="3dp"
+                            android:orientation="vertical"
+                            android:padding="32dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_semibold"
+                                android:letterSpacing="0.05"
+                                android:text="@string/patient_register_details_label"
+                                android:textColor="@color/patient_login_label"
+                                android:textSize="13sp" />
+
+                            <!-- Patient Name -->
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/patient_name_til_field"
+                                style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="14dp"
+                                app:boxCornerRadiusBottomEnd="14dp"
+                                app:boxCornerRadiusBottomStart="14dp"
+                                app:boxCornerRadiusTopEnd="14dp"
+                                app:boxCornerRadiusTopStart="14dp"
+                                app:hintEnabled="false">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/patient_name_input"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="58dp"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:hint="@string/patient_register_name_placeholder"
+                                    android:includeFontPadding="false"
+                                    android:inputType="textPersonName"
+                                    android:textColor="@color/patient_login_heading_text"
+                                    android:textColorHint="@color/patient_login_muted_text"
+                                    android:textSize="16sp"
+                                    android:text="@={viewModel.patient.name}" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <!-- Date of Birth + Mobile Number -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:baselineAligned="false"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:id="@+id/date_of_birth_til_field"
+                                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    app:boxCornerRadiusBottomEnd="14dp"
+                                    app:boxCornerRadiusBottomStart="14dp"
+                                    app:boxCornerRadiusTopEnd="14dp"
+                                    app:boxCornerRadiusTopStart="14dp"
+                                    app:endIconDrawable="@drawable/ic_chevron_down"
+                                    app:endIconMode="custom"
+                                    app:endIconTint="@color/patient_login_muted_text"
+                                    app:hintEnabled="false">
+
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/date_of_birth_input"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="58dp"
+                                        android:fontFamily="@font/roboto_regular"
+                                        android:focusableInTouchMode="false"
+                                        android:hint="@string/patient_register_dob_placeholder"
+                                        android:includeFontPadding="false"
+                                        android:inputType="number"
+                                        android:textColor="@color/patient_login_heading_text"
+                                        android:textColorHint="@color/patient_login_muted_text"
+                                        android:textSize="16sp" />
+
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:id="@+id/mobile_number_til_field"
+                                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    app:boxCornerRadiusBottomEnd="14dp"
+                                    app:boxCornerRadiusBottomStart="14dp"
+                                    app:boxCornerRadiusTopEnd="14dp"
+                                    app:boxCornerRadiusTopStart="14dp"
+                                    app:hintEnabled="false">
+
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/mobile_number_input"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="58dp"
+                                        android:fontFamily="@font/roboto_regular"
+                                        android:hint="@string/patient_register_mobile_placeholder"
+                                        android:includeFontPadding="false"
+                                        android:inputType="number"
+                                        android:maxLength="10"
+                                        android:textColor="@color/patient_login_heading_text"
+                                        android:textColorHint="@color/patient_login_muted_text"
+                                        android:textSize="16sp"
+                                        android:text="@={viewModel.patient.mobile}" />
+
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                            </LinearLayout>
+
+                            <!-- Email -->
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/email_til_field"
+                                style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                app:boxCornerRadiusBottomEnd="14dp"
+                                app:boxCornerRadiusBottomStart="14dp"
+                                app:boxCornerRadiusTopEnd="14dp"
+                                app:boxCornerRadiusTopStart="14dp"
+                                app:hintEnabled="false">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/email_input"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="58dp"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:hint="@string/patient_register_email_placeholder"
+                                    android:includeFontPadding="false"
+                                    android:inputType="textEmailAddress"
+                                    android:textColor="@color/patient_login_heading_text"
+                                    android:textColorHint="@color/patient_login_muted_text"
+                                    android:textSize="16sp"
+                                    android:text="@={viewModel.patient.email}" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <!-- Gender + Blood Group -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:baselineAligned="false"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:id="@+id/genderInputLayout"
+                                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    app:boxCornerRadiusBottomEnd="14dp"
+                                    app:boxCornerRadiusBottomStart="14dp"
+                                    app:boxCornerRadiusTopEnd="14dp"
+                                    app:boxCornerRadiusTopStart="14dp"
+                                    app:endIconDrawable="@drawable/ic_chevron_down"
+                                    app:endIconMode="custom"
+                                    app:endIconTint="@color/patient_login_muted_text"
+                                    app:hintEnabled="false">
+
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/gender_input"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="58dp"
+                                        android:fontFamily="@font/roboto_regular"
+                                        android:focusableInTouchMode="false"
+                                        android:hint="@string/patient_register_gender_placeholder"
+                                        android:includeFontPadding="false"
+                                        android:inputType="textPersonName"
+                                        android:textColor="@color/patient_login_heading_text"
+                                        android:textColorHint="@color/patient_login_muted_text"
+                                        android:textSize="16sp"
+                                        android:text="@={viewModel.patient.gender}" />
+
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:id="@+id/bloodGroupInputLayout"
+                                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    app:boxCornerRadiusBottomEnd="14dp"
+                                    app:boxCornerRadiusBottomStart="14dp"
+                                    app:boxCornerRadiusTopEnd="14dp"
+                                    app:boxCornerRadiusTopStart="14dp"
+                                    app:endIconDrawable="@drawable/ic_chevron_down"
+                                    app:endIconMode="custom"
+                                    app:endIconTint="@color/patient_login_muted_text"
+                                    app:hintEnabled="false">
+
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/blood_group_input"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="58dp"
+                                        android:fontFamily="@font/roboto_regular"
+                                        android:focusableInTouchMode="false"
+                                        android:hint="@string/patient_register_bloodgroup_placeholder"
+                                        android:includeFontPadding="false"
+                                        android:inputType="textPersonName"
+                                        android:textColor="@color/patient_login_heading_text"
+                                        android:textColorHint="@color/patient_login_muted_text"
+                                        android:textSize="16sp"
+                                        android:text="@={viewModel.patient.bloodGroup}" />
+
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatButton
+                                android:id="@+id/button_submit"
+                                style="@style/ButtonTextStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="58dp"
+                                android:layout_marginTop="22dp"
+                                android:background="@drawable/button_style"
+                                android:drawableEnd="@drawable/ic_arrow"
+                                android:drawablePadding="8dp"
+                                android:gravity="center"
+                                android:text="@string/patient_register_cta"
+                                android:textAllCaps="false" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/optional_fields_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/box_container_bg"
-                app:layout_constraintBottom_toTopOf="@+id/button_submit"
-                app:layout_constraintTop_toBottomOf="@+id/mandatory_fields_layout"
-                tools:layout_editor_absoluteX="20dp">
+        </androidx.core.widget.NestedScrollView>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/adhar_card_til_field"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="5dp"
-                    android:hint="Adhar card"
-                    app:layout_constraintEnd_toStartOf="@+id/unique_id_field"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/adhar_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:inputType="textPersonName"
-                        android:maxEms="5" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/unique_id_field"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:hint="Unique ID"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/adhar_card_til_field"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/unique_id_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:inputType="number" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/scan_qr_til_field"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="20dp"
-                    android:hint="Scan QR *"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/dummy_til_field"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/adhar_card_til_field">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/scan_qr_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:inputType="textPersonName"
-                        android:maxEms="5" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/dummy_til_field"
-                    style="@style/Widget.App.TextInputLayout.Outlined.Purple"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="20dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/scan_qr_til_field"
-                    app:layout_constraintTop_toBottomOf="@+id/unique_id_field">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/dummy_input"
-                        style="@style/SubTextStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:inputType="number" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/button_submit"
-                style="@style/ButtonTextStyle"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button_style"
-                android:text="@string/submit_text"
-                android:textAllCaps="false"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

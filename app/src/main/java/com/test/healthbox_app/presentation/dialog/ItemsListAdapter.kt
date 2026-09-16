@@ -40,6 +40,10 @@ class ItemsListAdapter @Inject constructor(
             tvItemName.text = item.value
             isSelectedRadioButton.isChecked = item.isSelected!!
 
+            itemLayoutCl.setBackgroundResource(
+                if (item.isSelected == true) R.drawable.bg_pill_tint else android.R.color.transparent
+            )
+
             itemLayoutCl.setOnClickListener { view ->
                 print("onItemClickLogs  : $item")
 

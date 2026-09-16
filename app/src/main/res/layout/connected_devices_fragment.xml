@@ -6,228 +6,269 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_login_gradient">
 
         <ImageView
             android:id="@+id/iv_back"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_marginHorizontal="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_circle_back_button"
+            android:elevation="2dp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
             android:src="@drawable/ic_back_arrow"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_title"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tv_title" />
-
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/app_color" />
 
         <TextView
             android:id="@+id/tv_title"
-            style="@style/ResultLabelTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="10dp"
-            android:gravity="center"
-            android:text="Connected Devices"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginStart="14dp"
+            android:fontFamily="@font/roboto_bold"
+            android:text="@string/connected_devices_title"
+            android:textColor="@color/patient_login_heading_text"
+            android:textSize="21sp"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_back"
+            app:layout_constraintStart_toEndOf="@+id/iv_back"
+            app:layout_constraintTop_toTopOf="@+id/iv_back" />
 
+        <TextView
+            android:id="@+id/tv_devices_subtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/roboto_regular"
+            android:text="@string/connected_devices_subtext"
+            android:textColor="@color/patient_login_muted_text"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@+id/tv_title"
+            app:layout_constraintTop_toBottomOf="@+id/iv_back" />
 
-        <!--        ****************-->
+        <!-- Sidebar: device category list -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_reports"
-            android:layout_width="match_parent"
+            android:id="@+id/layout_steps_list"
+            android:layout_width="240dp"
             android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:visibility="visible"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/bg_solid_card"
+            android:elevation="3dp"
+            android:padding="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_devices_subtext">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_devices_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Detail pane: selected device info -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_test_reports"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/bg_solid_card"
+            android:elevation="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_title">
+            app:layout_constraintStart_toEndOf="@+id/layout_steps_list"
+            app:layout_constraintTop_toBottomOf="@+id/tv_devices_subtext">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_steps_list"
+                android:id="@+id/layout_device_details"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/blur_background"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/view2"
-                app:layout_constraintHorizontal_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="28dp"
+                android:layout_marginVertical="26dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_devices_list"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginVertical="10dp"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <View
-                android:id="@+id/view2"
-                android:layout_width="1px"
-                android:layout_height="0dp"
-                android:layout_marginVertical="10dp"
-                android:background="@color/app_color"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/layout_test_reports"
-                app:layout_constraintStart_toEndOf="@+id/layout_steps_list"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_test_reports"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="3"
-                app:layout_constraintStart_toEndOf="@+id/view2"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_device_details"
-                    android:layout_width="450dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/blur_background"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                <FrameLayout
+                    android:id="@+id/icon_frame_device"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/bg_circle_teal"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_bluetooth"
+                        app:tint="@color/app_color" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/tv_device_type_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="Device Type"
+                    android:textColor="@color/patient_login_heading_text"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/chip_paired"
+                    app:layout_constraintStart_toEndOf="@+id/icon_frame_device"
+                    app:layout_constraintTop_toTopOf="@+id/icon_frame_device"
+                    app:layout_constraintVertical_chainStyle="packed" />
+
+                <TextView
+                    android:id="@+id/chip_paired"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/bg_pill_tint"
+                    android:fontFamily="@font/roboto_semibold"
+                    android:paddingHorizontal="9dp"
+                    android:paddingVertical="3dp"
+                    android:text="@string/connected_devices_paired_badge"
+                    android:textColor="@color/patient_login_label"
+                    android:textSize="10sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/icon_frame_device"
+                    app:layout_constraintStart_toEndOf="@+id/icon_frame_device"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_device_type_name" />
+
+                <View
+                    android:id="@+id/divider_1"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="22dp"
+                    android:background="@color/text_input_box_stroke"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/icon_frame_device" />
+
+                <TextView
+                    android:id="@+id/tv_label_device_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:fontFamily="@font/roboto_semibold"
+                    android:letterSpacing="0.08"
+                    android:text="Device Name"
+                    android:textAllCaps="true"
+                    android:textColor="@color/patient_login_muted_text"
+                    android:textSize="10sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider_1" />
+
+                <TextView
+                    android:id="@+id/tv_device_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_semibold"
+                    android:text=""
+                    android:textColor="@color/patient_login_heading_text"
+                    android:textSize="13sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_label_device_name"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/tv_label_device_name" />
+
+                <View
+                    android:id="@+id/divider_2"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@color/text_input_box_stroke"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_label_device_name" />
+
+                <TextView
+                    android:id="@+id/tv_label_device_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:fontFamily="@font/roboto_semibold"
+                    android:letterSpacing="0.08"
+                    android:text="Device Address"
+                    android:textAllCaps="true"
+                    android:textColor="@color/patient_login_muted_text"
+                    android:textSize="10sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider_2" />
+
+                <TextView
+                    android:id="@+id/tv_device_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_semibold"
+                    android:text=""
+                    android:textColor="@color/patient_login_heading_text"
+                    android:textSize="13sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_label_device_address"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/tv_label_device_address" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/button_disconnect_device_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:layout_marginTop="26dp"
+                    android:background="@drawable/bg_btn_outline_red"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_label_device_address">
+
                     <TextView
-                        android:id="@+id/tv_device_type_name"
-                        style="@style/ResultTextStyle"
+                        android:id="@+id/tv_disconnect_device"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginVertical="25dp"
-                        android:gravity="center"
-                        android:text='Device Type'
+                        android:fontFamily="@font/roboto_semibold"
+                        android:paddingHorizontal="22dp"
+                        android:text="Remove Device"
+                        android:textColor="@color/red"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:id="@+id/tv_label_device_name"
-                        style="@style/ResultLabelTextStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="25dp"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text='Device Name'
-                        app:layout_constraintEnd_toStartOf="@+id/tv_device_name"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_device_type_name" />
-
-
-                    <TextView
-                        android:id="@+id/tv_device_name"
-                        style="@style/ResultLabelTextStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="start"
-                        android:padding="10dp"
-                        android:text=''
-                        app:layout_constraintBottom_toBottomOf="@+id/tv_label_device_name"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/tv_label_device_name"
-                        app:layout_constraintTop_toTopOf="@+id/tv_label_device_name" />
-
-
-                    <TextView
-                        android:id="@+id/tv_label_device_address"
-                        style="@style/ResultLabelTextStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="15dp"
-                        android:gravity="center"
-                        android:padding="10dp"
-                        android:text="Device Address"
-                        app:layout_constraintEnd_toStartOf="@+id/tv_device_address"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_label_device_name" />
-
-                    <TextView
-                        android:id="@+id/tv_device_address"
-                        style="@style/ResultLabelTextStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="start"
-                        android:padding="10dp"
-                        android:text=''
-                        app:layout_constraintBottom_toBottomOf="@+id/tv_label_device_address"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/tv_label_device_address"
-                        app:layout_constraintTop_toTopOf="@+id/tv_label_device_address" />
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/button_disconnect_device_layout"
-                        style="@style/ButtonTextStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_marginVertical="25dp"
-                        android:background="@drawable/button_next_style"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_label_device_address">
-
-                        <TextView
-                            android:id="@+id/tv_disconnect_device"
-                            style="@style/TextStyleCustomSize"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:padding="15dp"
-                            android:text="Remove Device"
-                            android:textColor="@color/red"
-                            android:visibility="visible"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <TextView
-                    android:id="@+id/tv_no_device_found"
-                    style="@style/HeaderTextStyle2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="25dp"
-                    android:text="No Device Added"
-                    android:textColor="@color/red"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/tv_no_device_found"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:drawableTint="@color/patient_login_muted_text"
+                android:drawableTop="@drawable/ic_bluetooth"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="center"
+                android:text="@string/connected_devices_empty_title"
+                android:textColor="@color/patient_login_muted_text"
+                android:textSize="13sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -140,7 +140,7 @@ class CalibrationDevicesFragment() : BaseFragment() {
                 StringValues(value = CalibrationOperators.PLUS.name, isSelected = false),
                 StringValues(value = CalibrationOperators.MINUS.name, isSelected = false)
             )
-            calibrationOperatorTypesDialog.showDialog("Select Device Type", genderList)
+            calibrationOperatorTypesDialog.showDialog("Select Operator", genderList)
         }
     }
 
