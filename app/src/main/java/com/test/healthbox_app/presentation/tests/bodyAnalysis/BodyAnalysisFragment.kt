@@ -82,6 +82,13 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
         override fun onBleBroadcastData(bleValueBean: BleValueBean?, payload: ByteArray?) {
             val manufacturerData = bleValueBean?.manufacturerData
 
+            // DEBUG-WEIGHT: every raw broadcast the SDK delivers, whether or not it turns
+            // out to be our scale - if a "stuck" session shows NO DEBUG-WEIGHT lines at all
+            // for a while, the phone's BLE radio isn't hearing the scale (packet loss / out
+            // of range / scan silently stopped), not an app-logic bug.
+            println("DEBUG-WEIGHT: onBleBroadcastData mac=${bleValueBean?.mac} size=${manufacturerData?.size}")
+            Log.e("DEBUG-WEIGHT", "onBleBroadcastData mac=${bleValueBean?.mac} size=${manufacturerData?.size}")
+
             Log.e("onBleScannedBrodBAF", "  : : ${manufacturerData}")
 
             if (manufacturerData != null && manufacturerData.size >= 15) {
@@ -90,6 +97,10 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
                 val product = ((manufacturerData[6].toInt() and 0xff) shl 8) or (manufacturerData[7].toInt() and 0xff)
 
                 Log.e("onBleScannedBrodBAF", "  : manFData Prod $product")
+
+                // DEBUG-WEIGHT
+                println("DEBUG-WEIGHT: product=$product expected=$WEIGHT_BODY_FAT_SCALE_BROAD_CAST_LE_ONE matches=${product == WEIGHT_BODY_FAT_SCALE_BROAD_CAST_LE_ONE}")
+                Log.e("DEBUG-WEIGHT", "product=$product expected=$WEIGHT_BODY_FAT_SCALE_BROAD_CAST_LE_ONE matches=${product == WEIGHT_BODY_FAT_SCALE_BROAD_CAST_LE_ONE}")
 
                 if (product == WEIGHT_BODY_FAT_SCALE_BROAD_CAST_LE_ONE) {
                     Log.e("onBleScannedBrodBAF", "  : prod WeightBody : $product ")
@@ -601,6 +612,12 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
     fun onBroadCastData(mac: String, dataHexStr: String, data: ByteArray?) {
         Log.e("MainActivity", "mac:  $mac dataHexStr:  $dataHexStr  : data : $data")
 
+        // DEBUG-WEIGHT: entry point that flips the UI from illustration to the live-weight
+        // pill - if this keeps firing throughout a "stuck" session, broadcasts ARE arriving
+        // and the problem is downstream in getWeightData()/mBroadcastDataParsing parsing.
+        println("DEBUG-WEIGHT: onBroadCastData() mac=$mac")
+        Log.e("DEBUG-WEIGHT", "onBroadCastData() mac=$mac")
+
         binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, true)
 
         if (bleConnectionViewModel.selectedDevice.value == null) {
@@ -657,6 +674,17 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
         algorithmId: Int
     ) {
         var adc = adc
+
+        // DEBUG-WEIGHT: EVERY broadcast that reaches getWeightData(), before the
+        // duplicate-id short-circuit below - dataId/mOldNumberId shown together so we can
+        // see directly whether a stable (weightStatus=1) reading is ever being discarded
+        // here as a false "duplicate" (mOldNumberId is never reset between scans/Retest -
+        // if it collides with a leftover value from a PREVIOUS session, this is exactly
+        // where a real result would silently vanish while the scale's own screen still
+        // shows it).
+        println("DEBUG-WEIGHT: getWeightData() dataId=$dataId mOldNumberId=$mOldNumberId weightStatus=$weightStatus weight=$weight adc=$adc willSkipAsDuplicate=${mOldNumberId == dataId}")
+        Log.e("DEBUG-WEIGHT", "getWeightData() dataId=$dataId mOldNumberId=$mOldNumberId weightStatus=$weightStatus weight=$weight adc=$adc willSkipAsDuplicate=${mOldNumberId == dataId}")
+
         if (mOldNumberId == dataId) {
             //id相同,不处理
             return
@@ -713,6 +741,11 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
 //        mList!!.add(showData)
         println("\nweightStatus get Weight Data :: weightStatus :: $weightStatus  :: weight :: $weight")
 
+        // DEBUG-WEIGHT: which branch this broadcast takes - only weightStatus==0x01 with
+        // weight>0 leads to the body-fat calc and the results grid.
+        println("DEBUG-WEIGHT: willAttemptBodyFatCalc=${weightStatus == 0x01 && weight > 0} (weightStatus=$weightStatus weight=$weight)")
+        Log.e("DEBUG-WEIGHT", "willAttemptBodyFatCalc=${weightStatus == 0x01 && weight > 0} (weightStatus=$weightStatus weight=$weight)")
+
         if (weightStatus == 0x01 && weight > 0) {
 
             // BodyCheckupPref.height is saved verbatim from the Height screen's edit field,
@@ -723,6 +756,11 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
             // setWeightResults() is ever called, so nothing gets saved to BodyCheckupPref and
             // the Results screen shows a blank Weight/BMI/etc. row with no visible error.
             val heightCm = BodyCheckupPref.height?.toIntOrNull()
+
+            // DEBUG-WEIGHT
+            println("DEBUG-WEIGHT: heightCm=$heightCm (raw='${BodyCheckupPref.height}')")
+            Log.e("DEBUG-WEIGHT", "heightCm=$heightCm (raw='${BodyCheckupPref.height}')")
+
             if (heightCm == null) {
                 Log.e(TAG, "WeighingScaleLogs  : BodyFat  ::::  Skipped — invalid height '${BodyCheckupPref.height}', cannot compute body fat data")
 
@@ -762,24 +800,45 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
 
         println("\nweightStatus get Weight Data :: sex :: $sex  :: age :: $age :: height:: $height  :: weight :: $weight  :: adc ::$adc ")
 
-        val bodyFatData = AicareBleConfig.getBodyFatData(
-            AlgorithmUtil.AlgorithmType.TYPE_AICARE, sex, age, weight.toDouble() / 100, height, adc
-        )
-        val moreFatData = AicareBleConfig.getMoreFatData(
-            sex, height, weight.toDouble() / 100, bodyFatData.bfr, bodyFatData.rom, bodyFatData.pp
-        )
-        //http://doc.elinkthings.com/web/#/12?page_id=50  -> Part of the class description -> cn.net.aicare.algorithmutil.BodyFatData and MoreFatData doc
+        // DEBUG-WEIGHT: this callback runs on the vendor SDK's broadcast thread, so an
+        // uncaught exception here (e.g. adc=65535 meaning the scale couldn't measure
+        // impedance) can silently abort before setWeightResults() ever runs, with nothing
+        // visible on screen and no crash dialog. This try/catch ONLY adds logging - the
+        // exception is rethrown afterward, so behavior is unchanged either way.
+        println("DEBUG-WEIGHT: initBodyFatDataCalculation() entered sex=$sex age=$age height=$height weight=$weight adc=$adc")
+        Log.e("DEBUG-WEIGHT", "initBodyFatDataCalculation() entered sex=$sex age=$age height=$height weight=$weight adc=$adc")
 
-        Log.e(TAG, "WeighingScaleLogs  : BodyFat  ::::  Called  :$weight  : :  ${weight.toDouble() / 100}    :: " + Gson().toJson(bodyFatData))
-        Log.e(TAG, "WeighingScaleLogs  : MoreFat  ::::  Called  ::" + Gson().toJson(moreFatData))
+        try {
+            val bodyFatData = AicareBleConfig.getBodyFatData(
+                AlgorithmUtil.AlgorithmType.TYPE_AICARE, sex, age, weight.toDouble() / 100, height, adc
+            )
+            val moreFatData = AicareBleConfig.getMoreFatData(
+                sex, height, weight.toDouble() / 100, bodyFatData.bfr, bodyFatData.rom, bodyFatData.pp
+            )
+            //http://doc.elinkthings.com/web/#/12?page_id=50  -> Part of the class description -> cn.net.aicare.algorithmutil.BodyFatData and MoreFatData doc
 
-        val result = mapToBodyParameters(weight.toDouble() / 100, bodyFatData, moreFatData)
+            Log.e(TAG, "WeighingScaleLogs  : BodyFat  ::::  Called  :$weight  : :  ${weight.toDouble() / 100}    :: " + Gson().toJson(bodyFatData))
+            Log.e(TAG, "WeighingScaleLogs  : MoreFat  ::::  Called  ::" + Gson().toJson(moreFatData))
 
-        Log.e(TAG, "WeighingScaleLogs  : result  ::::  final  ::" + Gson().toJson(result))
+            val result = mapToBodyParameters(weight.toDouble() / 100, bodyFatData, moreFatData)
 
-        if (result.isNotEmpty()) AILinkBleManager.getInstance().stopScan()
+            Log.e(TAG, "WeighingScaleLogs  : result  ::::  final  ::" + Gson().toJson(result))
 
-        setWeightResults(result)
+            // DEBUG-WEIGHT: should always be size=15 - if setWeightResults() below doesn't
+            // show anything despite this printing, the problem is the UI layer, not the data.
+            println("DEBUG-WEIGHT: mapToBodyParameters() size=${result.size}")
+            Log.e("DEBUG-WEIGHT", "mapToBodyParameters() size=${result.size}")
+
+            if (result.isNotEmpty()) AILinkBleManager.getInstance().stopScan()
+
+            setWeightResults(result)
+        } catch (e: Exception) {
+            // DEBUG-WEIGHT: if this fires, the algorithm itself is throwing - check the adc
+            // (impedance) value logged above; 65535 means impedance measurement failed.
+            println("DEBUG-WEIGHT: EXCEPTION in initBodyFatDataCalculation(): ${e.javaClass.simpleName}: ${e.message}")
+            Log.e("DEBUG-WEIGHT", "EXCEPTION in initBodyFatDataCalculation()", e)
+            throw e
+        }
 
 //        mList!!.add("bodyFatData1:bmi=" + bodyFatData.bmi + "  bfr=" + bodyFatData.bfr + "  rom=" + bodyFatData.rom + "  pp=" + bodyFatData.pp + "  vwc=" + bodyFatData.vwc + "  bm=" + bodyFatData.bm)
 //        mList!!.add("bodyFatData2:$moreFatData")
@@ -787,6 +846,12 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
     }
 
     private fun setWeightResults(weightMeasurements: List<WeightMeasurement>) {
+
+        // DEBUG-WEIGHT: confirms this UI-update function itself is reached, and from which
+        // thread - if the DEBUG-WEIGHT lines above all print but this one is missing or
+        // shows a non-main thread, that's the whole answer.
+        println("DEBUG-WEIGHT: setWeightResults() called with ${weightMeasurements.size} items, thread=${Thread.currentThread().name} isMain=${android.os.Looper.myLooper() == android.os.Looper.getMainLooper()}")
+        Log.e("DEBUG-WEIGHT", "setWeightResults() called with ${weightMeasurements.size} items, thread=${Thread.currentThread().name} isMain=${android.os.Looper.myLooper() == android.os.Looper.getMainLooper()}")
 
         weightMeasurementsList = weightMeasurements
 
@@ -797,10 +862,22 @@ class BodyAnalysisFragment() : BaseFragment(), BroadcastDataParsing.OnBroadcastD
         binding.buttonStartWeight.visibility = View.VISIBLE
 
         binding.rvWeightResults.layoutManager = GridLayoutManager(context, 3)
+
+        // Guarded so re-running setWeightResults() (Retest) doesn't stack a second
+        // decoration on top of the first, which would double the spacing.
+        if (binding.rvWeightResults.itemDecorationCount == 0) {
+            val spacingPx = (14 * resources.displayMetrics.density).toInt()
+            binding.rvWeightResults.addItemDecoration(GridSpacingItemDecoration(3, spacingPx))
+        }
+
         binding.rvWeightResults.adapter = weightMeasurements.let {
             WeightResultsListAdapter(it)
         }
 
+        // DEBUG-WEIGHT: confirms the visibility/adapter actually landed on the real views
+        // right after setting them.
+        println("DEBUG-WEIGHT: post-set rvWeightResults.visibility=${binding.rvWeightResults.visibility} layoutWeightField.visibility=${binding.layoutWeightField.visibility} adapterItemCount=${binding.rvWeightResults.adapter?.itemCount}")
+        Log.e("DEBUG-WEIGHT", "post-set rvWeightResults.visibility=${binding.rvWeightResults.visibility} layoutWeightField.visibility=${binding.layoutWeightField.visibility} adapterItemCount=${binding.rvWeightResults.adapter?.itemCount}")
     }
 
     fun formatWeight(rawWeight: Int, decimal: Int): String {

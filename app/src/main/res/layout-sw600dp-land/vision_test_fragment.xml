@@ -13,136 +13,266 @@
             type="com.test.healthbox_app.BleConnectionViewModel" />
     </data>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_login_gradient">
 
-
-        <!-- User Details view -->
-        <com.test.healthbox_app.presentation.view.UserInfoView
-            android:id="@+id/userInfoView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="30dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.test.healthbox_app.presentation.view.StepsLayout
-            android:id="@+id/stepsLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.test.healthbox_app.presentation.view.DeviceStatusLayout
-            android:id="@+id/deviceStatusLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:layout_marginTop="24dp"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_vision_image_start"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginVertical="20dp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@+id/button_next_layout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/stepsLayout">
-
-            <ImageView
-                android:id="@+id/iv_weighing_scale"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:src="@drawable/ic_vision"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/button_start_vision"
-                style="@style/ButtonTextStyle"
-                android:layout_width="220dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/button_next_style"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
-                <TextView
-                    android:id="@+id/tv_start_weight"
-                    style="@style/SubTextStyle20"
+                <!-- Header row: the three status widgets share one horizontal band
+                     (common centerline via gravity="center_vertical", weighted spacers
+                     so StepsLayout tracks the true midpoint between its neighbors instead
+                     of the parent's midpoint) so the header reads as one designed strip
+                     instead of three independently-positioned floating cards.
+                     deviceStatusLayout stays invisible (not gone) - Vision has no BLE
+                     device at all (observeScanState()/observeConnectionState() are defined
+                     in VisionTestFragment but never called), but keeping it invisible
+                     rather than removing it preserves the same weighted-spacer geometry so
+                     stepsLayout still centers the same way as every other screen. -->
+                <LinearLayout
+                    android:id="@+id/header_row"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Start"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <!-- User Details view -->
+                    <com.test.healthbox_app.presentation.view.UserInfoView
+                        android:id="@+id/userInfoView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <com.test.healthbox_app.presentation.view.StepsLayout
+                        android:id="@+id/stepsLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <com.test.healthbox_app.presentation.view.DeviceStatusLayout
+                        android:id="@+id/deviceStatusLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible" />
+
+                </LinearLayout>
+
+                <!-- Single full-width card - once Start is tapped, vision_slides_view (the
+                     Snellen-chart wizard) replaces the whole content area and needs full
+                     width for its rows, same reasoning as Body Analysis's results grid. -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/card_outer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/bg_solid_card"
+                    android:clipToOutline="true"
+                    android:elevation="3dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/header_row">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="6dp"
+                        android:background="@drawable/bg_card_accent_top_teal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:orientation="vertical"
+                        android:padding="26dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_semibold"
+                            android:letterSpacing="0.05"
+                            android:text="@string/vision_eyebrow"
+                            android:textAllCaps="true"
+                            android:textColor="@color/patient_login_label"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="@string/vision_heading"
+                            android:textColor="@color/patient_login_heading_text"
+                            android:textSize="22sp" />
+
+                        <!-- Flexible spacer: hosts whichever of the two states Kotlin has
+                             made visible - the Start CTA (layout_vision_image_start) or the
+                             interactive Snellen-chart wizard (vision_slides_view). Only one
+                             is visible at a time; ids/visibility toggling unchanged from
+                             before, see VisionTestFragment.nextTestCall(). -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/layout_vision_image_start"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:visibility="visible">
+
+                                <FrameLayout
+                                    android:id="@+id/frame_vision_icon"
+                                    android:layout_width="220dp"
+                                    android:layout_height="220dp"
+                                    android:background="@drawable/bg_circle_teal"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <ImageView
+                                        android:id="@+id/iv_weighing_scale"
+                                        android:layout_width="130dp"
+                                        android:layout_height="130dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_vision" />
+
+                                </FrameLayout>
+
+                                <TextView
+                                    android:id="@+id/tv_vision_instruction"
+                                    android:layout_width="360dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:gravity="center"
+                                    android:text="@string/vision_instruction"
+                                    android:textColor="@color/patient_login_muted_text"
+                                    android:textSize="14sp"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/frame_vision_icon" />
+
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:id="@+id/button_start_vision"
+                                    android:layout_width="260dp"
+                                    android:layout_height="52dp"
+                                    android:layout_marginTop="22dp"
+                                    android:background="@drawable/bg_pill_tint"
+                                    android:visibility="visible"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/tv_vision_instruction">
+
+                                    <TextView
+                                        android:id="@+id/tv_start_weight"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/roboto_semibold"
+                                        android:gravity="center"
+                                        android:text="@string/vision_start_cta"
+                                        android:textAllCaps="false"
+                                        android:textColor="@color/app_color"
+                                        android:textSize="14sp"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent" />
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            <com.test.healthbox_app.presentation.view.VisionsTestAlphabetsView
+                                android:id="@+id/vision_slides_view"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:visibility="invisible" />
+
+                        </FrameLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/button_next_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:layout_marginTop="16dp"
+                            android:background="@drawable/bg_pill_tint">
+
+                            <TextView
+                                android:id="@+id/tv_next"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_semibold"
+                                android:gravity="center"
+                                android:text="@string/vision_next_cta"
+                                android:textAllCaps="false"
+                                android:textColor="@color/app_color"
+                                android:textSize="14sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/imageView7"
+                                app:layout_constraintHorizontal_chainStyle="packed"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <ImageView
+                                android:id="@+id/imageView7"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginStart="8dp"
+                                android:src="@drawable/ic_arrow"
+                                app:layout_constraintBottom_toBottomOf="@+id/tv_next"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/tv_next"
+                                app:layout_constraintTop_toTopOf="@+id/tv_next"
+                                app:tint="@color/app_color" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <com.test.healthbox_app.presentation.view.VisionsTestAlphabetsView
-            android:id="@+id/vision_slides_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginVertical="20dp"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/button_next_layout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/stepsLayout" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/button_next_layout"
-            style="@style/ButtonTextStyle"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="50dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/button_next_style"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <TextView
-                android:id="@+id/tv_next"
-                style="@style/SubTextStyle20"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageView7"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/imageView7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:src="@drawable/ic_arrow"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tv_next"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

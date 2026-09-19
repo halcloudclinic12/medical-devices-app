@@ -18,155 +18,285 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_login_gradient">
 
-        <!-- User Details view -->
-        <com.test.healthbox_app.presentation.view.UserInfoView
-            android:id="@+id/userInfoView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="30dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.test.healthbox_app.presentation.view.StepsLayout
-            android:id="@+id/stepsLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.test.healthbox_app.presentation.view.DeviceStatusLayout
-            android:id="@+id/deviceStatusLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:layout_marginTop="24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_hb_image_sample"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginVertical="20dp"
-            app:layout_constraintBottom_toTopOf="@+id/button_next_layout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/stepsLayout">
-
-            <ImageView
-                android:id="@+id/iv_weighing_scale"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:src="@drawable/ic_body_weight"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_weight_field"
-                android:layout_width="280dp"
-                android:layout_height="300dp"
-                android:background="@drawable/box_container_bg"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/edit_weight"
-                    style="@style/ResultTextStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="center"
-                    android:inputType="number"
-                    android:maxEms="5"
-                    android:text=""
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_weight_results"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="50dp"
-                android:layout_marginVertical="20dp"
-                android:visibility="gone" />
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <!-- Header row: the three status widgets share one horizontal band
+                     (common centerline via gravity="center_vertical", weighted spacers
+                     so StepsLayout tracks the true midpoint between its neighbors instead
+                     of the parent's midpoint) so the header reads as one designed strip
+                     instead of three independently-positioned floating cards. -->
+                <LinearLayout
+                    android:id="@+id/header_row"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/button_start_weight"
-            style="@style/ButtonTextStyle"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/button_next_style"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+                    <!-- User Details view -->
+                    <com.test.healthbox_app.presentation.view.UserInfoView
+                        android:id="@+id/userInfoView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/tv_start_weight"
-                style="@style/SubTextStyle20"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Start"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
 
+                    <com.test.healthbox_app.presentation.view.StepsLayout
+                        android:id="@+id/stepsLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
 
+                    <com.test.healthbox_app.presentation.view.DeviceStatusLayout
+                        android:id="@+id/deviceStatusLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/button_next_layout"
-            style="@style/ButtonTextStyle"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="50dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/button_next_style"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/tv_next"
-                style="@style/SubTextStyle20"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageView7"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <!-- Single full-width card - unlike the two-panel screens, Body Analysis's
+                     result is a grid of up to 15 metrics (see WeightResultsListAdapter /
+                     BodyCheckupPref.* in BodyAnalysisFragment.saveWeightData()) that needs
+                     the whole card width, not half of it. -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/card_outer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/bg_solid_card"
+                    android:clipToOutline="true"
+                    android:elevation="3dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/header_row">
 
-            <ImageView
-                android:id="@+id/imageView7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:src="@drawable/ic_arrow"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/tv_next"
-                app:layout_constraintTop_toTopOf="parent" />
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="6dp"
+                        android:background="@drawable/bg_card_accent_top_teal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:orientation="vertical"
+                        android:padding="26dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_semibold"
+                            android:letterSpacing="0.05"
+                            android:text="@string/wt_reading_eyebrow"
+                            android:textAllCaps="true"
+                            android:textColor="@color/patient_login_label"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="@string/wt_reading_heading"
+                            android:textColor="@color/patient_login_heading_text"
+                            android:textSize="22sp" />
+
+                        <!-- Flexible spacer: hosts whichever of the three states Kotlin has
+                             made visible - illustration (not started), live weight pill
+                             (stabilizing), or the results grid (final). Only one is visible
+                             at a time; ids/visibility toggling unchanged from before, see
+                             BodyAnalysisFragment.onBroadCastData()/getWeightData()/
+                             setWeightResults(). -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center">
+
+                            <!-- iv_weighing_scale is the whole circle (not just the icon) so
+                                 that BodyAnalysisFragment.onBroadCastData()'s
+                                 `binding.ivWeighingScale.visibility = View.GONE` hides the
+                                 circle entirely instead of leaving an empty ring behind. -->
+                            <FrameLayout
+                                android:id="@+id/iv_weighing_scale"
+                                android:layout_width="220dp"
+                                android:layout_height="220dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/bg_circle_teal"
+                                android:visibility="visible">
+
+                                <ImageView
+                                    android:layout_width="130dp"
+                                    android:layout_height="130dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_body_weight" />
+
+                            </FrameLayout>
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/layout_weight_field"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:background="@drawable/bg_pill_tint"
+                                android:paddingHorizontal="52dp"
+                                android:paddingVertical="32dp"
+                                android:visibility="invisible">
+
+                                <androidx.appcompat.widget.AppCompatEditText
+                                    android:id="@+id/edit_weight"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@android:color/transparent"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:gravity="center"
+                                    android:inputType="number"
+                                    android:maxEms="5"
+                                    android:minWidth="120dp"
+                                    android:textColor="@color/patient_login_heading_text"
+                                    android:textSize="68sp"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_semibold"
+                                    android:text="@string/wt_unit_kg"
+                                    android:textColor="@color/patient_login_label"
+                                    android:textSize="16sp"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/edit_weight" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rv_weight_results"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:clipToPadding="false"
+                                android:visibility="gone"
+                                tools:listitem="@layout/weight_results_list_item" />
+
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/button_start_weight"
+                                android:layout_width="0dp"
+                                android:layout_height="52dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_pill_tint">
+
+                                <TextView
+                                    android:id="@+id/tv_start_weight"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_semibold"
+                                    android:gravity="center"
+                                    android:text="@string/wt_start_cta"
+                                    android:textAllCaps="false"
+                                    android:textColor="@color/app_color"
+                                    android:textSize="14sp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/button_next_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="52dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_pill_tint">
+
+                                <TextView
+                                    android:id="@+id/tv_next"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_semibold"
+                                    android:gravity="center"
+                                    android:text="@string/wt_next_cta"
+                                    android:textAllCaps="false"
+                                    android:textColor="@color/app_color"
+                                    android:textSize="14sp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toStartOf="@+id/imageView7"
+                                    app:layout_constraintHorizontal_chainStyle="packed"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <ImageView
+                                    android:id="@+id/imageView7"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_marginStart="8dp"
+                                    android:src="@drawable/ic_arrow"
+                                    app:layout_constraintBottom_toBottomOf="@+id/tv_next"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toEndOf="@+id/tv_next"
+                                    app:layout_constraintTop_toTopOf="@+id/tv_next"
+                                    app:tint="@color/app_color" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </layout>

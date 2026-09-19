@@ -163,6 +163,42 @@
     <string name="bp_measuring_label">Measuring…</string>
     <string name="bp_next_cta">Next: Blood Sugar</string>
 
+    <!-- Blood Sugar screen -->
+    <string name="bs_guidance_eyebrow">Step Guidance</string>
+    <string name="bs_guidance_heading">Prepare the Glucometer</string>
+    <string name="bs_guidance_bullet_1_title">Insert the Strip</string>
+    <string name="bs_guidance_bullet_1_subtitle">Load a fresh strip into the glucometer</string>
+    <string name="bs_guidance_bullet_2_title">Prepare the Sample</string>
+    <string name="bs_guidance_bullet_2_subtitle">Use the lancet to draw a small blood drop</string>
+    <string name="bs_guidance_bullet_3_title">Apply to the Strip</string>
+    <string name="bs_guidance_bullet_3_subtitle">Touch the drop to the strip and hold steady</string>
+    <string name="bs_guidance_bullet_4_title">Wait for the Result</string>
+    <string name="bs_guidance_bullet_4_subtitle">Reading appears automatically, then eject the strip</string>
+    <string name="bs_reading_eyebrow">Live Reading</string>
+    <string name="bs_reading_heading">Blood Sugar</string>
+    <string name="bs_ready_title">Ready When You Are</string>
+    <string name="bs_ready_subtitle">Tap start to connect the glucometer and begin the test</string>
+    <string name="bs_start_cta">Start Test</string>
+    <string name="bs_retest_cta">Retest</string>
+    <string name="bs_unit_mgdl">mg/dL</string>
+    <string name="bs_next_cta">Next: Hemoglobin</string>
+
+    <!-- Vision screen -->
+    <string name="vision_eyebrow">Vision Test</string>
+    <string name="vision_heading">Check Your Vision</string>
+    <string name="vision_instruction">Cover one eye at a time and mark the smallest line of letters you can read clearly</string>
+    <string name="vision_start_cta">Start Test</string>
+    <string name="vision_next_cta">Next: Blood Pressure</string>
+    <string name="vision_left_eye_label">Left Eye</string>
+    <string name="vision_right_eye_label">Right Eye</string>
+
+    <!-- Body Analysis (Weight) screen -->
+    <string name="wt_reading_eyebrow">Live Reading</string>
+    <string name="wt_reading_heading">Body Composition</string>
+    <string name="wt_unit_kg">kg</string>
+    <string name="wt_start_cta">Start</string>
+    <string name="wt_next_cta">Next: Vision</string>
+
     <!-- Connected Devices screen -->
     <string name="connected_devices_title">Devices</string>
     <string name="connected_devices_subtext">Manage the paired vitals devices connected to this kiosk.</string>
