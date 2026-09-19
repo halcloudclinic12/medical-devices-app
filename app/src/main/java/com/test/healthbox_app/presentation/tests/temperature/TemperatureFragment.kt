@@ -191,12 +191,20 @@ class TemperatureFragment() : BaseFragment() {
         bleConnectionViewModel.setSelectedDevice(null)
 
         bleConnectionViewModel.setDeviceType(null)
+
+        // Stop promptly rather than leaving it running until the next screen's
+        // bindViewModel() cleans it up (see DeviceStatusLayout.bindViewModel()).
+        deviceStatusViewModel.stopBleScan()
     }
 
     private fun setupDialog() {
         deviceListDialog = mActivity?.let {
             DeviceListDialog(it, onDeviceClose = {
                 deviceListDialog.dismissDialog()
+
+                // Closed without picking a device - stop the scan and clear its result
+                // instead of leaving it to keep running/sitting in the shared state.
+                deviceStatusViewModel.stopBleScan()
             })
         }!!
 
@@ -326,6 +334,11 @@ class TemperatureFragment() : BaseFragment() {
 
                         binding.editTemperature.setText("${temperatureMeasurement.temperatureFahrenheit}")
 
+                        // Real device-reported value, not a computed conversion - the device
+                        // already sends both units, so no client-side math to get wrong.
+                        binding.tvTemperatureEquivalent.text =
+                            "Equivalent to %.1f°C".format(temperatureMeasurement.temperatureCelsius)
+
                     }
 
 
@@ -389,6 +402,11 @@ class TemperatureFragment() : BaseFragment() {
                 // Show dialog with the devices list
                 if (state.devices.isNotEmpty()) {
                     deviceListDialog.showDialog(state.devices)
+
+                    // Consumed - without this, the non-empty result sits in the shared
+                    // StateFlow and replays to the next screen that subscribes, exactly
+                    // like the empty case below already guards against.
+                    deviceStatusViewModel.updateScannedDevicesList()
                 } else {
                     // Show empty state or message
                     if (bleConnectionViewModel.selectedDevice.value == null) Toast.makeText(requireContext(), "No devices found", Toast.LENGTH_SHORT)

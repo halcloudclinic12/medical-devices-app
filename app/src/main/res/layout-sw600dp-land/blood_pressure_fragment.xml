@@ -18,298 +18,604 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_login_gradient">
 
-        <!-- User Details view -->
-        <com.test.healthbox_app.presentation.view.UserInfoView
-            android:id="@+id/userInfoView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="30dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.test.healthbox_app.presentation.view.StepsLayout
-            android:id="@+id/stepsLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.test.healthbox_app.presentation.view.DeviceStatusLayout
-            android:id="@+id/deviceStatusLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!--<androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/device_status_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="30dp"
-            android:layout_marginVertical="30dp"
-            android:background="@drawable/blur_background"
-            android:paddingHorizontal="30dp"
-            android:paddingVertical="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/tv_device_status"
-                style="@style/SubTextStyle20"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/device_status"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_device_availability"
-                style="@style/SubTextStyle18"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Disconnected"
-                android:visibility="@{viewModel.selectedDevice != null ? View.VISIBLE : View.GONE }"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_device_status" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/button_scan"
-                style="@style/SmallButtonTextStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/button_style"
-                android:onClick="@{()->viewModel.startScan(10000)}"
-                android:text="@string/scan"
-                android:textAllCaps="false"
-                android:visibility="@{viewModel.selectedDevice != null ? View.GONE : View.VISIBLE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_device_availability" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>-->
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_image_sample"
-            android:layout_width="0dp"
-            android:layout_height="400dp"
-            android:layout_marginStart="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/layout_blood_pressure_readings"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/stepsLayout">
-
-            <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:src="@drawable/ic_blood_pressure"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_blood_pressure_readings"
-            android:layout_width="0dp"
-            android:layout_height="400dp"
-            android:layout_marginEnd="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/layout_image_sample"
-            app:layout_constraintTop_toBottomOf="@+id/stepsLayout">
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/result_layout"
-                android:layout_width="480dp"
-                android:layout_height="380dp"
-                android:background="@drawable/box_container_bg"
-                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
-                <TextView
-                    android:id="@+id/tv_diastolic"
-                    style="@style/ResultLabelTextStyle"
-                    android:layout_width="wrap_content"
+                <!-- Header row: the three status widgets share one horizontal band
+                     (common centerline via gravity="center_vertical", weighted spacers
+                     so StepsLayout tracks the true midpoint between its neighbors instead
+                     of the parent's midpoint) so the header reads as one designed strip
+                     instead of three independently-positioned floating cards. -->
+                <LinearLayout
+                    android:id="@+id/header_row"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:text="Diastolic"
-                    app:layout_constraintEnd_toStartOf="@+id/tv_systolic"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
-
-
-                <TextView
-                    android:id="@+id/tv_systolic"
-                    style="@style/ResultLabelTextStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:text="Systolic"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/tv_diastolic"
-                    app:layout_constraintTop_toTopOf="parent" />
-                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
-
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/edit_diastolic"
-                    style="@style/ResultTextStyle"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="center"
-                    android:inputType="number"
-                    android:maxEms="5"
-                    android:text=""
-                    app:layout_constraintEnd_toStartOf="@+id/edit_systolic"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_diastolic" />
-                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
-
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/edit_systolic"
-                    style="@style/ResultTextStyle"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="center"
-                    android:inputType="number"
-                    android:maxEms="5"
-                    android:text=""
-
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/edit_diastolic"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_systolic" />
-                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
-
-
-                <TextView
-                    android:id="@+id/tv_pulse"
-                    style="@style/ResultLabelTextStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:text="Heart Rate"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_diastolic" />
-                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
+                    app:layout_constraintTop_toTopOf="parent">
 
+                    <!-- User Details view -->
+                    <com.test.healthbox_app.presentation.view.UserInfoView
+                        android:id="@+id/userInfoView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/edit_heart_rate"
-                    style="@style/ResultTextStyle"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="center"
-                    android:inputType="number"
-                    android:maxEms="5"
-                    android:text=""
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
 
+                    <com.test.healthbox_app.presentation.view.StepsLayout
+                        android:id="@+id/stepsLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <com.test.healthbox_app.presentation.view.DeviceStatusLayout
+                        android:id="@+id/deviceStatusLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <!-- Two-panel measurement card -->
+                <LinearLayout
+                    android:id="@+id/card_outer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_pulse" />
+                    app:layout_constraintTop_toBottomOf="@+id/header_row">
 
-                <!--                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE }"-->
+                    <!-- LEFT: procedure guidance -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_image_sample"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="0.46"
+                        android:background="@drawable/bg_solid_card"
+                        android:clipToOutline="true"
+                        android:elevation="3dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/bg_card_accent_top_teal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:orientation="vertical"
+                            android:padding="26dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_semibold"
+                                android:letterSpacing="0.05"
+                                android:text="@string/bp_guidance_eyebrow"
+                                android:textAllCaps="true"
+                                android:textColor="@color/patient_login_label"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/bp_guidance_heading"
+                                android:textColor="@color/patient_login_heading_text"
+                                android:textSize="22sp" />
+
+                            <!-- Flexible spacer: centers the illustration in whatever room
+                                 is left once the card stretches to fill the screen. -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <FrameLayout
+                                    android:layout_width="220dp"
+                                    android:layout_height="220dp"
+                                    android:layout_gravity="center"
+                                    android:background="@drawable/bg_circle_teal">
+
+                                    <ImageView
+                                        android:id="@+id/imageView6"
+                                        android:layout_width="130dp"
+                                        android:layout_height="130dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_blood_pressure" />
+
+                                </FrameLayout>
+
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="16dp"
+                                    android:orientation="horizontal">
+
+                                    <FrameLayout
+                                        android:layout_width="26dp"
+                                        android:layout_height="26dp"
+                                        android:background="@drawable/bg_circle_teal">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:fontFamily="@font/roboto_bold"
+                                            android:text="1"
+                                            android:textColor="@color/app_color"
+                                            android:textSize="13sp" />
+
+                                    </FrameLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="12dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/bp_guidance_bullet_1_title"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="14sp" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_regular"
+                                            android:text="@string/bp_guidance_bullet_1_subtitle"
+                                            android:textColor="@color/patient_login_muted_text"
+                                            android:textSize="12sp" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="14dp"
+                                    android:orientation="horizontal">
+
+                                    <FrameLayout
+                                        android:layout_width="26dp"
+                                        android:layout_height="26dp"
+                                        android:background="@drawable/bg_circle_teal">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:fontFamily="@font/roboto_bold"
+                                            android:text="2"
+                                            android:textColor="@color/app_color"
+                                            android:textSize="13sp" />
+
+                                    </FrameLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="12dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/bp_guidance_bullet_2_title"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="14sp" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_regular"
+                                            android:text="@string/bp_guidance_bullet_2_subtitle"
+                                            android:textColor="@color/patient_login_muted_text"
+                                            android:textSize="12sp" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="14dp"
+                                    android:orientation="horizontal">
+
+                                    <FrameLayout
+                                        android:layout_width="26dp"
+                                        android:layout_height="26dp"
+                                        android:background="@drawable/bg_circle_teal">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:fontFamily="@font/roboto_bold"
+                                            android:text="3"
+                                            android:textColor="@color/app_color"
+                                            android:textSize="13sp" />
+
+                                    </FrameLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="12dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/bp_guidance_bullet_3_title"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="14sp" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_regular"
+                                            android:text="@string/bp_guidance_bullet_3_subtitle"
+                                            android:textColor="@color/patient_login_muted_text"
+                                            android:textSize="12sp" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- RIGHT: live reading + next action. No manual capture button - the
+                         reading is requested automatically once the device connects. Two
+                         mutually-exclusive states share the same pill slot so the transition
+                         from "measuring" to "final result" reads as one element resolving:
+                         testing_layout shows the live rising systolic-only value while the
+                         cuff inflates (deviceResponsesReceived == false, i.e. isTesting ==
+                         true), result_layout shows systolic/diastolic + heart rate once the
+                         reading is final (see BloodPressureFragment.observeDataState()). -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_blood_pressure_readings"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="0.54"
+                        android:background="@drawable/bg_solid_card"
+                        android:clipToOutline="true"
+                        android:elevation="3dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/bg_card_accent_top_teal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:orientation="vertical"
+                            android:padding="26dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_semibold"
+                                android:letterSpacing="0.05"
+                                android:text="@string/bp_reading_eyebrow"
+                                android:textAllCaps="true"
+                                android:textColor="@color/patient_login_label"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/bp_reading_heading"
+                                android:textColor="@color/patient_login_heading_text"
+                                android:textSize="22sp" />
+
+                            <!-- Flexible spacer: centers the reading pill in whatever room
+                                 is left once the card stretches to fill the screen. -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <!-- Final result: systolic/diastolic as one pill, heart rate
+                                     as the secondary line below - same slot pattern as
+                                     Height/Temperature/Pulse's single hero + secondary line. -->
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:id="@+id/result_layout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:background="@drawable/bg_pill_tint"
+                                    android:paddingVertical="32dp"
+                                    android:visibility="@{viewModel.deviceResponsesReceived == true ? View.VISIBLE : View.GONE}">
+
+                                    <androidx.appcompat.widget.AppCompatEditText
+                                        android:id="@+id/edit_systolic"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="@android:color/transparent"
+                                        android:fontFamily="@font/roboto_bold"
+                                        android:gravity="center"
+                                        android:inputType="number"
+                                        android:maxEms="3"
+                                        android:minWidth="64dp"
+                                        android:textColor="@color/patient_login_heading_text"
+                                        android:textSize="52sp"
+                                        app:layout_constraintEnd_toStartOf="@+id/tv_bp_separator"
+                                        app:layout_constraintHorizontal_chainStyle="packed"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent" />
+
+                                    <TextView
+                                        android:id="@+id/tv_bp_separator"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginHorizontal="4dp"
+                                        android:fontFamily="@font/roboto_regular"
+                                        android:text="/"
+                                        android:textColor="@color/patient_login_label"
+                                        android:textSize="40sp"
+                                        app:layout_constraintBottom_toBottomOf="@+id/edit_systolic"
+                                        app:layout_constraintEnd_toStartOf="@+id/edit_diastolic"
+                                        app:layout_constraintStart_toEndOf="@+id/edit_systolic"
+                                        app:layout_constraintTop_toTopOf="@+id/edit_systolic" />
+
+                                    <androidx.appcompat.widget.AppCompatEditText
+                                        android:id="@+id/edit_diastolic"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="@android:color/transparent"
+                                        android:fontFamily="@font/roboto_bold"
+                                        android:gravity="center"
+                                        android:inputType="number"
+                                        android:maxEms="3"
+                                        android:minWidth="64dp"
+                                        android:textColor="@color/patient_login_heading_text"
+                                        android:textSize="52sp"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toEndOf="@+id/tv_bp_separator"
+                                        app:layout_constraintTop_toTopOf="parent" />
+
+                                    <TextView
+                                        android:id="@+id/tv_bp_unit"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/roboto_semibold"
+                                        android:gravity="center"
+                                        android:text="@string/bp_unit_mmhg"
+                                        android:textColor="@color/patient_login_label"
+                                        android:textSize="16sp"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toBottomOf="@+id/edit_systolic" />
+
+                                    <!-- Secondary line, same slot Height uses for ft/in and
+                                         Pulse uses for pulse rate - real third value from the
+                                         same reading, not fabricated. -->
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="14dp"
+                                        android:gravity="center"
+                                        android:orientation="horizontal"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toBottomOf="@+id/tv_bp_unit">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_regular"
+                                            android:text="Heart Rate "
+                                            android:textColor="@color/patient_login_muted_text"
+                                            android:textSize="15sp" />
+
+                                        <androidx.appcompat.widget.AppCompatEditText
+                                            android:id="@+id/edit_heart_rate"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:background="@android:color/transparent"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:gravity="center"
+                                            android:inputType="number"
+                                            android:maxEms="3"
+                                            android:minWidth="32dp"
+                                            android:minHeight="0dp"
+                                            android:padding="0dp"
+                                            android:text=""
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="15sp" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="2dp"
+                                            android:fontFamily="@font/roboto_regular"
+                                            android:text="@string/bp_unit_bpm"
+                                            android:textColor="@color/patient_login_muted_text"
+                                            android:textSize="15sp" />
+
+                                    </LinearLayout>
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                                <!-- Measuring: same pill slot, live rising systolic-only
+                                     value while the cuff inflates. -->
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:id="@+id/testing_layout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:background="@drawable/bg_pill_tint"
+                                    android:paddingVertical="32dp"
+                                    android:visibility="@{viewModel.deviceResponsesReceived == true ? View.GONE : View.VISIBLE}">
+
+                                    <TextView
+                                        android:id="@+id/tv_bp_measuring"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/roboto_semibold"
+                                        android:letterSpacing="0.05"
+                                        android:text="@string/bp_measuring_label"
+                                        android:textAllCaps="true"
+                                        android:textColor="@color/patient_login_label"
+                                        android:textSize="12sp"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent" />
+
+                                    <androidx.appcompat.widget.AppCompatEditText
+                                        android:id="@+id/edit_testing_value"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="8dp"
+                                        android:background="@android:color/transparent"
+                                        android:fontFamily="@font/roboto_bold"
+                                        android:gravity="center"
+                                        android:inputType="number"
+                                        android:maxEms="5"
+                                        android:minWidth="120dp"
+                                        android:textColor="@color/patient_login_heading_text"
+                                        android:textSize="68sp"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toBottomOf="@+id/tv_bp_measuring" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:fontFamily="@font/roboto_semibold"
+                                        android:text="@string/bp_unit_mmhg"
+                                        android:textColor="@color/patient_login_label"
+                                        android:textSize="16sp"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toBottomOf="@+id/edit_testing_value" />
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            </FrameLayout>
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/button_next_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:layout_marginTop="16dp"
+                                android:background="@drawable/bg_pill_tint">
+
+                                <TextView
+                                    android:id="@+id/tv_next"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_semibold"
+                                    android:gravity="center"
+                                    android:text="@string/bp_next_cta"
+                                    android:textAllCaps="false"
+                                    android:textColor="@color/app_color"
+                                    android:textSize="14sp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toStartOf="@+id/imageView7"
+                                    app:layout_constraintHorizontal_chainStyle="packed"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <ImageView
+                                    android:id="@+id/imageView7"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_marginStart="8dp"
+                                    android:src="@drawable/ic_arrow"
+                                    app:layout_constraintBottom_toBottomOf="@+id/tv_next"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toEndOf="@+id/tv_next"
+                                    app:layout_constraintTop_toTopOf="@+id/tv_next"
+                                    app:tint="@color/app_color" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/testing_layout"
-                android:layout_width="480dp"
-                android:layout_height="380dp"
-                android:background="@drawable/box_container_bg"
-                android:visibility="@{viewModel.deviceResponsesReceived == true ? View.GONE : View.VISIBLE }"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/edit_testing_value"
-                    style="@style/ResultTextStyle"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="center"
-                    android:inputType="number"
-                    android:maxEms="5"
-                    android:text=""
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/button_next_layout"
-            style="@style/ButtonTextStyle"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="50dp"
-            android:background="@drawable/button_next_style"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_blood_pressure_readings">
-
-            <TextView
-                android:id="@+id/tv_next"
-                style="@style/SubTextStyle20"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageView7"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/imageView7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:src="@drawable/ic_arrow"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/tv_next"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </layout>

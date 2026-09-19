@@ -2,6 +2,8 @@ package com.test.healthbox_app.presentation.tests.height
 
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -106,11 +108,36 @@ class HeightFragment() : BaseFragment() {
 
         nextTestCall()
 
+        setupHeightEquivalent()
+
         if (Constants.LOGS_ENABLE) {
             binding.editHeight.setText("172")
         }
 
         return binding.root
+    }
+
+    // The cm reading is the real, device-reported value. The ft/in line under it is a
+    // plain unit conversion computed from that same value — not a second, independent
+    // measurement — so it's recomputed on every change instead of coming from the device.
+    private fun setupHeightEquivalent() {
+        binding.editHeight.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val cm = s?.toString()?.toFloatOrNull()
+
+                binding.tvHeightEquivalent.text = if (cm != null && cm > 0) {
+                    val totalInches = cm / 2.54f
+                    val feet = (totalInches / 12).toInt()
+                    val inches = totalInches - (feet * 12)
+                    "Equivalent to %d ft %.1f inches".format(feet, inches)
+                } else {
+                    ""
+                }
+            }
+        })
     }
 
     private fun setAndObserveDeviceAvailability() {
@@ -175,6 +202,10 @@ class HeightFragment() : BaseFragment() {
                         )
                     }
 
+                    // Stop promptly rather than leaving it running until the next screen's
+                    // bindViewModel() cleans it up (see DeviceStatusLayout.bindViewModel()).
+                    deviceStatusViewModel.stopBleScan()
+
                     delay(100)
 
                     // Save before advancing the shared step list — goToNextStep() fires an
@@ -209,6 +240,10 @@ class HeightFragment() : BaseFragment() {
         deviceListDialog = mActivity?.let {
             DeviceListDialog(it, onDeviceClose = {
                 deviceListDialog.dismissDialog()
+
+                // Closed without picking a device - stop the scan and clear its result
+                // instead of leaving it to keep running/sitting in the shared state.
+                deviceStatusViewModel.stopBleScan()
             })
         }!!
 
@@ -289,7 +324,9 @@ class HeightFragment() : BaseFragment() {
                                 bleConnectionViewModel.saveDevice(it)
                             }
 
-                            binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, true)
+                            binding.deviceStatusLayout.setupDeviceStatus(
+                                mActivity!!, true, bleConnectionViewModel.selectedDevice.value?.name
+                            )
 //                                binding.tvDeviceAvailability.text = "Connected"
 //                                binding.tvDeviceAvailability.setTextColor(mActivity?.resources!!.getColor(R.color.green))
                         }
@@ -397,6 +434,11 @@ class HeightFragment() : BaseFragment() {
                 // Show dialog with the devices list
                 if (state.devices.isNotEmpty()) {
                     deviceListDialog.showDialog(state.devices)
+
+                    // Consumed - without this, the non-empty result sits in the shared
+                    // StateFlow and replays to the next screen that subscribes, exactly
+                    // like the empty case below already guards against.
+                    deviceStatusViewModel.updateScannedDevicesList()
                 } else {
                     // Show empty state or message
                     if (bleConnectionViewModel.selectedDevice.value == null) Toast.makeText(requireContext(), "No devices found", Toast.LENGTH_SHORT)
@@ -415,10 +457,21 @@ class HeightFragment() : BaseFragment() {
 //                binding.buttonScan.isEnabled = true
 //                binding.tvDeviceAvailability.text = "Error: ${state.message}"
                 Toast.makeText(requireContext(), "Error: ${state.message}", Toast.LENGTH_SHORT).show()
+
+                // A connection attempt (ScanState.Connecting) may have failed here - restore
+                // whatever the card was really showing before it, rather than guessing
+                // "Disconnected" (which would be wrong if this was a re-scan-to-switch
+                // attempt on an already-connected device).
+                mActivity?.let { binding.deviceStatusLayout.clearConnecting(it) }
             }
 
             is ScanState.Connecting -> {
                 Log.e("scanStateHeight :  in_conn", "  :  ${ScanState.Connected}")
+
+                // The device list dialog dismisses the instant a device row is tapped, but
+                // the actual BLE connection can take a couple seconds - previously the card
+                // just sat on its old state through this whole gap.
+                mActivity?.let { binding.deviceStatusLayout.setConnecting(it) }
             }
 
             is ScanState.Connected -> {

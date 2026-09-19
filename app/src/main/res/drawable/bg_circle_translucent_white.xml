@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icon badge for the device status card once the card itself carries the state color
+     (see bg_pill_status_fill) - a solid white icon on a solid colored card would vanish,
+     so the badge is a translucent white circle instead, and stays this one fixed style
+     across connected/disconnected/connecting/scan states. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#33FFFFFF" />
+</shape>

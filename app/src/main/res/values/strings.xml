@@ -5,7 +5,12 @@
     <string name="submit_text">Submit</string>
     <string name="machine_id">Machine ID</string>
     <string name="machine_password">Machine Password</string>
-    <string name="are_you_sure_you_want_to_check_in_to_s">Are you sure you want to check in to %s?</string>
+
+    <!-- Machine Check-in screen -->
+    <string name="machine_checkin_verify_cta">Verify Machine ID</string>
+    <string name="machine_checkin_verified_label">Clinic Verified</string>
+    <string name="machine_checkin_confirm_subtext">You\'re checked in as this clinic\'s kiosk. Tap below to continue.</string>
+    <string name="machine_checkin_cta">Check In →</string>
 
     <string name="Authentication_failed">Authentication failed</string>
     <string name="Authentication_error">Authentication error: </string>
@@ -23,6 +28,8 @@
     <string name="scan">Scan</string>
     <string name="start">Start</string>
     <string name="device_status">Device Status</string>
+    <string name="device_status_scan_cta">Scan for Device</string>
+    <string name="device_status_change_cta">Change Device</string>
     <string name="select_device">Select Device</string>
     <string name="next">Next</string>
 
@@ -96,6 +103,65 @@
     <string name="calibration_device_type_placeholder">Device Type *</string>
     <string name="calibration_operation_type_placeholder">Operator *</string>
     <string name="calibration_value_placeholder">Value *</string>
+
+    <!-- Height screen -->
+    <string name="height_guidance_eyebrow">Step Guidance</string>
+    <string name="height_guidance_heading">Stand Still &amp; Straight</string>
+    <string name="height_guidance_bullet_1_title">Look Straight Ahead</string>
+    <string name="height_guidance_bullet_1_subtitle">Keep your head level and eyes forward</string>
+    <string name="height_guidance_bullet_2_title">Relax Your Shoulders</string>
+    <string name="height_guidance_bullet_2_subtitle">Stand naturally with your back straight</string>
+    <string name="height_guidance_bullet_3_title">Heels Together</string>
+    <string name="height_guidance_bullet_3_subtitle">Feet flat, heels touching the base</string>
+    <string name="height_reading_eyebrow">Live Reading</string>
+    <string name="height_reading_heading">Patient Height</string>
+    <string name="height_unit_cm">cm</string>
+    <string name="height_capture_cta">Capture Height Reading</string>
+    <string name="height_next_cta">Next: Temperature</string>
+
+    <!-- Temperature screen -->
+    <string name="temperature_guidance_eyebrow">Step Guidance</string>
+    <string name="temperature_guidance_heading">Stay Still &amp; Steady</string>
+    <string name="temperature_guidance_bullet_1_title">Keep Device In Place</string>
+    <string name="temperature_guidance_bullet_1_subtitle">Hold steady against the skin</string>
+    <string name="temperature_guidance_bullet_2_title">Avoid Talking Or Moving</string>
+    <string name="temperature_guidance_bullet_2_subtitle">Movement can affect the reading</string>
+    <string name="temperature_guidance_bullet_3_title">Reading Is Automatic</string>
+    <string name="temperature_guidance_bullet_3_subtitle">Captured as soon as the device connects</string>
+    <string name="temperature_reading_eyebrow">Live Reading</string>
+    <string name="temperature_reading_heading">Patient Temperature</string>
+    <string name="temperature_unit_f">°F</string>
+    <string name="temperature_next_cta">Next: Pulse</string>
+
+    <!-- Pulse / SpO2 screen -->
+    <string name="pulse_guidance_eyebrow">Step Guidance</string>
+    <string name="pulse_guidance_heading">Keep Finger Still</string>
+    <string name="pulse_guidance_bullet_1_title">Insert Finger Fully</string>
+    <string name="pulse_guidance_bullet_1_subtitle">Place fingertip snugly in the sensor clip</string>
+    <string name="pulse_guidance_bullet_2_title">Avoid Movement</string>
+    <string name="pulse_guidance_bullet_2_subtitle">Movement can affect the reading</string>
+    <string name="pulse_guidance_bullet_3_title">Reading Is Automatic</string>
+    <string name="pulse_guidance_bullet_3_subtitle">Captured as soon as the device connects</string>
+    <string name="pulse_reading_eyebrow">Live Reading</string>
+    <string name="pulse_reading_heading">Blood Oxygen (SpO₂)</string>
+    <string name="pulse_unit_percent">%</string>
+    <string name="pulse_next_cta">Next: Weight</string>
+
+    <!-- Blood Pressure screen -->
+    <string name="bp_guidance_eyebrow">Step Guidance</string>
+    <string name="bp_guidance_heading">Rest Your Arm &amp; Relax</string>
+    <string name="bp_guidance_bullet_1_title">Rest Your Arm</string>
+    <string name="bp_guidance_bullet_1_subtitle">Keep it supported on a table, palm up</string>
+    <string name="bp_guidance_bullet_2_title">Keep Still &amp; Quiet</string>
+    <string name="bp_guidance_bullet_2_subtitle">Movement or talking can affect the reading</string>
+    <string name="bp_guidance_bullet_3_title">Reading Is Automatic</string>
+    <string name="bp_guidance_bullet_3_subtitle">Cuff inflates and reports once connected</string>
+    <string name="bp_reading_eyebrow">Live Reading</string>
+    <string name="bp_reading_heading">Blood Pressure</string>
+    <string name="bp_unit_mmhg">mmHg</string>
+    <string name="bp_unit_bpm">bpm</string>
+    <string name="bp_measuring_label">Measuring…</string>
+    <string name="bp_next_cta">Next: Blood Sugar</string>
 
     <!-- Connected Devices screen -->
     <string name="connected_devices_title">Devices</string>

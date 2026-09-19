@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Device status icon badge, disconnected state. Solid oval so it compiles to a
+     GradientDrawable at runtime and can be recolored directly (see bg_circle_status_neutral,
+     the default before any connect attempt, and DeviceStatusLayout.setupDeviceStatus()). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/red" />
+</shape>

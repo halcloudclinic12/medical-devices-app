@@ -18,159 +18,491 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_login_gradient">
 
-        <!-- User Details view -->
-
-        <com.test.healthbox_app.presentation.view.UserInfoView
-            android:id="@+id/userInfoView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="30dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.test.healthbox_app.presentation.view.StepsLayout
-            android:id="@+id/stepsLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.test.healthbox_app.presentation.view.DeviceStatusLayout
-            android:id="@+id/deviceStatusLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_image_sample"
-            android:layout_width="0dp"
-            android:layout_height="400dp"
-            android:layout_marginStart="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/layout_height_readings"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/stepsLayout">
-
-            <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:src="@drawable/ic_height"
-
-                app:layout_constraintBottom_toTopOf="@+id/view"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-            <View
-                android:id="@+id/view"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_height_readings"
-            android:layout_width="0dp"
-            android:layout_height="400dp"
-            android:layout_marginEnd="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/layout_image_sample"
-            app:layout_constraintTop_toBottomOf="@+id/stepsLayout">
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout4"
-                android:layout_width="280dp"
-                android:layout_height="300dp"
-                android:background="@drawable/box_container_bg"
-                app:layout_constraintBottom_toTopOf="@+id/button_get_height"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
+                <!-- Header row: the three status widgets share one horizontal band
+                     (common centerline via gravity="center_vertical", weighted spacers
+                     so StepsLayout tracks the true midpoint between its neighbors instead
+                     of the parent's midpoint) so the header reads as one designed strip
+                     instead of three independently-positioned floating cards. Neither
+                     UserInfoView, StepsLayout nor DeviceStatusLayout had their own internal
+                     design touched - only how they're grouped here. -->
+                <LinearLayout
+                    android:id="@+id/header_row"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/edit_height"
-                    style="@style/ResultTextStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="center"
-                    android:inputType="number"
-                    android:maxEms="5"
+                    <!-- User Details view -->
+                    <com.test.healthbox_app.presentation.view.UserInfoView
+                        android:id="@+id/userInfoView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <com.test.healthbox_app.presentation.view.StepsLayout
+                        android:id="@+id/stepsLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <com.test.healthbox_app.presentation.view.DeviceStatusLayout
+                        android:id="@+id/deviceStatusLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <!-- Two-panel measurement card -->
+                <LinearLayout
+                    android:id="@+id/card_outer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@+id/header_row">
+
+                    <!-- LEFT: posture guidance -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_image_sample"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="0.46"
+                        android:background="@drawable/bg_solid_card"
+                        android:clipToOutline="true"
+                        android:elevation="3dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="5dp"
+                            android:background="@drawable/bg_card_accent_top_teal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:orientation="vertical"
+                            android:padding="18dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_semibold"
+                                android:letterSpacing="0.05"
+                                android:text="@string/height_guidance_eyebrow"
+                                android:textAllCaps="true"
+                                android:textColor="@color/patient_login_label"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/height_guidance_heading"
+                                android:textColor="@color/patient_login_heading_text"
+                                android:textSize="18sp" />
+
+                            <!-- Flexible spacer: centers the illustration in whatever room
+                                 is left once the card stretches to fill the screen, instead
+                                 of the icon sitting right under the heading with a dead gap
+                                 below the bullets. -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <FrameLayout
+                                    android:layout_width="168dp"
+                                    android:layout_height="168dp"
+                                    android:layout_gravity="center"
+                                    android:background="@drawable/bg_circle_teal">
+
+                                    <ImageView
+                                        android:id="@+id/imageView6"
+                                        android:layout_width="118dp"
+                                        android:layout_height="118dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_height" />
+
+                                </FrameLayout>
+
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="12dp"
+                                    android:orientation="horizontal">
+
+                                    <FrameLayout
+                                        android:layout_width="22dp"
+                                        android:layout_height="22dp"
+                                        android:background="@drawable/bg_circle_teal">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:fontFamily="@font/roboto_bold"
+                                            android:text="1"
+                                            android:textColor="@color/app_color"
+                                            android:textSize="11sp" />
+
+                                    </FrameLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/height_guidance_bullet_1_title"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="12sp" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_regular"
+                                            android:text="@string/height_guidance_bullet_1_subtitle"
+                                            android:textColor="@color/patient_login_muted_text"
+                                            android:textSize="10sp" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="12dp"
+                                    android:orientation="horizontal">
+
+                                    <FrameLayout
+                                        android:layout_width="22dp"
+                                        android:layout_height="22dp"
+                                        android:background="@drawable/bg_circle_teal">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:fontFamily="@font/roboto_bold"
+                                            android:text="2"
+                                            android:textColor="@color/app_color"
+                                            android:textSize="11sp" />
+
+                                    </FrameLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/height_guidance_bullet_2_title"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="12sp" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_regular"
+                                            android:text="@string/height_guidance_bullet_2_subtitle"
+                                            android:textColor="@color/patient_login_muted_text"
+                                            android:textSize="10sp" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="12dp"
+                                    android:orientation="horizontal">
+
+                                    <FrameLayout
+                                        android:layout_width="22dp"
+                                        android:layout_height="22dp"
+                                        android:background="@drawable/bg_circle_teal">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:fontFamily="@font/roboto_bold"
+                                            android:text="3"
+                                            android:textColor="@color/app_color"
+                                            android:textSize="11sp" />
+
+                                    </FrameLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="10dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/height_guidance_bullet_3_title"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="12sp" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/roboto_regular"
+                                            android:text="@string/height_guidance_bullet_3_subtitle"
+                                            android:textColor="@color/patient_login_muted_text"
+                                            android:textSize="10sp" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- RIGHT: live reading + actions -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_height_readings"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="0.54"
+                        android:background="@drawable/bg_solid_card"
+                        android:clipToOutline="true"
+                        android:elevation="3dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="5dp"
+                            android:background="@drawable/bg_card_accent_top_teal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:orientation="vertical"
+                            android:padding="18dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_semibold"
+                                android:letterSpacing="0.05"
+                                android:text="@string/height_reading_eyebrow"
+                                android:textAllCaps="true"
+                                android:textColor="@color/patient_login_label"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/height_reading_heading"
+                                android:textColor="@color/patient_login_heading_text"
+                                android:textSize="18sp" />
+
+                            <!-- Flexible spacer: centers the reading pill in whatever room
+                                 is left once the card stretches to fill the screen, and lets
+                                 the pill itself grow taller (bigger number, more presence)
+                                 instead of leaving a dead gap below the action buttons. -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="vertical">
+
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:id="@+id/constraintLayout4"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_pill_tint"
+                                    android:paddingVertical="32dp">
+
+                                    <androidx.appcompat.widget.AppCompatEditText
+                                        android:id="@+id/edit_height"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="@android:color/transparent"
+                                        android:fontFamily="@font/roboto_bold"
+                                        android:gravity="center"
+                                        android:inputType="number"
+                                        android:maxEms="4"
+                                        android:minWidth="96dp"
+                                        android:textColor="@color/patient_login_heading_text"
+                                        android:textSize="54sp"
+                                        app:layout_constraintEnd_toStartOf="@+id/tv_height_unit"
+                                        app:layout_constraintHorizontal_chainStyle="packed"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent" />
+
+                                    <TextView
+                                        android:id="@+id/tv_height_unit"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="4dp"
+                                        android:fontFamily="@font/roboto_semibold"
+                                        android:text="@string/height_unit_cm"
+                                        android:textColor="@color/patient_login_label"
+                                        android:textSize="18sp"
+                                        app:layout_constraintBottom_toBottomOf="@+id/edit_height"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toEndOf="@+id/edit_height" />
+
+                                    <TextView
+                                        android:id="@+id/tv_height_equivalent"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:fontFamily="@font/roboto_regular"
+                                        android:gravity="center"
+                                        android:text=""
+                                        android:textColor="@color/patient_login_muted_text"
+                                        android:textSize="13sp"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toBottomOf="@+id/edit_height" />
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatButton
+                                android:id="@+id/button_get_height"
+                                android:layout_width="match_parent"
+                                android:layout_height="48dp"
+                                android:layout_marginTop="14dp"
+                                android:background="@drawable/button_style"
+                                android:fontFamily="@font/roboto_semibold"
+                                android:onClick="@{()->viewModel.getHeight()}"
+                                android:text="@string/height_capture_cta"
+                                android:textAllCaps="false"
+                                android:textColor="@color/white"
+                                android:textSize="14sp" />
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/button_next_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="46dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_pill_tint">
+
+                                <TextView
+                                    android:id="@+id/tv_next"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_semibold"
+                                    android:gravity="center"
+                                    android:text="@string/height_next_cta"
+                                    android:textAllCaps="false"
+                                    android:textColor="@color/app_color"
+                                    android:textSize="13sp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toStartOf="@+id/imageView7"
+                                    app:layout_constraintHorizontal_chainStyle="packed"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <ImageView
+                                    android:id="@+id/imageView7"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:layout_marginStart="6dp"
+                                    android:src="@drawable/ic_arrow"
+                                    app:layout_constraintBottom_toBottomOf="@+id/tv_next"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toEndOf="@+id/tv_next"
+                                    app:layout_constraintTop_toTopOf="@+id/tv_next"
+                                    app:tint="@color/app_color" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/button_get_height"
-                style="@style/ButtonTextStyle"
-                android:layout_width="220dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button_style"
-                android:onClick="@{()->viewModel.getHeight()}"
-                android:text="Get Height"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/constraintLayout4"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="@+id/constraintLayout4"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout4" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/button_next_layout"
-            style="@style/ButtonTextStyle"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="50dp"
-            android:background="@drawable/button_next_style"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_height_readings">
-
-            <TextView
-                android:id="@+id/tv_next"
-                style="@style/SubTextStyle20"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageView7"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/imageView7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:src="@drawable/ic_arrow"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/tv_next"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </layout>

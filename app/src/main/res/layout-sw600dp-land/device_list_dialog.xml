@@ -5,40 +5,78 @@
     tools:ignore="MissingDefaultResource">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/box_container_bg"
-        android:padding="20dp">
+        android:background="@drawable/bg_solid_card"
+        android:elevation="8dp"
+        android:padding="26dp">
 
+        <FrameLayout
+            android:id="@+id/icon_frame_dialog"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_circle_teal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/iv_close_dialog"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:src="@drawable/ic_cancel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_bluetooth"
+                app:tint="@color/app_color" />
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/tv_select_device"
-            style="@style/TextStyle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="12dp"
+            android:fontFamily="@font/roboto_bold"
             android:text="@string/select_device"
-            android:textStyle="bold"
+            android:textColor="@color/patient_login_heading_text"
+            android:textSize="19sp"
+            app:layout_constraintBottom_toBottomOf="@+id/icon_frame_dialog"
+            app:layout_constraintEnd_toStartOf="@+id/iv_close_dialog"
+            app:layout_constraintStart_toEndOf="@+id/icon_frame_dialog"
+            app:layout_constraintTop_toTopOf="@+id/icon_frame_dialog" />
+
+        <ImageView
+            android:id="@+id/iv_close_dialog"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_circle_back_button"
+            android:elevation="1dp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:padding="7dp"
+            android:src="@drawable/ic_close"
+            app:layout_constraintBottom_toBottomOf="@+id/icon_frame_dialog"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/icon_frame_dialog"
+            app:tint="@color/patient_login_muted_text" />
+
+        <View
+            android:id="@+id/divider_header"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="18dp"
+            android:background="@color/text_input_box_stroke"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/icon_frame_dialog" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_device_list"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginTop="20dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:clipToPadding="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_select_device" />
+            app:layout_constraintTop_toBottomOf="@+id/divider_header" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

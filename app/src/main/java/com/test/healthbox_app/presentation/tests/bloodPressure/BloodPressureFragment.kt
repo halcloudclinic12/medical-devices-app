@@ -197,6 +197,13 @@ class BloodPressureFragment() : BaseFragment() {
             override fun onItemSelect(bleDevice: BleDevice?) {
 //                binding.buttonScan.visibility = View.GONE
 
+                // Picking a device doesn't stop the ongoing scan — BLE scan results keep
+                // arriving afterward, each one re-triggering ScanState.DevicesFound, whose
+                // handler unconditionally calls deviceListDialog.showDialog(...) again. That's
+                // what re-popped the picker on top of an in-progress connection. Stop the scan
+                // here so no further DevicesFound emissions can reopen it.
+                deviceStatusViewModel.stopBleScan()
+
                 showDialog()
 
                 bleDevice?.let {
@@ -275,11 +282,17 @@ class BloodPressureFragment() : BaseFragment() {
 
                             binding.deviceStatusLayout.setupDeviceStatus(mActivity!!, false)
 
+                            // The BP monitor closes the BLE link itself a few seconds after
+                            // sending a reading (normal power-saving firmware behavior, not an
+                            // error) — confirmed in the field: clean disconnect, status
+                            // GATT_SUCCESS, right after the final measurement packet. Without
+                            // reconnecting here, every subsequent reading required the user to
+                            // manually re-scan/re-pair, which is what showed up as "connects
+                            // fine but disconnects frequently".
                             bleConnectionViewModel.selectedDevice.value?.let {
-                                /*bleConnectionViewModel.connectToDevice(
-                                    bleConnectionViewModel.selectedDevice.value!!,
-                                    bleConnectionViewModel.selectedDeviceType.value!!
-                                )*/
+                                bleConnectionViewModel.connectToDevice(
+                                    it, DeviceType.BLOOD_PRESSURE_MONITOR
+                                )
                             }
                         }
 

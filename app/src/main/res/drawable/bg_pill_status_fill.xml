@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Device status card fill. Every other card on a test screen (user card, steps pill,
+     both measurement panels) is flat white - this is the one filled/colored element in
+     the header, so the most important live indicator on the screen doesn't blend into
+     the rest of the white cards. Solid shape so it compiles to a GradientDrawable at
+     runtime and can be recolored per state (see DeviceStatusLayout.setupDeviceStatus/
+     setConnecting/setUpDeviceAvailability). Same 20dp radius as bg_solid_card so it still
+     reads as part of the same card family, just filled instead of outlined. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="@color/red" />
+
+    <corners android:radius="20dp" />
+
+</shape>

@@ -1,16 +1,10 @@
 package com.test.healthbox_app.presentation.onboarding.checkin
 
 import android.content.Context
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
@@ -220,32 +214,13 @@ class MachineCheckInFragment() : BaseFragment() {
     fun showClinicName(apiData: ClinicLoginResponse) {
 
         val clinicName = apiData.data?.clinic?.name ?: ""
-        val fullText = getString(R.string.are_you_sure_you_want_to_check_in_to_s, clinicName)
 
-        val spannable = SpannableString(fullText)
-
-//        Find where the clinic name starts and ends in the sentence
-        val startIndex = fullText.indexOf(clinicName)
-        if (startIndex >= 0) {
-            val endIndex = startIndex + clinicName.length
-            spannable.setSpan(
-                StyleSpan(Typeface.BOLD), // Make it bold
-                startIndex,
-                endIndex,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-
-            spannable.setSpan(
-                ForegroundColorSpan(ContextCompat.getColor(context, R.color.app_color)), startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-
-        binding.machineNameText.visibility = View.VISIBLE
-        binding.machineNameText.text = spannable
+        binding.clinicConfirmationLayout.visibility = View.VISIBLE
+        binding.machineNameText.text = clinicName
     }
 
     fun resetClinic() {
         binding.buttonCheckIn.visibility = View.GONE
-        binding.machineNameText.visibility = View.GONE
+        binding.clinicConfirmationLayout.visibility = View.GONE
     }
 }

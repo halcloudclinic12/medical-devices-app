@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Small connection-status indicator dot on the tiny device icon badge - same visual
+     language as bg_online_dot (UserInfoView's avatar), but a separate drawable since this
+     one gets recolored per state (red/amber/green) instead of staying fixed green. Solid
+     shape so it compiles to a GradientDrawable at runtime (see DeviceStatusLayout). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/red" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/white" />
+</shape>

@@ -5,11 +5,14 @@
     android:id="@+id/user_info_card"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_solid_card"
     android:elevation="3dp"
-    android:paddingHorizontal="14dp"
-    android:paddingVertical="9dp"
     tools:ignore="MissingDefaultResource">
+            <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:background="@drawable/bg_solid_card"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="9dp"
+        android:layout_height="match_parent">
 
     <FrameLayout
         android:id="@+id/avatar_frame"
@@ -69,4 +72,5 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_patient_name_age"
         tools:text="Male" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

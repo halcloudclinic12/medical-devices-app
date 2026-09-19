@@ -34,14 +34,13 @@ class DeviceListDialog @Inject constructor(
         binding = DeviceListDialogBinding.inflate(LayoutInflater.from(context))
         dialog.setContentView(binding.root)
 
-        // Set fixed width and height
+        // Width is fixed to a fraction of the screen; height wraps the actual device
+        // count instead of a forced 60% of screen height — with only 2-3 nearby devices
+        // typically found, that used to leave a large empty gap below the list.
         dialog.window?.let { window ->
-            // Set width to 80% of screen width
-            val width = (context.resources.displayMetrics.widthPixels * 0.3).toInt()
-            // Set height to 70% of screen height
-            val height = (context.resources.displayMetrics.heightPixels * 0.6).toInt()
+            val width = (context.resources.displayMetrics.widthPixels * 0.34).toInt()
 
-            window.setLayout(width, height)
+            window.setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
 
             // Optional: Set dialog position to center
             window.setGravity(android.view.Gravity.CENTER)

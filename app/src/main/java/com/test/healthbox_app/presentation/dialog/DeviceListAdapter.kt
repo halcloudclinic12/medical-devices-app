@@ -35,7 +35,10 @@ class DeviceListAdapter @Inject constructor(
         fun bind(device: BleDevice, onItemClick: (BleDevice) -> Unit) {
             tvDeviceName.text = device.name
 
-            tvDeviceName.setOnClickListener { view ->
+            // Whole row is tappable now (was just the name text), matching the row-click
+            // convention used elsewhere (e.g. ConnectedDevicesListAdapter) — a bigger,
+            // more forgiving touch target on a kiosk screen.
+            itemView.setOnClickListener { view ->
                 print("onItemClick  : $device")
                 onItemClick(device)
             }

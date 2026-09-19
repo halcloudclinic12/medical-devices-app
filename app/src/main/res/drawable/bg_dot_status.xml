@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Device connection status dot. Solid oval so it compiles to a GradientDrawable at
+     runtime — DeviceStatusLayout.setupDeviceStatus() recolors it via setColor() to mirror
+     the connected/disconnected state, same as it already does for the status text. Default
+     color matches the "Disconnected" text default declared alongside it in XML. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/red" />
+</shape>

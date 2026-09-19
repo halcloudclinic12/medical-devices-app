@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dedicated icon-badge background for the device status dialog ONLY - do not reuse this
+     for any other screen. It gets recolored at runtime via GradientDrawable.setColor()
+     (see DeviceStatusLayout.showStatusDialog()). bg_circle_teal looked like the right
+     drawable to reuse here since it has the same default teal look, but it is shared by
+     16+ layouts across the app (calibration, height illustration/step badges, dashboard,
+     device list, etc.) - Android caches one Drawable instance per resource id and shares
+     it across every view that references it, so recoloring it on the dialog's icon without
+     calling mutate() recolored EVERY bg_circle_teal circle in the app at once (the "every
+     circle is red" bug). Keep this file's only reference to dialog_icon_frame. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#1F3A8F98" />
+</shape>

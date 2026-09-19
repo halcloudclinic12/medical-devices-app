@@ -11,6 +11,7 @@ import com.test.healthbox_app.domain.use_cases.BleUseCases
 import com.test.healthbox_app.domain.use_cases.BluetoothUseCases
 import com.test.healthbox_app.domain.use_cases.SharedPreferenceUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +38,13 @@ class DeviceStatusViewModel @Inject constructor(
     private val _scanState = MutableStateFlow<ScanState>(ScanState.Idle)
     val scanState: StateFlow<ScanState> = _scanState.asStateFlow()
 
+    // This ViewModel is activity-scoped/shared across every test screen. Without tracking
+    // the running scan's own coroutine Job, a scan started on one screen keeps running (and
+    // can still deliver a result into _scanState) after the user has navigated to a
+    // different screen — whichever screen is now collecting scanState reacts to a result it
+    // never asked for. Held so it can be cancelled outright, not just asked nicely to stop.
+    private var scanJob: Job? = null
+
 //    private val _selectedDevice = MutableStateFlow<BleDevice?>(null)
 //    val selectedDevice: StateFlow<BleDevice?> = _selectedDevice.asStateFlow()
 //
@@ -58,7 +66,12 @@ class DeviceStatusViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
+        // Cancelling any scan already in flight (rather than letting two run at once) is
+        // what actually stops a previous screen's abandoned scan from later delivering a
+        // result nobody asked for - see the comment on scanJob.
+        scanJob?.cancel()
+
+        scanJob = viewModelScope.launch {
             _scanState.value = ScanState.Scanning
 
             bleUseCases.scanForDevices(scanDuration).collect { devices ->
@@ -80,9 +93,16 @@ class DeviceStatusViewModel @Inject constructor(
     }
 
     fun stopBleScan() {
-        viewModelScope.launch {
-            _scanState.value = ScanState.Idle
+        // Cancelling the Job outright (not just closing the scanner's channel) reliably
+        // stops a collect{} loop that's mid-flight, which merely setting _scanState back to
+        // Idle does not - a result the scan callback already produced a moment earlier would
+        // otherwise still land in _scanState right after this runs.
+        scanJob?.cancel()
+        scanJob = null
 
+        _scanState.value = ScanState.Idle
+
+        viewModelScope.launch {
             bleUseCases.stopBleScan()
         }
     }

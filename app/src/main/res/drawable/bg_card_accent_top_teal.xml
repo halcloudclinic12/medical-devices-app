@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Thin accent strip along the top of a card, teal variant (see bg_card_accent_top for
+     the amber "featured" version used on the dashboard). Rounded only on top so it sits
+     flush with the card's own rounded corners (card clips to its outline). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="@color/app_color" />
+    <corners
+        android:topLeftRadius="18dp"
+        android:topRightRadius="18dp"
+        android:bottomLeftRadius="0dp"
+        android:bottomRightRadius="0dp" />
+
+</shape>

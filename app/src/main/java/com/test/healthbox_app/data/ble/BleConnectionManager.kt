@@ -11,10 +11,7 @@ import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothStatusCodes
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.icu.text.DecimalFormat
 import android.os.Build
 import android.os.Handler
@@ -31,8 +28,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -103,20 +98,13 @@ class BleConnectionManager @Inject constructor(
         // Update connection state
         _connectionsState.update { it + (deviceType to ConnectionState.Connecting) }
 
-        // ── Bond first for device types whose GATT profile requires it ─────
-        // The BLOOD_PRESSURE_MONITOR (JPD BPM) has been observed connecting at the GATT
-        // layer and then dropping with status 133 before any data could be read, while
-        // unbonded (bondState == BOND_NONE — confirmed in the field). That matches vendor
-        // BP-monitor profiles that require a classic bond before their measurement
-        // characteristics become readable. Request the bond up front; if it fails or
-        // times out we still fall through to connectGatt() below, so this can't make an
-        // otherwise-working device (one that never needed bonding) any worse than before.
-        if (deviceType == DeviceType.BLOOD_PRESSURE_MONITOR && device.bondState != BluetoothDevice.BOND_BONDED) {
-            Log.d(tag, "Requesting bond for $deviceType (${bleDevice.address}), current bondState=${device.bondState}")
-            val bonded = ensureBonded(device)
-            Log.d(tag, "Bond result for $deviceType: $bonded")
-            _connectionsState.update { it + (deviceType to if (bonded) ConnectionState.Paired else ConnectionState.PairedFailed) }
-        }
+        // NOTE: BLOOD_PRESSURE_MONITOR used to require a classic bond here before
+        // connectGatt(), on the theory that this device drops with GATT status 133 unless
+        // bonded first. Field logs show the opposite: bonding fails every time (device
+        // doesn't support/require it) and connectGatt() then succeeds cleanly on the
+        // unbonded fallback path — full reading streamed, no errors. The blocking bond
+        // request was only adding ~12s of latency to every connection for no benefit, so
+        // it's been removed.
 
         // Create device-specific callback
         val callback = DeviceGattCallback(deviceType) { result ->
@@ -143,67 +131,6 @@ class BleConnectionManager @Inject constructor(
         awaitClose {
             disconnect(bleDevice, deviceType)
         }
-    }
-
-    /**
-     * Request a classic bond with [device] and suspend until it resolves.
-     * Returns true once BOND_BONDED is observed, false on BOND_NONE, a failed
-     * createBond() call, or a 20s timeout (whichever comes first). Safe to call when
-     * already bonded (returns true immediately) or already bonding (skips createBond()
-     * and just waits for the broadcast).
-     */
-    @SuppressLint("MissingPermission")
-    private suspend fun ensureBonded(device: BluetoothDevice): Boolean {
-        if (device.bondState == BluetoothDevice.BOND_BONDED) return true
-
-        return withTimeoutOrNull(20_000L) {
-            suspendCancellableCoroutine<Boolean> { cont ->
-                lateinit var receiver: BroadcastReceiver
-                receiver = object : BroadcastReceiver() {
-                    override fun onReceive(ctx: Context?, intent: Intent?) {
-                        if (intent?.action != BluetoothDevice.ACTION_BOND_STATE_CHANGED) return
-
-                        val changedDevice = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                        if (changedDevice?.address != device.address) return
-
-                        when (intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1)) {
-                            BluetoothDevice.BOND_BONDED, BluetoothDevice.BOND_NONE -> {
-                                try {
-                                    context.unregisterReceiver(receiver)
-                                } catch (e: Exception) {
-                                    // already unregistered
-                                }
-                                if (cont.isActive) {
-                                    cont.resumeWith(Result.success(intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1) == BluetoothDevice.BOND_BONDED))
-                                }
-                            }
-                            // BOND_BONDING — keep waiting for the terminal state
-                        }
-                    }
-                }
-
-                context.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
-
-                cont.invokeOnCancellation {
-                    try {
-                        context.unregisterReceiver(receiver)
-                    } catch (e: Exception) {
-                        // already unregistered
-                    }
-                }
-
-                if (device.bondState == BluetoothDevice.BOND_NONE && !device.createBond()) {
-                    try {
-                        context.unregisterReceiver(receiver)
-                    } catch (e: Exception) {
-                        // already unregistered
-                    }
-                    if (cont.isActive) cont.resumeWith(Result.success(false))
-                }
-                // else: bondState was already BOND_BONDING, or createBond() started
-                // successfully — just wait for the receiver above to fire.
-            }
-        } ?: false.also { Log.w(tag, "Bonding to ${device.address} timed out after 20s") }
     }
 
     /**

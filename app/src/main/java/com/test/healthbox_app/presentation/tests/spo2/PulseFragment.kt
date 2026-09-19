@@ -317,6 +317,11 @@ class PulseFragment() : BaseFragment() {
 
                             binding.editPulse.setText("${pulseMeasurement.oxygenSaturation}")
 //                            binding.editPulse.setText(pulseMeasurement.oxygenSaturation)
+
+                            // Real device-reported value, not a computed one - the same
+                            // measurement already carries pulse rate alongside SpO2, it just
+                            // wasn't being shown.
+                            binding.tvPulseRate.text = "Pulse Rate: ${pulseMeasurement.pulseRate} bpm"
                         }
                     }
                 }
