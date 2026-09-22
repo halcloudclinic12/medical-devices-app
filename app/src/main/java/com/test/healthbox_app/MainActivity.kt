@@ -181,7 +181,14 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        // Was calling super.onBackPressed() unconditionally above AND again in the `else`
+        // branch below (monBackPressListener is never set - nothing in the codebase calls
+        // registerOnBackPress()/unRegisterOnBackPress() - so that branch always ran). Each
+        // call dispatches through onBackPressedDispatcher, which pops/invokes the current
+        // NavHostFragment back-stack entry or fragment callback - so one physical back press
+        // was popping the nav back stack TWICE. That's what made the previous screen (e.g. a
+        // stale Dashboard instance still sitting underneath) visibly flash on screen before
+        // the second pop/finish took over.
         try {
             if (monBackPressListener != null) {
                 monBackPressListener!!.onBackPress()
@@ -190,7 +197,6 @@ class MainActivity : BaseActivity() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-//            super.onBackPressed();
         }
     }
 }

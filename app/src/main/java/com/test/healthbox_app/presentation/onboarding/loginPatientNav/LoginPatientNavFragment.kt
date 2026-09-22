@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +34,7 @@ import com.test.healthbox_app.domain.model.BleDevice
 import com.test.healthbox_app.domain.model.ConnectionState
 import com.test.healthbox_app.domain.model.ScanState
 import com.test.healthbox_app.presentation.dialog.DeviceListDialog
+import com.test.healthbox_app.presentation.dialog.LogoutConfirmationDialog
 import com.test.healthbox_app.presentation.util.BluetoothPermissionHandler
 import com.test.healthbox_app.presentation.util.CustomSnackBar
 import com.test.healthbox_app.presentation.util.DatePickerUtil
@@ -102,8 +104,33 @@ class LoginPatientNavFragment() : BaseFragment() {
         return binding.root
     }
 
+    private var backPressedOnce = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // This is the app's real "root" screen: reached via dash_back_button_action
+        // (a forward nav() call, not a back-stack pop, so the fragments below it on the
+        // back stack are stale). Without this callback, pressing back here would fall
+        // through to the NavController's default pop and briefly reveal one of those
+        // stale screens instead of exiting. Consuming back here fixes that and adds the
+        // requested "press back again to exit" confirmation.
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (backPressedOnce) {
+                    requireActivity().finishAffinity()
+                    return
+                }
+
+                backPressedOnce = true
+                Toast.makeText(requireContext(), "Press back again to exit", Toast.LENGTH_SHORT).show()
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(2000)
+                    backPressedOnce = false
+                }
+            }
+        })
 
         setupToolbar()
 
@@ -633,10 +660,17 @@ class LoginPatientNavFragment() : BaseFragment() {
                 }
 
                 R.id.nav_logout -> {
-                    // Handle profile navigation
-                    viewModel.clearPreferenceData()
+                    // Close the drawer first so the confirmation dialog isn't fighting the
+                    // drawer's own slide-closed animation underneath its dim/scrim.
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
 
-                    findNavController().navigate(R.id.clinic_logout_action)
+                    LogoutConfirmationDialog(requireActivity()).show {
+                        // clearPreferenceData() is a synchronous SharedPreferences commit()
+                        // with no BLE/network work to await, so it's safe to call directly
+                        // here before navigating away.
+                        viewModel.clearPreferenceData()
+                        findNavController().navigate(R.id.clinic_logout_action)
+                    }
                     true
                 }
                 // Add more menu items as needed

@@ -22,6 +22,11 @@
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
 
+    <!-- Logout confirmation dialog (nav drawer) -->
+    <string name="logout_confirm_title">Leaving so soon?</string>
+    <string name="logout_confirm_message">You\'ll be logged out of this clinic session and returned to machine check-in.</string>
+    <string name="logout_confirm_cta">Yes, Logout</string>
+
     <!-- Step Indicator Strings -->
     <string name="step_icon_description">Step icon</string>
     <string name="step_completed_description">Step completed</string>
