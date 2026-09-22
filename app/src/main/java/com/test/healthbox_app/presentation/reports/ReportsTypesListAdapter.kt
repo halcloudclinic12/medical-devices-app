@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.test.healthbox_app.R
 import com.test.healthbox_app.data.model.ReportTestType
@@ -30,16 +32,18 @@ class ReportsTypesListAdapter @Inject constructor(
     }
 
     class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val layoutChip: ConstraintLayout = itemView.findViewById(R.id.layout_chip)
         private val tvTitle: TextView = itemView.findViewById(R.id.tv_title)
-        private val viewHighlight: View = itemView.findViewById(R.id.view_highlight)
 
         fun bind(reportTestType: ReportTestType, context: Context, onItemClick: (ReportTestType) -> Unit) {
             tvTitle.text = reportTestType.title
 
             if (reportTestType.isSelected == true) {
-                viewHighlight.visibility = View.VISIBLE
+                layoutChip.setBackgroundResource(R.drawable.bg_btn_teal)
+                tvTitle.setTextColor(ContextCompat.getColor(context, R.color.white))
             } else {
-                viewHighlight.visibility = View.INVISIBLE
+                layoutChip.setBackgroundResource(R.drawable.bg_btn_outline)
+                tvTitle.setTextColor(ContextCompat.getColor(context, R.color.app_color))
             }
 
             itemView.setOnClickListener { view ->

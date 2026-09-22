@@ -3,6 +3,7 @@ package com.test.healthbox_app.data.repository
 import com.test.healthbox_app.data.model.response.BasicTestsResponse
 import com.test.healthbox_app.data.model.response.CreateBasicTestResponse
 import com.test.healthbox_app.data.model.response.CreateHba1cTestResponse
+import com.test.healthbox_app.data.model.response.Hba1cTestsResponse
 import com.test.healthbox_app.data.model.response.PatientLoginResponse
 import com.test.healthbox_app.data.network.ApiService
 import com.test.healthbox_app.domain.model.ApiResponse
@@ -82,6 +83,19 @@ class PatientsAPIRepositoryImpl @Inject constructor(private val apiService: ApiS
             emit(ApiResponse.ApiSuccess(response))
         } catch (e: Exception) {
             emit(ApiResponse.ApiError<CreateHba1cTestResponse>(message = e.localizedMessage ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun getHba1cTests(
+        patientId: String,
+        token: String
+    ): Flow<ApiResponse<Hba1cTestsResponse>> = flow {
+        emit(ApiResponse.ApiLoading())
+        try {
+            val response = apiService.getHba1cTests(patientId = patientId/*, token = token*/)
+            emit(ApiResponse.ApiSuccess(response))
+        } catch (e: Exception) {
+            emit(ApiResponse.ApiError<Hba1cTestsResponse>(message = e.localizedMessage ?: "Unknown error"))
         }
     }
 

@@ -41,4 +41,9 @@ class PatientsAPIUseCases @Inject constructor(
         token = authToken,
     ).flowOn(Dispatchers.IO)
 
+    suspend fun getHba1cTest(patientId: String, authToken: String) = patientsAPIRepository.getHba1cTests(
+        patientId = patientId,
+        token = authToken,
+    ).flowOn(Dispatchers.IO)
+
 }

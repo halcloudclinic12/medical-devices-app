@@ -1,101 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Card row: per-parameter icon, name + color-coded status chip on top, big value and
+     muted range underneath. tv_result keeps its ORIGINAL role (the adapter only ever calls
+     setText/setTextColor on it) - it just now lives inside a pill background so the
+     runtime-set color reads as a status chip instead of plain colored text. -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/bg_metric_tile"
+    android:padding="17dp"
     tools:ignore="MissingDefaultResource">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <FrameLayout
+        android:id="@+id/iv_parameter_icon_wrap"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_circle_teal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tv_parameter"
-            style="@style/TextStyleCustomSize"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="Parameter"
-            android:textStyle="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv_result"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/iv_parameter_icon"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_health_checkup" />
 
-        <View
-            android:layout_width="1px"
-            android:layout_height="0dp"
-            android:background="@color/app_color"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/tv_parameter"
-            app:layout_constraintStart_toStartOf="@+id/tv_result"
-            app:layout_constraintTop_toTopOf="parent" />
+    </FrameLayout>
 
-        <TextView
-            android:id="@+id/tv_result"
-            style="@style/TextStyleCustomSize"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="Result"
-            android:textStyle="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv_value"
-            app:layout_constraintStart_toEndOf="@+id/tv_parameter"
-            app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/tv_parameter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:fontFamily="@font/roboto_semibold"
+        android:text="Parameter"
+        android:textColor="@color/patient_login_heading_text"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toStartOf="@+id/tv_result"
+        app:layout_constraintStart_toEndOf="@+id/iv_parameter_icon_wrap"
+        app:layout_constraintTop_toTopOf="@+id/iv_parameter_icon_wrap" />
 
-        <View
-            android:layout_width="1px"
-            android:layout_height="0dp"
-            android:background="@color/app_color"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/tv_result"
-            app:layout_constraintStart_toStartOf="@+id/tv_value"
-            app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/tv_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/bg_pill_tint"
+        android:fontFamily="@font/roboto_bold"
+        android:minWidth="32dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="5dp"
+        android:text="Result"
+        android:textAllCaps="true"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_parameter_icon_wrap" />
 
-        <TextView
-            android:id="@+id/tv_value"
-            style="@style/TextStyleCustomSize"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="Value"
-            android:textStyle="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv_range"
-            app:layout_constraintStart_toEndOf="@+id/tv_result"
-            app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/tv_value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Value"
+        android:textColor="@color/app_color"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/tv_range"
+        app:layout_constraintStart_toEndOf="@+id/iv_parameter_icon_wrap"
+        app:layout_constraintTop_toBottomOf="@+id/tv_parameter" />
 
-        <View
-            android:layout_width="1px"
-            android:layout_height="0dp"
-            android:background="@color/app_color"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/tv_value"
-            app:layout_constraintStart_toStartOf="@+id/tv_range"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_range"
-            style="@style/TextStyleCustomSize"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="Range"
-            android:textStyle="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tv_value"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/tv_range"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:fontFamily="@font/roboto_regular"
+        android:gravity="end"
+        android:text="Range"
+        android:textColor="@color/patient_login_muted_text"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_value"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

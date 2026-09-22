@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Plain solid white circle - hero logo badge on the Splash screen, elevation is set
+     on the ImageView/FrameLayout itself since shape drawables can't carry it. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/white" />
+</shape>

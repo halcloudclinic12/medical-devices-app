@@ -87,6 +87,32 @@ object BodyCheckupPref {
         return null
     }
 
+    // The printed "[Normal Range]" text must describe the same bounds getResultFromRange()
+    // actually classifies against - it reads the "Normal" bucket out of the same map so the two
+    // can never drift apart the way the old hardcoded "10-20%" / "18-30%" strings did (those
+    // didn't match ParameterRanges.BODY_FAT_MALE/FEMALE or SUBCUTANEOUS_FAT_MALE/FEMALE, so a
+    // value like Body Fat 20.8% printed "Result: Normal" right next to "[Normal Range]: 10-20%",
+    // which looks self-contradictory even though the underlying classification was correct).
+    private fun normalRangeText(ranges: Map<String, String>, unit: String = "%"): String {
+        val normal = ranges["Normal"] ?: return "-"
+        return "$normal$unit"
+    }
+
+    // Weight has no fixed "Normal" kg band like the other parameters - getWeightResult()
+    // classifies it as a ratio against a height-derived standard weight (ParameterRanges.WEIGHT
+    // "Standard" bucket is that ratio, e.g. 0.90-1.09), so the printed range must be computed
+    // per patient the same way, instead of the old literal "kg" placeholder (which wasn't a
+    // range at all - see the cut-off top line of the reported screenshot: "[Normal Range]: kg").
+    private fun weightRangeText(): String {
+        val h = height?.toDoubleOrNull() ?: return "kg"
+        val std = if (isMale) ((h - 80) * 0.7) else (((h * 1.37) - 110) * 0.45)
+        val standardRatio = ParameterRanges.WEIGHT["Standard"] ?: return "kg"
+        val parts = standardRatio.split("-")
+        val lowRatio = parts.getOrNull(0)?.toDoubleOrNull() ?: return "kg"
+        val highRatio = parts.getOrNull(1)?.toDoubleOrNull() ?: return "kg"
+        return "%.1f-%.1f kg".format(std * lowRatio, std * highRatio)
+    }
+
     // ----------------- Example Parameters -----------------
     var height: String? = null
     var height_result: String? = ""
@@ -483,37 +509,49 @@ object BodyCheckupPref {
 
         return listOf(
             Parameters("Height", "", height, "cm"),
-            Parameters("Weight", weight_result, weight, "kg"),
+            Parameters("Weight", weight_result, weight, weightRangeText()),
             Parameters("BMI", bmi_result, bmi, "18.5 - 24.9"),
             Parameters("BMR", bmr_result, bmr, "Normal based on age/sex"),
-            Parameters("Bone Mass", bone_mass_result, bone_mass, "2.5 - 4.0 kg"),
-            Parameters("Body Fat", body_fat_result, body_fat, if (isMale) "10-20%" else "18-30%"),
+            Parameters("Bone Mass", bone_mass_result, bone_mass, normalRangeText(if (isMale) ParameterRanges.BONE_MASS_MALE else ParameterRanges.BONE_MASS_FEMALE, unit = " kg")),
+            Parameters("Body Fat", body_fat_result, body_fat, normalRangeText(if (isMale) ParameterRanges.BODY_FAT_MALE else ParameterRanges.BODY_FAT_FEMALE)),
             Parameters("Lean Body Weight", lean_body_weight_result, lean_body_weight, "Healthy Range"),
-            Parameters("Muscle Mass", muscle_mass_result, muscle_mass, "Varies by sex/age"),
+            Parameters("Muscle Mass", muscle_mass_result, muscle_mass, normalRangeText(if (isMale) ParameterRanges.MUSCLE_MASS_MALE else ParameterRanges.MUSCLE_MASS_FEMALE, unit = " kg")),
             Parameters("Muscle Rate", muscle_rate_result, muscle_rate, "Normal: 33-39%"),
-            Parameters("Subcutaneous Fat", subcutaneous_fat_result, subcutaneous_fat, "10-20%"),
-            Parameters("Visceral Fat", visceral_fat_result, visceral_fat, "1-12"),
-            Parameters("Body Water", body_water_result, body_water, "50-65%"),
+            Parameters("Subcutaneous Fat", subcutaneous_fat_result, subcutaneous_fat, normalRangeText(if (isMale) ParameterRanges.SUBCUTANEOUS_FAT_MALE else ParameterRanges.SUBCUTANEOUS_FAT_FEMALE)),
+            Parameters("Visceral Fat", visceral_fat_result, visceral_fat, normalRangeText(if (isMale) ParameterRanges.VISCERAL_FAT_MALE else ParameterRanges.VISCERAL_FAT_FEMALE, unit = "")),
+            Parameters("Body Water", body_water_result, body_water, normalRangeText(if (isMale) ParameterRanges.BODY_WATER_MALE else ParameterRanges.BODY_WATER_FEMALE)),
             Parameters("Metabolic Age", meta_age_result, meta_age, "Should ≈ Actual Age"),
             Parameters("Protein", protein_result, protein, "16-20%"),
             Parameters("Fat Level", null, fat_level, "Normal <20%"),
             Parameters("Control Weight", null, control_weight, "-"),
             Parameters("Temperature", temperature_result, temperature, "97°F - 99°F"),
-            Parameters("Blood Pressure (Diastolic)", blood_pressure_diastolic_result, blood_pressure_diastolic, "60-80 mmHg"),
-            Parameters("Blood Pressure (Systolic)", blood_pressure_systolic_result, blood_pressure_systolic, "90-120 mmHg"),
+            // Text must track getDiastolicResult()/getSystolicResult() below - those are plain
+            // `when` blocks, not ParameterRanges maps, so normalRangeText() can't derive this one;
+            // keep both in sync by hand if the thresholds ever change.
+            Parameters("Blood Pressure (Diastolic)", blood_pressure_diastolic_result, blood_pressure_diastolic, "60-79 mmHg"),
+            Parameters("Blood Pressure (Systolic)", blood_pressure_systolic_result, blood_pressure_systolic, "90-119 mmHg"),
             Parameters("Left Eye Vision", eye_left_result, eye_left_vision, "6/6"),
             Parameters("Right Eye Vision", eye_right_result, eye_right_vision, "6/6"),
             Parameters("Oxygen Saturation", oxygen_result, oxygen, "95-100%"),
             Parameters("Pulse", pulse_result, pulse, "60-100 bpm"),
-            Parameters("Sugar", sugar_result, sugar, "70-110 mg/dL (fasting)"),
-            Parameters("Hemoglobin", hemoglobin_result, hemoglobin, if (isMale) "13.5-17.5 g/dL" else "12-16 g/dL")
+            Parameters("Sugar", sugar_result, sugar, normalRangeText(ParameterRanges.SUGAR, unit = " mg/dL (fasting)")),
+            Parameters("Hemoglobin", hemoglobin_result, hemoglobin, normalRangeText(if (isMale) ParameterRanges.HEMOGLOBIN_MALE else ParameterRanges.HEMOGLOBIN_FEMALE, unit = " g/dL"))
             // NOTE: HbA1c is deliberately NOT listed here. This list feeds the *basic
             // health checkup* results screen and printout, and clearAll() only runs at
             // the end of that flow (ResultsFragment "Home" button). The HbA1c test is a
             // separate standalone flow, so including it would let a value captured in an
             // earlier session — possibly for a different patient — appear in the next
             // patient's basic report. HbA1c belongs to the HBA1C report type instead.
-        ).filter { it.value != null } // optional: hide null values
+
+            // isNullOrBlank(), not != null: several test fragments (e.g. PulseFragment,
+            // TemperatureFragment, HemoglobinTestFragment.saveHemoglobinData()) unconditionally
+            // write binding.editXxx.text.toString() into these fields when the user moves past
+            // that step, so a skipped/not-performed test lands here as "" rather than staying
+            // null - a bare `!= null` check let those show up on the Results screen as a blank
+            // row. This only changes what's DISPLAYED (this list feeds the results screen and
+            // printout, per the note above) - toBasicTestRequestDto(), which builds the actual
+            // API request body, reads these same fields directly and is untouched by this filter.
+        ).filter { !it.value.isNullOrBlank() }
     }
 
     /**

@@ -46,6 +46,11 @@
     <string name="hba1c_status_waiting">Waiting for result from the meter…</string>
     <string name="hba1c_status_disconnected">Meter disconnected</string>
     <string name="hba1c_help_title">HbA1c Meter Error Codes</string>
+    <string name="hba1c_meter_eyebrow">HBA1C METER</string>
+    <string name="hba1c_guidance_eyebrow">GETTING STARTED</string>
+    <string name="hba1c_guidance_heading">How to Test</string>
+    <string name="hba1c_reading_eyebrow">YOUR RESULT</string>
+    <string name="hba1c_reading_heading">HbA1c Level</string>
 
     <string name="connected_devices">Devices</string>
     <string name="clinic_analytics">Clinic Analytics</string>
@@ -103,6 +108,11 @@
     <string name="calibration_device_type_placeholder">Device Type *</string>
     <string name="calibration_operation_type_placeholder">Operator *</string>
     <string name="calibration_value_placeholder">Value *</string>
+
+    <!-- M-PIN Authenticate screen -->
+    <string name="mpin_badge">Machine Authentication</string>
+    <string name="mpin_heading">Enter M-PIN to Continue</string>
+    <string name="mpin_subtext">This PIN verifies the kiosk operator before starting a new patient checkup.</string>
 
     <!-- Height screen -->
     <string name="height_guidance_eyebrow">Step Guidance</string>
@@ -199,9 +209,28 @@
     <string name="wt_start_cta">Start</string>
     <string name="wt_next_cta">Next: Vision</string>
 
+    <!-- Hemoglobin screen -->
+    <string name="hb_guidance_eyebrow">Step Guidance</string>
+    <string name="hb_guidance_heading">Prepare the Hb Meter</string>
+    <string name="hb_guidance_bullet_1_title">Insert Test Strip</string>
+    <string name="hb_guidance_bullet_1_subtitle">Load a fresh strip into the meter</string>
+    <string name="hb_guidance_bullet_2_title">Apply Blood Sample</string>
+    <string name="hb_guidance_bullet_2_subtitle">Collect a drop and apply it to the strip</string>
+    <string name="hb_guidance_bullet_3_title">Wait for Result</string>
+    <string name="hb_guidance_bullet_3_subtitle">Keep the strip steady while it processes</string>
+    <string name="hb_reading_eyebrow">Live Reading</string>
+    <string name="hb_reading_heading">Hemoglobin</string>
+    <string name="hb_start_cta">Start Test</string>
+    <string name="hb_unit_gdl">g/dL</string>
+    <string name="hb_next_cta">View Results</string>
+
+    <!-- Results screen -->
+    <string name="results_report_eyebrow">HEALTH REPORT</string>
+    <string name="results_report_heading">Your Checkup Results</string>
+
     <!-- Connected Devices screen -->
     <string name="connected_devices_title">Devices</string>
-    <string name="connected_devices_subtext">Manage the paired vitals devices connected to this kiosk.</string>
+    <string name="connected_devices_subtext">Manage the paired vitals devices connected to this system.</string>
     <string name="connected_devices_paired_badge">Paired Device</string>
     <string name="connected_devices_empty_title">No device paired for this category yet</string>
 

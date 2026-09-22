@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -16,6 +17,8 @@ import com.test.healthbox_app.bluetooth.DeviceType
 import com.test.healthbox_app.databinding.ConnectedDevicesFragmentBinding
 import com.test.healthbox_app.domain.model.BleDevice
 import com.test.healthbox_app.presentation.util.CustomSnackBar
+import com.test.healthbox_app.presentation.util.iconRes
+import com.test.healthbox_app.presentation.util.needsIconTint
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -86,8 +89,11 @@ class ConnectedDevicesFragment() : BaseFragment() {
     }
 
     fun getDevice() {
+        println("DEBUG-DEVICESAVE ConnectedDevicesFragment.getDevice() called for selectedDeviceType=$selectedDeviceType")
+
         selectedDevice = bleConnectionViewModel.getDeviceByType(selectedDeviceType)
 
+        println("DEBUG-DEVICESAVE ConnectedDevicesFragment.getDevice() result for $selectedDeviceType: $selectedDevice")
         println("selected device available :: ${selectedDevice}")
 
         if (selectedDevice == null) {
@@ -146,6 +152,13 @@ class ConnectedDevicesFragment() : BaseFragment() {
 
             binding.tvDeviceName.text = it.name
             binding.tvDeviceAddress.text = it.address
+
+            binding.ivDeviceDetailIcon.setImageResource(selectedDeviceType.iconRes())
+            if (selectedDeviceType.needsIconTint()) {
+                binding.ivDeviceDetailIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.app_color))
+            } else {
+                binding.ivDeviceDetailIcon.clearColorFilter()
+            }
         }
     }
 

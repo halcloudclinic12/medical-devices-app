@@ -14,8 +14,8 @@ data class ReportTestType(
         fun typesList() = listOf(
             ReportTestType(title = "Basic Health", isSelected = true, testType = "BASIC"),
             ReportTestType(title = "HbA1c", isSelected = false, testType = "HBA1C"),
-            ReportTestType(title = "Lipid", isSelected = false, testType = "LIPID"),
-            ReportTestType(title = "Rapid", isSelected = false, testType = "RAPID"),
+//            ReportTestType(title = "Lipid", isSelected = false, testType = "LIPID"),
+//            ReportTestType(title = "Rapid", isSelected = false, testType = "RAPID"),
         )
     }
 }

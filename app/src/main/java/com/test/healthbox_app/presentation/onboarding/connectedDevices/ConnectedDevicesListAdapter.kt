@@ -3,10 +3,14 @@ package com.test.healthbox_app.presentation.onboarding.connectedDevices
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.test.healthbox_app.R
 import com.test.healthbox_app.bluetooth.DeviceType
+import com.test.healthbox_app.presentation.util.iconRes
+import com.test.healthbox_app.presentation.util.needsIconTint
 import javax.inject.Inject
 
 class ConnectedDevicesListAdapter @Inject constructor(
@@ -33,8 +37,17 @@ class ConnectedDevicesListAdapter @Inject constructor(
     class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvTitle: TextView = itemView.findViewById(R.id.tv_title)
         private val viewHighlight: View = itemView.findViewById(R.id.view_highlight)
+        private val ivDeviceTypeIcon: ImageView = itemView.findViewById(R.id.iv_device_type_icon)
 
         fun bind(deviceType: DeviceType, selectedDeviceType: DeviceType, onItemClick: (DeviceType) -> Unit) {
+            val context = itemView.context
+
+            ivDeviceTypeIcon.setImageResource(deviceType.iconRes())
+            if (deviceType.needsIconTint()) {
+                ivDeviceTypeIcon.setColorFilter(ContextCompat.getColor(context, R.color.app_color))
+            } else {
+                ivDeviceTypeIcon.clearColorFilter()
+            }
 
             var title = ""
 

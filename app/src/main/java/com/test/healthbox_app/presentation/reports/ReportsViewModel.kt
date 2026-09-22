@@ -7,6 +7,7 @@ import com.test.healthbox_app.data.model.PatientPref
 import com.test.healthbox_app.data.model.ReportTestType
 import com.test.healthbox_app.data.model.ReportsTestTypes
 import com.test.healthbox_app.data.model.response.BasicTestsResponse
+import com.test.healthbox_app.data.model.response.Hba1cTestsResponse
 import com.test.healthbox_app.data.model.response.Patient
 import com.test.healthbox_app.domain.model.ApiResponse
 import com.test.healthbox_app.domain.use_cases.PatientsAPIUseCases
@@ -27,6 +28,9 @@ class ReportsViewModel @Inject constructor(
 
     private val _getBasicTestState = MutableStateFlow<ApiResponse<BasicTestsResponse>>(ApiResponse.ApiLoading())
     val getBasicTestState: StateFlow<ApiResponse<BasicTestsResponse>> get() = _getBasicTestState
+
+    private val _getHba1cTestState = MutableStateFlow<ApiResponse<Hba1cTestsResponse>>(ApiResponse.ApiLoading())
+    val getHba1cTestState: StateFlow<ApiResponse<Hba1cTestsResponse>> get() = _getHba1cTestState
 
     private val _reportTypes = MutableStateFlow(
         ReportsTestTypes(testTypesList = ReportTestType.typesList())
@@ -64,6 +68,22 @@ class ReportsViewModel @Inject constructor(
                 ).collect { it ->
                     println("\ngetBasicTestLog   :: Res Logs :: ${Gson().toJson(it)}")
                     _getBasicTestState.value = it
+                }
+            }
+
+
+        }
+    }
+
+    fun getHba1cTest() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            PatientPref.patient?.let {
+                patientsAPIUseCases.getHba1cTest(
+                    patientId = it.id.toString(), authToken = "Bearer ${sharedPreferenceUseCases.getToken().toString()}"
+                ).collect { it ->
+                    println("\ngetHba1cTestLog   :: Res Logs :: ${Gson().toJson(it)}")
+                    _getHba1cTestState.value = it
                 }
             }
 

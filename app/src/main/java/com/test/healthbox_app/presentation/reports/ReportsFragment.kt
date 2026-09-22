@@ -27,6 +27,7 @@ import com.test.healthbox_app.data.model.PatientPref
 import com.test.healthbox_app.data.model.ReportTestType
 import com.test.healthbox_app.data.model.mapper.toParametersList
 import com.test.healthbox_app.data.model.response.BasicTestData
+import com.test.healthbox_app.data.model.response.Hba1cTestData
 import com.test.healthbox_app.databinding.ReportsFragmentBinding
 import com.test.healthbox_app.domain.model.ApiResponse
 import com.test.healthbox_app.domain.model.BleDevice
@@ -64,10 +65,18 @@ class ReportsFragment() : BaseFragment() {
 
     private var selectedReport: BasicTestData? = BasicTestData()
 
-    private lateinit var datesAdapter: ReportsDatesListAdapter
+    private var hba1cReportsList: List<Hba1cTestData> = arrayListOf()
+
+    private var selectedHba1cReport: Hba1cTestData? = Hba1cTestData()
+
+    private lateinit var datesAdapter: ReportsDatesListAdapter<*>
     private lateinit var parametersResultsListAdapter: ParametersResultsListAdapter
 
     private var isPrinting = false
+
+    // Set only when THIS screen actually initiates a printer connect (device picked
+    // from the scan dialog) - see observeConnectionState()'s use of it.
+    private var isConnectingPrinter = false
 
     var selectedReportType = ReportTestType.typesList().find { it.title == "Basic Health" }?.testType
 
@@ -125,6 +134,8 @@ class ReportsFragment() : BaseFragment() {
         reportsViewModel.getBasicTest()
 
         observeReportsData()
+
+        observeHba1cReportsData()
 
         observePrintStatus()
 //        printReportText = getPrintText()
@@ -205,17 +216,109 @@ class ReportsFragment() : BaseFragment() {
         }
     }
 
+    /** Mirrors observeReportsData() above, for the HbA1c history endpoint. */
+    fun observeHba1cReportsData() {
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            reportsViewModel.getHba1cTestState.collect { state ->
+                when (state) {
+                    is ApiResponse.ApiLoading -> {
+                        println("Get Hba1cTestState Logs  :  Loading")
+                        // show loading
+                    }
+
+                    is ApiResponse.ApiSuccess -> {
+                        val apiData = state.data
+                        println("Get Hba1cTestState Logs Success:: ${Gson().toJson(apiData.data)}")
+
+                        if (apiData.data != null) {
+
+                            hba1cReportsList = apiData.data.records
+
+                            if (hba1cReportsList.isNotEmpty()) {
+                                selectedHba1cReport = hba1cReportsList[0]
+                            }
+
+                            // This collector can fire after the user has already switched
+                            // back to Basic Health (e.g. a slow response arriving late) -
+                            // only refresh the visible strip/list if HbA1c is still active.
+                            if (selectedReportType == "HBA1C") {
+                                setDatesList()
+                                setResultsList()
+                            }
+
+                            delay(100)
+                            hideDialog()
+
+                        } else {
+                            hideDialog()
+                            CustomSnackBar.make(
+                                binding.root, "Failed to get data.", Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
+                            ).show()
+                        }
+                    }
+
+                    is ApiResponse.ApiError -> {
+                        hideDialog()
+
+                        CustomSnackBar.make(
+                            binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
     private fun setReportsTypesList() {
         viewLifecycleOwner.lifecycleScope.launch {
             reportsViewModel.reportTypes.collect { state ->
 
-                binding.rvTestTypeList.layoutManager = LinearLayoutManager(context)
+                binding.rvTestTypeList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
                 binding.rvTestTypeList.adapter = state.testTypesList.let {
                     ReportsTypesListAdapter(
                         reportsTypesList = it, context = context, onItemClick = { selectedReportTestType ->
                             println("\nselectedReportTestType Logs print :: ${selectedReportTestType}")
-//                            selectedReportType = selectedReportTestType.testType
+
+                            selectedReportType = selectedReportTestType.testType
+                            reportsViewModel.onReportTypeSelected(selectedReportTestType.title.orEmpty())
+
+                            when (selectedReportTestType.testType) {
+                                "HBA1C" -> {
+                                    if (hba1cReportsList.isEmpty()) {
+                                        showDialog()
+                                        reportsViewModel.getHba1cTest()
+                                    } else {
+                                        setDatesList()
+                                        setResultsList()
+                                    }
+                                }
+
+                                "BASIC" -> {
+                                    if (reportsList.isEmpty()) {
+                                        showDialog()
+                                        reportsViewModel.getBasicTest()
+                                    } else {
+                                        setDatesList()
+                                        setResultsList()
+                                    }
+                                }
+
+                                else -> {
+                                    // Lipid/Rapid: no backend endpoint yet - clear the
+                                    // strip/list rather than leave the previous type's
+                                    // data on screen under the wrong label.
+                                    binding.rvDatesList.adapter = null
+                                    binding.rvReportsList.adapter = null
+                                    CustomSnackBar.make(
+                                        binding.root,
+                                        "${selectedReportTestType.title} reports coming soon",
+                                        Snackbar.LENGTH_SHORT,
+                                        CustomSnackBar.Companion.SnackBarType.ERROR
+                                    ).show()
+                                }
+                            }
                         })
                 }
             }
@@ -224,46 +327,71 @@ class ReportsFragment() : BaseFragment() {
 
     private fun setDatesList() {
 
-        selectedReport?.let {
-            datesAdapter = ReportsDatesListAdapter(
-                reportsResultList = reportsList, selectedReport = it, onItemClick = { report ->
+        // rv_dates_list only shows ~3 chips at a time (fixed width), and assigning a
+        // fresh adapter below resets scroll position to the start every time - so a
+        // date tapped further along the strip would select correctly but scroll back
+        // out of view, making the selection look like it didn't register. Bring the
+        // selected chip back into view every time this rebuilds.
+        if (selectedReportType == "HBA1C") {
+            selectedHba1cReport?.let { current ->
+                datesAdapter = ReportsDatesListAdapter(
+                    reportsResultList = hba1cReportsList,
+                    selectedReport = current,
+                    getId = { it.Id },
+                    getCreatedAt = { it.createdAt },
+                    onItemClick = { report ->
+                        println(" selected HbA1c Report logs :: ${Gson().toJson(report)}")
 
-                    println(" selected Report logs :: ${Gson().toJson(selectedReport)}")
-                    println(" selected Report logs :: ${Gson().toJson(report)}")
+                        selectedHba1cReport = report
 
-                    // ✅ 1. Update selected report
-                    selectedReport = report
+                        setDatesList()
+                        setResultsList()
+                    })
+                binding.rvDatesList.adapter = datesAdapter
 
-                    // ✅ 2. Notify both adapters
-//                    datesAdapter.notifyDataSetChanged()
-//                    parametersResultsListAdapter.notifyDataSetChanged()
+                val selectedIndex = hba1cReportsList.indexOfFirst { it.Id == current.Id }
+                if (selectedIndex >= 0) {
+                    binding.rvDatesList.scrollToPosition(selectedIndex)
+                }
+            }
+        } else {
+            selectedReport?.let { current ->
+                datesAdapter = ReportsDatesListAdapter(
+                    reportsResultList = reportsList,
+                    selectedReport = current,
+                    getId = { it.Id },
+                    getCreatedAt = { it.createdAt },
+                    onItemClick = { report ->
+                        println(" selected Report logs :: ${Gson().toJson(report)}")
 
-                    setDatesList()
-                    setResultsList()
+                        selectedReport = report
 
-                })
-            binding.rvDatesList.adapter = datesAdapter
+                        setDatesList()
+                        setResultsList()
+                    })
+                binding.rvDatesList.adapter = datesAdapter
+
+                val selectedIndex = reportsList.indexOfFirst { it.Id == current.Id }
+                if (selectedIndex >= 0) {
+                    binding.rvDatesList.scrollToPosition(selectedIndex)
+                }
+            }
         }
     }
 
     private fun setResultsList() {
 
-        selectedReport?.let {
+        val parametersList = if (selectedReportType == "HBA1C") {
+            selectedHba1cReport?.toParametersList()
+        } else {
+            selectedReport?.toParametersList()
+        } ?: emptyList()
 
-            println("\nBodyCheckupPref Logs print :: ${Gson().toJson(selectedReport)}")
+        println("\nReportsList Logs print :: ${Gson().toJson(parametersList)}")
 
-            val parametersList = selectedReport!!.toParametersList()
+        parametersResultsListAdapter = ParametersResultsListAdapter(parametersResultList = parametersList, context = context)
 
-            /* binding.rvReportsList.adapter = parametersList.let {
-                 ParametersResultsListAdapter(parametersResultList = it, context = context)
-             }*/
-
-            parametersList.let {
-                parametersResultsListAdapter = ParametersResultsListAdapter(parametersResultList = it, context = context)
-            }
-
-            binding.rvReportsList.adapter = parametersResultsListAdapter
-        }
+        binding.rvReportsList.adapter = parametersResultsListAdapter
     }
 
     private fun nextTestCall() {
@@ -293,8 +421,10 @@ class ReportsFragment() : BaseFragment() {
         }
 
         binding.buttonViewReport.setOnClickListener {
-            println("selectedReportType Logs on click :: ${selectedReport?.Id} :: $selectedReportType")
-            val url = PdfOpener.buildUrl(testId = selectedReport?.Id.toString(), testType = selectedReportType)
+            val testId = if (selectedReportType == "HBA1C") selectedHba1cReport?.Id else selectedReport?.Id
+
+            println("selectedReportType Logs on click :: $testId :: $selectedReportType")
+            val url = PdfOpener.buildUrl(testId = testId.toString(), testType = selectedReportType)
             PdfOpener.openUrl(context = requireContext(), url = url)
 
             /*CustomSnackBar.make(
@@ -390,6 +520,7 @@ class ReportsFragment() : BaseFragment() {
 
                 bleDevice?.let {
 
+                    isConnectingPrinter = true
                     showDialog()
 
                     selectedPrinterDevice = bleDevice
@@ -420,21 +551,34 @@ class ReportsFragment() : BaseFragment() {
         }
     }
 
+    // bleConnectionViewModel.scanState is activity-scoped and shared with every
+    // BT-using screen, defaulting to ScanState.Idle - observeScanState()'s collector
+    // replays that current value the moment it subscribes, regardless of whether THIS
+    // screen ever started a scan. Idle's hideDialog() was firing on every Reports
+    // screen open and dismissing whatever OTHER loader (e.g. getBasicTest()'s) had
+    // just been shown. Only treat Idle as "a scan on this screen just ended" if
+    // Scanning was actually observed first.
+    private var hasScanStarted = false
+
     private fun updateUIForScanState(state: ScanState) {
         Log.e("updatingUIState", " : " + state.toString())
         when (state) {
             is ScanState.Idle -> {
-                // Handle idle state (initial state)
-                hideDialog()
+                if (hasScanStarted) {
+                    hasScanStarted = false
+                    hideDialog()
+                }
             }
 
             is ScanState.Scanning -> {
                 // Handle scanning state (show progress)
+                hasScanStarted = true
                 showDialog()
             }
 
             is ScanState.DevicesFound -> {
 
+                hasScanStarted = false
                 hideDialog()
 
                 // Show dialog with the devices list
@@ -449,6 +593,7 @@ class ReportsFragment() : BaseFragment() {
 
             is ScanState.Error -> {
                 // Handle error state
+                hasScanStarted = false
                 hideDialog()
                 Toast.makeText(requireContext(), "Error: ${state.message}", Toast.LENGTH_SHORT).show()
             }
@@ -486,8 +631,16 @@ class ReportsFragment() : BaseFragment() {
                                     //Close BLE device dialog
                                     deviceListDialog.dismissDialog()
 
-                                    //Close loader after device connected
-                                    hideDialog()
+                                    // btConnectionState is activity-scoped and replays
+                                    // its current value on subscribe - only hide the
+                                    // loader if THIS screen actually showed one for a
+                                    // printer connect (e.g. an already-connected
+                                    // printer from an earlier screen would otherwise
+                                    // dismiss getBasicTest()'s loader on every entry).
+                                    if (isConnectingPrinter) {
+                                        isConnectingPrinter = false
+                                        hideDialog()
+                                    }
 
                                     // Save the connected device in shared pref
                                     selectedPrinterDevice?.let {
@@ -518,8 +671,10 @@ class ReportsFragment() : BaseFragment() {
                                 }
 
                                 is ConnectionState.Disconnected -> {
-                                    //Close loader after device connected
-                                    hideDialog()
+                                    if (isConnectingPrinter) {
+                                        isConnectingPrinter = false
+                                        hideDialog()
+                                    }
 
                                     selectedPrinterDevice?.let { printerDevice ->
                                         bleConnectionViewModel.connectBTDevice(bleDevice = printerDevice)
@@ -529,8 +684,10 @@ class ReportsFragment() : BaseFragment() {
                                 is ConnectionState.Error -> {
 
                                     withContext(Dispatchers.Main) {
-                                        //Close loader after device connected
-                                        hideDialog()
+                                        if (isConnectingPrinter) {
+                                            isConnectingPrinter = false
+                                            hideDialog()
+                                        }
 
                                         CustomSnackBar.make(
                                             binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.ERROR
@@ -556,7 +713,14 @@ class ReportsFragment() : BaseFragment() {
     private fun getPrintText(): String {
         val sb = StringBuilder()
 
-        val dateOfBirthTimeStamp = DatePickerUtil.isoStringToTimestamp(selectedReport?.createdAt)
+        val createdAtRaw = if (selectedReportType == "HBA1C") selectedHba1cReport?.createdAt else selectedReport?.createdAt
+        val parametersList = if (selectedReportType == "HBA1C") {
+            selectedHba1cReport?.toParametersList()
+        } else {
+            selectedReport?.toParametersList()
+        } ?: emptyList()
+
+        val dateOfBirthTimeStamp = DatePickerUtil.isoStringToTimestamp(createdAtRaw)
 
         val createdDate = DatePickerUtil.formatDate(dateOfBirthTimeStamp, pattern = DatePickerUtil.prettyFormat)
 
@@ -569,7 +733,7 @@ class ReportsFragment() : BaseFragment() {
         sb.appendLine("------------------------")
 
         // ----- Dynamically build parameters -----
-        selectedReport!!.toParametersList().filter { !it.value.isNullOrBlank() } // ✅ Only print non-null & non-empty
+        parametersList.filter { !it.value.isNullOrBlank() } // ✅ Only print non-null & non-empty
             .forEach { param ->
                 sb.appendLine("${param.parameterName}: ${param.value}")
 

@@ -36,6 +36,19 @@ class ResultsViewModel @Inject constructor(
     }
 
     fun createBasicTest() {
+        // resultsViewModel is activity-scoped, so _createBasicTestState still holds the
+        // terminal ApiSuccess/ApiError from the PREVIOUS patient's submission when this screen
+        // is revisited. ResultsFragment calls createBasicTest() then immediately
+        // viewLifecycleOwner.lifecycleScope.launch { createBasicTestState.collect { ... } } —
+        // on lifecycleScope's Main.immediate dispatcher that launch runs synchronously (no
+        // dispatch) since we're already on the main thread, so StateFlow's replay of that
+        // stale terminal value fires the ApiSuccess/ApiError branch, and its
+        // CustomSnackBar.make(binding.root, ...) call, before onCreateView has returned and
+        // the fragment's view is attached to a window — crashing with "No suitable parent
+        // found from the given view." Resetting to ApiLoading here, synchronously and before
+        // the fragment's collector is even launched, ensures that replay is always safe.
+        _createBasicTestState.value = ApiResponse.ApiLoading()
+
         viewModelScope.launch(Dispatchers.IO) {
 
             val basicRequest = BodyCheckupPref.toBasicTestRequestDto()
@@ -56,6 +69,10 @@ class ResultsViewModel @Inject constructor(
     val createHba1cTestState: StateFlow<ApiResponse<CreateHba1cTestResponse>> get() = _createHba1cTestState
 
     fun createHba1cTest() {
+        // Same replay hazard as createBasicTest() above — reset before the fragment's
+        // collector can observe a stale terminal state from a previous visit.
+        _createHba1cTestState.value = ApiResponse.ApiLoading()
+
         viewModelScope.launch(Dispatchers.IO) {
 
             val hba1cRequest = BodyCheckupPref.toHba1cTestRequestDto()
@@ -69,6 +86,18 @@ class ResultsViewModel @Inject constructor(
             }
 
         }
+    }
+
+    /**
+     * Called from the Home button (activity-scoped ResultsViewModel survives that
+     * navigation) so the next patient's Results visit doesn't start out holding this
+     * patient's ApiSuccess/ApiError. createBasicTest()/createHba1cTest() already guard
+     * against this at their own call sites, so this is belt-and-suspenders — it just
+     * avoids leaving stale data sitting in these flows between patients.
+     */
+    fun resetTestState() {
+        _createBasicTestState.value = ApiResponse.ApiLoading()
+        _createHba1cTestState.value = ApiResponse.ApiLoading()
     }
 
     fun savePatient(patient: Patient) {

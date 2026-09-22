@@ -105,6 +105,21 @@ class BleConnectionViewModel @Inject constructor(
     private val _printState = MutableStateFlow<PrintState>(PrintState.Idle)
     val printState: MutableStateFlow<PrintState> = _printState
 
+    /**
+     * Same stale-replay hazard as resetTestState() in ResultsViewModel — printState is
+     * activity-scoped and only ever moves forward (Loading -> Success/Error) from a print
+     * attempt, never back. Confirmed via device logcat (2026-09-22): a stale Success from
+     * an earlier print replayed synchronously into ResultsFragment.observePrintStatus()'s
+     * collector on the very next Results visit, crashing with "No suitable parent found
+     * from the given view" (CustomSnackBar.make(binding.root, ...) firing before
+     * onCreateView had returned) — before createBasicTest() ever ran, silently losing that
+     * whole submission. Call this at the top of observePrintStatus() so any replay is
+     * always safe.
+     */
+    fun resetPrintState() {
+        _printState.value = PrintState.Idle
+    }
+
     private val _weightWiState = MutableStateFlow(WeighingUiState())
     val weightUiState: StateFlow<WeighingUiState> = _weightWiState.asStateFlow()
 
@@ -127,6 +142,22 @@ class BleConnectionViewModel @Inject constructor(
         _deviceResponsesReceived.postValue(status)
     }
 
+    /**
+     * Clears every device's last stored measurement. deviceResponses is activity-scoped
+     * and only ever grows (see the various _deviceResponses.update { current + ... } call
+     * sites) — nothing resets it as a whole. All ~8 test fragments (Height, Temperature,
+     * Pulse, BP, Blood Sugar, Body Analysis, Vision, HB Check) collect it and write
+     * straight into their result field on whatever value is already there, so a fresh
+     * StateFlow collector on the next visit to any of those screens replays the
+     * *previous* patient's reading before a new one ever arrives. Call this at the same
+     * session boundary as BodyCheckupPref.clearAll() (Results "Home" button) so the next
+     * patient starts with a clean slate on every screen, not just the ones with their own
+     * per-screen cleanup (e.g. stopHba1cListening()).
+     */
+    fun clearDeviceResponses() {
+        _deviceResponses.value = emptyMap()
+    }
+
     fun getDevice() {
         viewModelScope.launch {
             _selectedDevice.value = selectedDeviceType.value?.let { sharedPreferenceUseCases.getDevice(it) }
@@ -143,12 +174,15 @@ class BleConnectionViewModel @Inject constructor(
     }
 
     fun getDeviceByType(deviceType: DeviceType): BleDevice? {
-
-        var bleDevice: BleDevice? = null
-
-        viewModelScope.launch {
-            bleDevice = deviceType.let { sharedPreferenceUseCases.getDevice(it) }
-        }
+        // sharedPreferenceUseCases.getDevice() is a plain synchronous SharedPreferences read
+        // (see SharedPreferencesManager.getDevice()) - no suspend calls anywhere in that
+        // chain, so it needs no coroutine. Previously this was wrapped in
+        // viewModelScope.launch and the function returned its local var immediately
+        // afterward, before that coroutine had a chance to run - so it always returned null
+        // regardless of what was actually saved. Confirmed via DEBUG-DEVICESAVE logs: after
+        // saveDevice() correctly persisted the HB_CHECK device (isSaved=true, verified by a
+        // read-back), ConnectedDevicesFragment still couldn't find it through this function.
+        val bleDevice = sharedPreferenceUseCases.getDevice(deviceType)
 
         Log.i("getDeviceByIdLog", "  :  type  : ${deviceType}  :  devices  :  ${bleDevice}")
 
@@ -427,11 +461,28 @@ class BleConnectionViewModel @Inject constructor(
     }
 
     fun saveDevice(selectedDevice: BleDevice) {
+        println("DEBUG-DEVICESAVE BleConnectionViewModel.saveDevice() called: name=${selectedDevice.name} address=${selectedDevice.address} deviceType=${selectedDevice.deviceType}")
+        if (selectedDevice.deviceType == null) {
+            // saveDevice() below keys the SharedPreferences entry on device.deviceType?.name -
+            // if deviceType is null here, it silently writes under a null key instead of the
+            // real type's name, and getDevice(HB_CHECK) (a real, non-null key) will never
+            // find it again. This would explain "connected but not showing up" independent
+            // of the getDeviceByType() race below.
+            println("DEBUG-DEVICESAVE WARNING: deviceType is NULL - this device will be saved under a null key and won't be retrievable by DeviceType later")
+            Log.e("DEBUG-DEVICESAVE", "WARNING: deviceType is NULL for device being saved: $selectedDevice")
+        }
+
         viewModelScope.launch {
             selectedDevice.let {
                 Log.e("savingDeviceLog", "  :   " + selectedDevice)
                 val isSaved = sharedPreferenceUseCases.saveDevice(it)
                 Log.e("savingDeviceLog", "  : saved : " + isSaved)
+                println("DEBUG-DEVICESAVE saveDevice() isSaved=$isSaved for deviceType=${it.deviceType}")
+
+                // Read the same type straight back to confirm it round-trips correctly.
+                val readBack = it.deviceType?.let { type -> sharedPreferenceUseCases.getDevice(type) }
+                println("DEBUG-DEVICESAVE saveDevice() read-back for deviceType=${it.deviceType} immediately after save: $readBack")
+                Log.e("DEBUG-DEVICESAVE", "saveDevice() read-back for deviceType=${it.deviceType} immediately after save: $readBack")
 
 //                Log.e("savingDeviceLog", "  : saved : " + deviceUseCases.getDevice(selectedDeviceType.value!!))
                 Log.e("savingDeviceLog", "  : saved : " + sharedPreferenceUseCases.getDevice(DeviceType.BT_PRINTER))

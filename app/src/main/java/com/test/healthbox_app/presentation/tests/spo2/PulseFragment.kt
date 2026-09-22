@@ -195,6 +195,12 @@ class PulseFragment() : BaseFragment() {
             override fun onItemSelect(bleDevice: BleDevice?) {
 //                binding.buttonScan.visibility = View.GONE
 
+                // Picking a device doesn't stop the ongoing scan on its own — scan results
+                // keep arriving afterward, each one re-triggering ScanState.DevicesFound,
+                // whose handler unconditionally reopens the device list dialog. Stop the scan
+                // here so no further DevicesFound emissions can reopen it mid-connection.
+                deviceStatusViewModel.stopBleScan()
+
                 showDialog()
 
                 bleDevice?.let {

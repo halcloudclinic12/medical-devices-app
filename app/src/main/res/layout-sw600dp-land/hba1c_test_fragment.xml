@@ -18,384 +18,585 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_login_gradient">
 
-        <!-- User Details view -->
-        <com.test.healthbox_app.presentation.view.UserInfoView
-            android:id="@+id/userInfoView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="30dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.test.healthbox_app.presentation.view.DeviceStatusLayout
-            android:id="@+id/deviceStatusLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:layout_marginTop="24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Reference for the meter's own error codes (E-0..E-8, HI, LO, etc.) — the
-             device only ever shows these on its LCD, never over Bluetooth, so this is
-             the operator's lookup when the app can't say what went wrong. -->
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/button_hba1c_help"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/hba1c_help_title"
-            android:src="@drawable/ic_info"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="@+id/deviceStatusLayout"
-            app:layout_constraintTop_toBottomOf="@+id/deviceStatusLayout" />
-
-        <!-- Left: device illustration -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_image_sample"
+        <!-- Unlike other redesigned screens, button_next_layout here is a separate fixed
+             footer (not nested inside the scrolling content), so this NestedScrollView
+             needs explicit constraints pinning it above that button - otherwise its
+             match_parent height would extend the full screen and overlap the fixed
+             button instead of sitting above it. -->
+        <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
-            android:layout_height="450dp"
-            android:layout_marginStart="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/layout_hba1c_readings"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/userInfoView">
-
-            <ImageView
-                android:id="@+id/iv_hba1c_icon"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:contentDescription="@string/hba1c_title"
-                android:src="@drawable/ic_hba1c"
-                app:layout_constraintBottom_toTopOf="@+id/tv_hba1c_status"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Live connection / progress message. The HbA1c cycle runs for several
-                 minutes, so the operator needs explicit feedback that the app is
-                 still listening rather than an indefinite spinner. -->
-            <TextView
-                android:id="@+id/tv_hba1c_status"
-                style="@style/SubTextStyle18"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="10dp"
-                android:gravity="center"
-                android:text="@string/hba1c_status_idle"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/iv_hba1c_icon" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- Right: instructions, then result -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_hba1c_readings"
-            android:layout_width="0dp"
-            android:layout_height="450dp"
-            android:layout_marginEnd="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="0dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@+id/button_next_layout"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/layout_image_sample"
-            app:layout_constraintTop_toBottomOf="@+id/userInfoView">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_hba1c_instructions"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="visible">
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_first_step"
-                    android:layout_width="match_parent"
+                <!-- Header row: userInfoView + deviceStatusLayout + the meter's own
+                     error-code lookup (buttonHba1cHelp), which has no StepsLayout
+                     equivalent since this is a standalone flow, not part of the Basic
+                     checkup steps. -->
+                <LinearLayout
+                    android:id="@+id/header_row"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/box_container_bg"
-                    app:layout_constraintBottom_toTopOf="@+id/layout_second_step"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
-                        android:id="@+id/tv_step_one_title"
-                        style="@style/ResultTextStyle"
+                    <com.test.healthbox_app.presentation.view.UserInfoView
+                        android:id="@+id/userInfoView"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Step 1:"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_height="wrap_content" />
 
-                    <TextView
-                        android:id="@+id/tv_step_one_description"
-                        style="@style/ResultLabelTextStyle"
-                        android:layout_width="0dip"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/hba1c_step_one"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/tv_step_one_title"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_second_step"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/box_container_bg"
-                    app:layout_constraintBottom_toTopOf="@+id/layout_third_step"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_first_step">
-
-                    <TextView
-                        android:id="@+id/tv_step_two_title"
-                        style="@style/ResultTextStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Step 2:"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_step_two_description"
-                        style="@style/ResultLabelTextStyle"
-                        android:layout_width="0dip"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/hba1c_step_two"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/tv_step_two_title"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_third_step"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/box_container_bg"
-                    app:layout_constraintBottom_toTopOf="@+id/layout_fourth_step"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_second_step">
-
-                    <TextView
-                        android:id="@+id/tv_step_three_title"
-                        style="@style/ResultTextStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Step 3:"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_step_three_description"
-                        style="@style/ResultLabelTextStyle"
-                        android:layout_width="0dip"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/hba1c_step_three"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/tv_step_three_title"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_fourth_step"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/box_container_bg"
-                    app:layout_constraintBottom_toTopOf="@+id/button_start"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_third_step">
-
-                    <TextView
-                        android:id="@+id/tv_step_four_title"
-                        style="@style/ResultTextStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Step 4:"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_step_four_description"
-                        style="@style/ResultLabelTextStyle"
-                        android:layout_width="0dip"
-                        android:layout_height="wrap_content"
-                        android:layout_marginVertical="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/hba1c_step_four"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/tv_step_four_title"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/button_start"
-                    style="@style/SmallButtonTextStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/button_style"
-                    android:text="@string/start"
-                    android:textAllCaps="false"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Result panel — shown only once a valid record has been decoded -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_hba1c_result"
-                android:layout_width="0dp"
-                android:layout_height="450dp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_hba1c_reading_box"
-                    android:layout_width="280dp"
-                    android:layout_height="300dp"
-                    android:background="@drawable/box_container_bg"
-                    app:layout_constraintBottom_toTopOf="@+id/button_retest"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <!-- Device-driven value: not focusable, the meter is the source of truth -->
-                    <androidx.appcompat.widget.AppCompatEditText
-                        android:id="@+id/edit_hba1c"
-                        style="@style/ResultTextStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="160dp"
-                        android:background="@android:color/transparent"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:hint=""
-                        android:inputType="numberDecimal"
-                        android:maxEms="5"
-                        android:maxLength="3"
-                        android:text=""
-                        app:layout_constraintBottom_toTopOf="@+id/tv_hba1c_unit"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_hba1c_unit"
-                        style="@style/SubTextStyle20"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/hba1c_unit_ngsp"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toTopOf="@+id/tv_hba1c_result"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/edit_hba1c"
-                        app:layout_constraintVertical_bias="0.5" />
-
-                    <TextView
-                        android:id="@+id/tv_hba1c_result"
-                        style="@style/SubTextStyle18"
+                    <View
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_marginTop="6dp"
-                        android:gravity="center"
-                        android:text=""
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_hba1c_unit"
-                        app:layout_constraintVertical_bias="0.5" />
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    <com.test.healthbox_app.presentation.view.DeviceStatusLayout
+                        android:id="@+id/deviceStatusLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/button_retest"
-                    style="@style/ButtonTextStyle"
-                    android:layout_width="220dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/button_style"
-                    android:text="@string/retest"
-                    android:textAllCaps="false"
-                    android:visibility="gone"
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/button_hba1c_help"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/hba1c_help_title"
+                        android:src="@drawable/ic_info" />
+
+                </LinearLayout>
+
+                <!-- Two-panel measurement card -->
+                <LinearLayout
+                    android:id="@+id/card_outer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/layout_hba1c_reading_box"
-                    app:layout_constraintStart_toStartOf="@+id/layout_hba1c_reading_box"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_hba1c_reading_box" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/header_row">
+
+                    <!-- LEFT: meter illustration + live connection/progress status.
+                         ivHba1cIcon has its own onClick (setupButtons()) that manually
+                         flips instructions -> result, so it stays a directly-tappable
+                         ImageView rather than nested inside a decorative wrapper. -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_image_sample"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="0.46"
+                        android:background="@drawable/bg_solid_card"
+                        android:clipToOutline="true"
+                        android:elevation="3dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/bg_card_accent_top_teal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:orientation="vertical"
+                            android:padding="22dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_semibold"
+                                android:letterSpacing="0.05"
+                                android:text="@string/hba1c_meter_eyebrow"
+                                android:textAllCaps="true"
+                                android:textColor="@color/patient_login_label"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/hba1c_title"
+                                android:textColor="@color/patient_login_heading_text"
+                                android:textSize="22sp" />
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <FrameLayout
+                                    android:layout_width="140dp"
+                                    android:layout_height="140dp"
+                                    android:layout_gravity="center"
+                                    android:background="@drawable/bg_circle_teal">
+
+                                    <ImageView
+                                        android:id="@+id/iv_hba1c_icon"
+                                        android:layout_width="82dp"
+                                        android:layout_height="82dp"
+                                        android:layout_gravity="center"
+                                        android:contentDescription="@string/hba1c_title"
+                                        android:src="@drawable/ic_hba1c" />
+
+                                </FrameLayout>
+
+                            </FrameLayout>
+
+                            <!-- Live connection / progress message. The HbA1c cycle runs
+                                 for several minutes, so the operator needs explicit
+                                 feedback that the app is still listening rather than an
+                                 indefinite spinner. -->
+                            <TextView
+                                android:id="@+id/tv_hba1c_status"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:fontFamily="@font/roboto_regular"
+                                android:gravity="center"
+                                android:text="@string/hba1c_status_idle"
+                                android:textColor="@color/patient_login_muted_text"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- RIGHT: toggles between guidance (layoutHba1cInstructions,
+                         visible by default) and the decoded result
+                         (layoutHba1cResult, invisible by default) - both containers'
+                         visibility is fully owned by Kotlin (showResult(),
+                         showStartOrRetest(), the manual ivHba1cIcon toggle), so neither
+                         is wrapped in anything that would also need toggling. -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_hba1c_readings"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="0.54"
+                        android:background="@drawable/bg_solid_card"
+                        android:clipToOutline="true"
+                        android:elevation="3dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/bg_card_accent_top_teal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layout_hba1c_instructions"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:visibility="visible"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:orientation="vertical"
+                                android:padding="22dp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_semibold"
+                                    android:letterSpacing="0.05"
+                                    android:text="@string/hba1c_guidance_eyebrow"
+                                    android:textAllCaps="true"
+                                    android:textColor="@color/patient_login_label"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:text="@string/hba1c_guidance_heading"
+                                    android:textColor="@color/patient_login_heading_text"
+                                    android:textSize="22sp" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_marginTop="16dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center_vertical"
+                                    android:orientation="vertical">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="horizontal">
+
+                                        <FrameLayout
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:background="@drawable/bg_circle_teal">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_gravity="center"
+                                                android:fontFamily="@font/roboto_bold"
+                                                android:text="1"
+                                                android:textColor="@color/app_color"
+                                                android:textSize="12sp" />
+
+                                        </FrameLayout>
+
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="12dp"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/hba1c_step_one"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="14sp" />
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="12dp"
+                                        android:orientation="horizontal">
+
+                                        <FrameLayout
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:background="@drawable/bg_circle_teal">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_gravity="center"
+                                                android:fontFamily="@font/roboto_bold"
+                                                android:text="2"
+                                                android:textColor="@color/app_color"
+                                                android:textSize="12sp" />
+
+                                        </FrameLayout>
+
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="12dp"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/hba1c_step_two"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="14sp" />
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="12dp"
+                                        android:orientation="horizontal">
+
+                                        <FrameLayout
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:background="@drawable/bg_circle_teal">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_gravity="center"
+                                                android:fontFamily="@font/roboto_bold"
+                                                android:text="3"
+                                                android:textColor="@color/app_color"
+                                                android:textSize="12sp" />
+
+                                        </FrameLayout>
+
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="12dp"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/hba1c_step_three"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="14sp" />
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="12dp"
+                                        android:orientation="horizontal">
+
+                                        <FrameLayout
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:background="@drawable/bg_circle_teal">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_gravity="center"
+                                                android:fontFamily="@font/roboto_bold"
+                                                android:text="4"
+                                                android:textColor="@color/app_color"
+                                                android:textSize="12sp" />
+
+                                        </FrameLayout>
+
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="12dp"
+                                            android:layout_weight="1"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/hba1c_step_four"
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="14sp" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                                <androidx.appcompat.widget.AppCompatButton
+                                    android:id="@+id/button_start"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="48dp"
+                                    android:layout_marginTop="16dp"
+                                    android:background="@drawable/bg_btn_teal"
+                                    android:fontFamily="@font/roboto_semibold"
+                                    android:insetBottom="0dp"
+                                    android:insetTop="0dp"
+                                    android:minWidth="0dp"
+                                    android:minHeight="0dp"
+                                    android:stateListAnimator="@null"
+                                    android:text="@string/start"
+                                    android:textAllCaps="false"
+                                    android:textColor="@color/white"
+                                    android:textSize="14sp" />
+
+                            </LinearLayout>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layout_hba1c_result"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:visibility="invisible"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:orientation="vertical"
+                                android:padding="22dp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_semibold"
+                                    android:letterSpacing="0.05"
+                                    android:text="@string/hba1c_reading_eyebrow"
+                                    android:textAllCaps="true"
+                                    android:textColor="@color/patient_login_label"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:text="@string/hba1c_reading_heading"
+                                    android:textColor="@color/patient_login_heading_text"
+                                    android:textSize="22sp" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center">
+
+                                    <androidx.constraintlayout.widget.ConstraintLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/bg_pill_tint"
+                                        android:paddingHorizontal="22dp"
+                                        android:paddingVertical="30dp">
+
+                                        <!-- Device-driven value: not focusable, the
+                                             meter is the source of truth. -->
+                                        <androidx.appcompat.widget.AppCompatEditText
+                                            android:id="@+id/edit_hba1c"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:background="@android:color/transparent"
+                                            android:focusable="false"
+                                            android:fontFamily="@font/roboto_bold"
+                                            android:gravity="center"
+                                            android:hint="@string/hba1c_unit_ngsp"
+                                            android:inputType="numberDecimal"
+                                            android:maxEms="5"
+                                            android:minWidth="110dp"
+                                            android:text=""
+                                            android:textColor="@color/patient_login_heading_text"
+                                            android:textSize="64sp"
+                                            app:layout_constraintEnd_toEndOf="parent"
+                                            app:layout_constraintStart_toStartOf="parent"
+                                            app:layout_constraintTop_toTopOf="parent" />
+
+                                        <TextView
+                                            android:id="@+id/tv_hba1c_unit"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="2dp"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:text="@string/hba1c_unit_ngsp"
+                                            android:textColor="@color/patient_login_label"
+                                            android:textSize="15sp"
+                                            app:layout_constraintEnd_toEndOf="parent"
+                                            app:layout_constraintStart_toStartOf="parent"
+                                            app:layout_constraintTop_toBottomOf="@+id/edit_hba1c" />
+
+                                        <TextView
+                                            android:id="@+id/tv_hba1c_result"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="12dp"
+                                            android:fontFamily="@font/roboto_semibold"
+                                            android:gravity="center"
+                                            android:text=""
+                                            android:textColor="@color/app_color"
+                                            android:textSize="16sp"
+                                            app:layout_constraintEnd_toEndOf="parent"
+                                            app:layout_constraintStart_toStartOf="parent"
+                                            app:layout_constraintTop_toBottomOf="@+id/tv_hba1c_unit" />
+
+                                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                                </FrameLayout>
+
+                                <androidx.appcompat.widget.AppCompatButton
+                                    android:id="@+id/button_retest"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="48dp"
+                                    android:layout_marginTop="16dp"
+                                    android:background="@drawable/bg_btn_teal"
+                                    android:fontFamily="@font/roboto_semibold"
+                                    android:insetBottom="0dp"
+                                    android:insetTop="0dp"
+                                    android:minWidth="0dp"
+                                    android:minHeight="0dp"
+                                    android:stateListAnimator="@null"
+                                    android:text="@string/retest"
+                                    android:textAllCaps="false"
+                                    android:textColor="@color/white"
+                                    android:textSize="14sp" />
+
+                            </LinearLayout>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
 
+        <!-- Next: always reachable regardless of instructions/result toggle state -
+             matches the original's placement outside layout_hba1c_readings. -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/button_next_layout"
-            style="@style/ButtonTextStyle"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="50dp"
-            android:background="@drawable/button_next_style"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginBottom="22dp"
+            android:background="@drawable/bg_btn_teal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_hba1c_readings">
+            app:layout_constraintStart_toStartOf="parent">
 
             <TextView
                 android:id="@+id/tv_next"
-                style="@style/SubTextStyle20"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_semibold"
                 android:gravity="center"
                 android:text="@string/next"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="17sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/imageView7"
+                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/imageView7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="8dp"
                 android:src="@drawable/ic_arrow"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_next"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/tv_next"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="@+id/tv_next"
+                app:tint="@color/white" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

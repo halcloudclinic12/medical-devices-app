@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Purely transient - SplashFragment.kt never binds any view here by id (it navigates
+     away almost immediately: instantly if no clinic is set up, after a 500ms delay if
+     the session is still valid, or as soon as the refresh/verify-token call resolves),
+     so there's no id-preservation constraint on this layout at all. -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
@@ -6,29 +10,101 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_login_gradient">
+        android:background="@drawable/bg_login_gradient"
+        android:clipChildren="false">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/hal_logo_square"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+        <!-- Decorative depth layer - large soft teal circles bleeding off two corners,
+             purely cosmetic, sitting behind the hero content below. -->
+        <View
+            android:layout_width="260dp"
+            android:layout_height="260dp"
+            android:layout_marginStart="-90dp"
+            android:layout_marginTop="-90dp"
+            android:background="@drawable/bg_circle_teal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textView"
+        <View
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="-70dp"
+            android:layout_marginEnd="-70dp"
+            android:background="@drawable/bg_circle_teal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Hero content -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="20dp"
-            android:text=""
-            android:textSize="30sp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <FrameLayout
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:background="@drawable/bg_circle_white"
+                android:elevation="8dp">
+
+                <ImageView
+                    android:layout_width="92dp"
+                    android:layout_height="92dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/hal_logo_square" />
+
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/app_name"
+                android:textColor="@color/patient_login_heading_text"
+                android:textSize="26sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/roboto_semibold"
+                android:letterSpacing="0.12"
+                android:text="@string/hal_cloud_clinic"
+                android:textAllCaps="true"
+                android:textColor="@color/app_color"
+                android:textSize="11sp" />
+
+            <!-- Real work happens behind this screen (refresh/verify token API calls)
+                 with no loading feedback previously shown at all - reusing the same
+                 loading_spinner Lottie asset used everywhere else in the app instead of
+                 a bare ProgressBar, for a more considered, on-brand feel. -->
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="36dp"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/loading_spinner" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="28dp"
+            android:fontFamily="@font/roboto_semibold"
+            android:letterSpacing="0.1"
+            android:text="@string/patient_login_footer"
+            android:textAllCaps="true"
+            android:textColor="@color/patient_login_muted_text"
+            android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
-
-

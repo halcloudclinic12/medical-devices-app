@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hero summary card - always the first item in rv_results when at least one parameter
+     could be classified. Percent/title/subtitle are computed in
+     ParametersResultsListAdapter.SummaryViewHolder from the same flat parameter list every
+     row comes from, not a separate data source. -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="18dp"
+    android:background="@drawable/bg_pill_tint"
+    android:padding="20dp"
+    tools:ignore="MissingDefaultResource">
+
+    <FrameLayout
+        android:id="@+id/summary_ring"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@drawable/bg_circle_teal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_summary_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/roboto_bold"
+            android:text="0%"
+            android:textColor="@color/app_color"
+            android:textSize="20sp" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_summary_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Parameters normal"
+        android:textColor="@color/patient_login_heading_text"
+        android:textSize="19sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/summary_ring"
+        app:layout_constraintTop_toTopOf="@+id/summary_ring" />
+
+    <TextView
+        android:id="@+id/tv_summary_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/roboto_semibold"
+        android:text="Results need attention"
+        android:textColor="@color/patient_login_muted_text"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/summary_ring"
+        app:layout_constraintTop_toBottomOf="@+id/tv_summary_title" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

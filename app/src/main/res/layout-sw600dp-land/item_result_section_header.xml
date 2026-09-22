@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Section label - either a category name (Vitals / Body Composition / Vision) or the
+     pinned "NEEDS ATTENTION" header. Color and text are set per-instance in
+     ParametersResultsListAdapter.SectionHeaderViewHolder. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="18dp"
+    android:layout_marginBottom="10dp"
+    android:fontFamily="@font/roboto_semibold"
+    android:id="@+id/tv_section_title"
+    android:letterSpacing="0.05"
+    android:text="SECTION"
+    android:textAllCaps="true"
+    android:textSize="13sp" />

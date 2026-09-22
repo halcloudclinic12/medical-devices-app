@@ -58,17 +58,26 @@
             android:layout_marginTop="28dp"
             android:layout_marginBottom="24dp"
             android:background="@drawable/bg_solid_card"
+            android:clipToOutline="true"
             android:elevation="3dp"
-            android:padding="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_devices_subtext">
 
+            <View
+                android:layout_width="0dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_card_accent_top_teal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_devices_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:clipToPadding="false"
+                android:padding="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +87,7 @@
 
         <!-- Detail pane: selected device info -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_test_reports"
+            android:id="@+id/layout_device_detail_card"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="20dp"
@@ -86,11 +95,20 @@
             android:layout_marginEnd="24dp"
             android:layout_marginBottom="24dp"
             android:background="@drawable/bg_solid_card"
+            android:clipToOutline="true"
             android:elevation="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/layout_steps_list"
             app:layout_constraintTop_toBottomOf="@+id/tv_devices_subtext">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_card_accent_top_teal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_device_details"
@@ -111,11 +129,11 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
+                        android:id="@+id/iv_device_detail_icon"
                         android:layout_width="38dp"
                         android:layout_height="38dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_bluetooth"
-                        app:tint="@color/app_color" />
+                        android:src="@drawable/ic_bluetooth" />
 
                 </FrameLayout>
 

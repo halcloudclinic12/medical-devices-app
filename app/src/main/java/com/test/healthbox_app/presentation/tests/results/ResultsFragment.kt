@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -77,6 +78,18 @@ class ResultsFragment() : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Back press is disabled on Results for both the Basic and HbA1c flows — the user
+        // must leave via the Home button (which runs goHome()'s cleanup) or Print/View
+        // Report. System back press previously fell through to the default nav back stack
+        // with no cleanup at all, dropping the user into a stale, torn-down previous test
+        // fragment; an empty callback here just swallows the event instead.
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Intentionally no-op — back press is disabled on this screen.
+                }
+            }
+        )
     }
 
     override fun onCreateView(
@@ -298,17 +311,39 @@ class ResultsFragment() : BaseFragment() {
         }
 
         binding.buttonHome.setOnClickListener {
-
-            stepsViewModel.resetSteps()
-
-            BodyCheckupPref.clearAll()
-
-            // Consumed — clear so a future flow that doesn't set this explicitly
-            // (the basic checkup never does) can't inherit this session's value.
-            bleConnectionViewModel.setTestFlow(null)
-
-            findNavController().navigate(R.id.home_button_action_results_screen)
+            goHome()
         }
+    }
+
+    /**
+     * Ends the checkup session: clears every piece of activity-scoped state a future
+     * patient's flow could otherwise inherit (steps, BodyCheckupPref test values,
+     * testFlow, the Results API state, and every test screen's last device reading),
+     * then returns to Dashboard. Shared by the Home button and the system back press
+     * below — ResultsFragment previously had no back-press handling at all, so pressing
+     * back skipped all of this cleanup and dropped the user into a stale, torn-down
+     * previous test fragment with last session's data still showing.
+     */
+    private fun goHome() {
+        stepsViewModel.resetSteps()
+
+        BodyCheckupPref.clearAll()
+
+        // Consumed — clear so a future flow that doesn't set this explicitly
+        // (the basic checkup never does) can't inherit this session's value.
+        bleConnectionViewModel.setTestFlow(null)
+
+        // resultsViewModel is activity-scoped too — clear its last API result so the
+        // next patient's Results visit doesn't start out holding this patient's data.
+        resultsViewModel.resetTestState()
+
+        // deviceResponses (activity-scoped, BleConnectionViewModel) only ever grows —
+        // without this, every test screen's collector replays the previous patient's
+        // last reading into its result field the moment it's (re)entered, before any
+        // new device data arrives.
+        bleConnectionViewModel.clearDeviceResponses()
+
+        findNavController().navigate(R.id.home_button_action_results_screen)
     }
 
     private fun setupDialog() {
@@ -405,6 +440,11 @@ class ResultsFragment() : BaseFragment() {
 
     private fun observePrintStatus() {
 
+        // Reset before the collector below can replay a stale terminal value from an
+        // earlier print attempt this session — see resetPrintState() for the crash this
+        // caused.
+        bleConnectionViewModel.resetPrintState()
+
         viewLifecycleOwner.lifecycleScope.launch {
             bleConnectionViewModel.printState.collect { state ->
                 when (state) {
@@ -445,7 +485,6 @@ class ResultsFragment() : BaseFragment() {
                             binding.root, state.message, Snackbar.LENGTH_SHORT, CustomSnackBar.Companion.SnackBarType.SUCCESS
                         ).show()
                     }
-
                 }
             }
         }

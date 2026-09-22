@@ -17,60 +17,111 @@
         android:background="@drawable/bg_login_gradient">
 
         <ImageView
-            android:layout_width="345dp"
-            android:layout_height="148dp"
-            android:layout_marginVertical="50dp"
+            android:id="@+id/hal_logo"
+            android:layout_width="240dp"
+            android:layout_height="103dp"
+            android:layout_marginBottom="28dp"
             android:src="@drawable/hal_logo_square"
-            android:tag="hal_logo"
-            app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+            app:layout_constraintBottom_toTopOf="@+id/card_outer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
-            android:layout_width="700dp"
-            android:layout_height="320dp"
-            android:background="@drawable/blur_background"
+        <!-- Auth card - same bg_outer_card/padding language as Calibration's form
+             card, but width-capped and center-aligned rather than full-width/
+             left-aligned, since PIN entry is a compact, centered task rather than a
+             multi-field form. -->
+        <LinearLayout
+            android:id="@+id/card_outer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_outer_card"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:elevation="6dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="32dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/hal_logo"
+            app:layout_constraintWidth_max="520dp">
 
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_circle_teal">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_lock"
+                    app:tint="@color/app_color" />
+
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/roboto_semibold"
+                android:letterSpacing="0.05"
+                android:text="@string/mpin_badge"
+                android:textAllCaps="true"
+                android:textColor="@color/app_color"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="@string/mpin_heading"
+                android:textColor="@color/patient_login_heading_text"
+                android:textSize="26sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/roboto_regular"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:text="@string/mpin_subtext"
+                android:textColor="@color/patient_login_muted_text"
+                android:textSize="15sp" />
 
             <com.noobcode.otpview.OTPView
                 android:id="@+id/otpView"
-                style="@style/ResultTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="32dp"
                 android:text="@={viewModel.mPin}"
                 app:borderThickness="2"
-                app:layout_constraintBottom_toTopOf="@+id/button_submit"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:otpLayoutColor="@color/app_color"
                 app:otpLayoutType="0"
                 app:otpLength="6"
-                app:spaceBetween="26" />
+                app:spaceBetween="20" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/button_submit"
-                style="@style/ButtonTextStyle"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="30dp"
-                android:background="@drawable/button_style"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/bg_btn_teal"
+                android:fontFamily="@font/roboto_semibold"
                 android:text="@string/submit_text"
                 android:textAllCaps="false"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:textColor="@color/white"
+                android:textSize="17sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

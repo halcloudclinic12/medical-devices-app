@@ -58,6 +58,12 @@ class HemoglobinTestFragment() : BaseFragment() {
     private var hbCounter = 0
     private var hbTimerJob: Job? = null
 
+    // Sanity ceiling for a final hemoglobin reading (raw device value / 10, in g/dL) -
+    // generously above any physiologically plausible human reading, so an unmapped status
+    // code that happens to be numeric (like "2241" -> 224.1) can't masquerade as a result.
+    // See observeDataState()'s `else` branch.
+    private val MAX_PLAUSIBLE_HB_GDL = 30.0
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -176,6 +182,41 @@ class HemoglobinTestFragment() : BaseFragment() {
                 }
             }
         }
+
+        binding.buttonStartTest.setOnClickListener {
+            startHbStartLoader()
+            bleConnectionViewModel.startHbTest()
+        }
+    }
+
+    private var hbStartLoaderTimeoutJob: Job? = null
+
+    /** Spinner shown from the moment Start Test is tapped until the device's first real
+     *  response comes back through observeDataState() (stopHbStartLoader()), so the button
+     *  reflects "waiting on the device" instead of looking like a dead tap. Guarded by a
+     *  failsafe timeout in case the device never responds, so the button can't get stuck
+     *  disabled forever. */
+    private fun startHbStartLoader() {
+        binding.buttonStartTest.isEnabled = false
+        binding.buttonStartTest.alpha = 0.6f
+        binding.lottieAnimationViewStartTest.visibility = View.VISIBLE
+        binding.lottieAnimationViewStartTest.playAnimation()
+
+        hbStartLoaderTimeoutJob?.cancel()
+        hbStartLoaderTimeoutJob = viewLifecycleOwner.lifecycleScope.launch {
+            delay(8000)
+            stopHbStartLoader()
+        }
+    }
+
+    private fun stopHbStartLoader() {
+        hbStartLoaderTimeoutJob?.cancel()
+        hbStartLoaderTimeoutJob = null
+
+        binding.lottieAnimationViewStartTest.cancelAnimation()
+        binding.lottieAnimationViewStartTest.visibility = View.GONE
+        binding.buttonStartTest.isEnabled = true
+        binding.buttonStartTest.alpha = 1f
     }
 
     fun saveHemoglobinData() {
@@ -265,7 +306,12 @@ class HemoglobinTestFragment() : BaseFragment() {
 
                             // Save the connected device in shared pref
                             bleConnectionViewModel.selectedDevice.value?.let {
+                                println("DEBUG-DEVICESAVE HemoglobinTestFragment: connected, about to save device: name=${it.name} address=${it.address} deviceType=${it.deviceType}")
+                                Log.e("DEBUG-DEVICESAVE", "HemoglobinTestFragment: connected, about to save device: name=${it.name} address=${it.address} deviceType=${it.deviceType}")
                                 bleConnectionViewModel.saveDevice(it)
+                            } ?: run {
+                                println("DEBUG-DEVICESAVE HemoglobinTestFragment: connectionState=true but selectedDevice.value is NULL - nothing to save")
+                                Log.e("DEBUG-DEVICESAVE", "HemoglobinTestFragment: connectionState=true but selectedDevice.value is NULL - nothing to save")
                             }
 
 //                        bleConnectionViewModel.getBloodPressure()
@@ -357,52 +403,91 @@ class HemoglobinTestFragment() : BaseFragment() {
 
                         println("deviceResponseLogs hbCheckMeasurement value :: $hbValue")
 
+                        // Any real response from the device is proof the test actually
+                        // started - stop the Start Test spinner here rather than waiting on
+                        // a specific status code. Idempotent (no-op once already stopped), so
+                        // it's safe to call on every response, not just the first.
+                        stopHbStartLoader()
+
+                        // DEBUG-HB: trace the exact status-code sequence and timing coming
+                        // off the real device, plus hbCounter's state at each point - to
+                        // diagnose why nothing shows during tray-open/calibration and why
+                        // the on-device countdown isn't reflected in the UI after the strip
+                        // is inserted. Remove once diagnosed.
+                        println("DEBUG-HB raw code=$hbValue hbCounter=$hbCounter hbTimerJob active=${hbTimerJob?.isActive}")
+                        Log.e("DEBUG-HB", "raw code=$hbValue hbCounter=$hbCounter hbTimerJob active=${hbTimerJob?.isActive}")
+
                         when (hbValue) {
                             "2222" -> {
+                                println("DEBUG-HB branch=2222 (Checking process started) - starting 5s counter")
                                 showHbMessage("Checking process started")
                                 startHbCheckCounter(seconds = 5)
                             }
 
                             "2221" -> {
+                                println("DEBUG-HB branch=2221 (Please collect blood and insert strip)")
                                 showHbMessage("Please collect blood and insert strip")
                             }
 
                             "2223" -> {
-                                showHbMessage("") // blank message
+                                println("DEBUG-HB branch=2223 (clear message)")
+                                clearHbMessage()
                             }
 
                             "2227" -> {
+                                println("DEBUG-HB branch=2227 (Error 2)")
                                 showHbMessage("Error 2 - Please clean and close the tray")
                             }
 
                             "2235" -> {
-                                showHbMessage("") // blank message
+                                println("DEBUG-HB branch=2235 (clear message)")
+                                clearHbMessage()
                             }
 
                             "2225" -> {
+                                println("DEBUG-HB branch=2225 (Error 1)")
                                 showHbMessage("Error 1 - Please clean and close the tray")
                             }
 
                             "78" -> {
+                                println("DEBUG-HB branch=78 (Error 2)")
                                 showHbMessage("Error 2 - Please clean and close the tray")
                             }
 
                             "2224" -> {
+                                println("DEBUG-HB branch=2224 (Please wait for Result) - hbCounter before decrement=$hbCounter")
                                 showHbMessage("Please wait for Result")
                                 decreaseHbCounterByOne()
                             }
 
                             else -> {
                                 println("deviceResponseLogs HB Result value :: $hbValue")
-                                hbValue?.toDouble()?.let { value ->
+                                println("DEBUG-HB branch=else raw=$hbValue")
+                                hbValue?.toDoubleOrNull()?.let { value ->
 
                                     val res = value / 10
 
-                                    if (res > 0) {
+                                    // Confirmed via logcat: code "2241" (not in the mapped
+                                    // list above) fell through here and got treated as a
+                                    // literal result of 224.1 g/dL - physiologically
+                                    // impossible (real hemoglobin readings are roughly
+                                    // 0-25 g/dL even at extremes), and the device's own
+                                    // screen was showing "0C2", not a finished reading, at
+                                    // that same moment. So "2241" is almost certainly another
+                                    // in-progress/status code we don't have mapped yet, not a
+                                    // result - only accept values inside a plausible range as
+                                    // a genuine final reading; anything else is logged instead
+                                    // of being written to the result field, so it doesn't
+                                    // silently masquerade as real data.
+                                    if (res > 0 && res <= MAX_PLAUSIBLE_HB_GDL) {
+                                        println("DEBUG-HB branch=else ACCEPTED as final result raw=$hbValue res=$res")
                                         binding.tvMessage.visibility = View.GONE
                                         binding.editHemoglobinValue.setText(res.toString())
 
                                         bleConnectionViewModel.stopHbTest()
+                                    } else {
+                                        println("DEBUG-HB branch=else REJECTED - raw=$hbValue res=$res is outside plausible range (0, $MAX_PLAUSIBLE_HB_GDL] - likely an unmapped status code, not a result")
+                                        Log.e("DEBUG-HB", "Unmapped/implausible HB code rejected: raw=$hbValue res=$res")
                                     }
 
 
@@ -419,16 +504,22 @@ class HemoglobinTestFragment() : BaseFragment() {
         hbTimerJob?.cancel()
         hbCounter = seconds
 
+        // Deliberately not touching editHemoglobinValue here. "2222" (which calls this
+        // function) fires as soon as the device is connected/ready - before the patient has
+        // actually inserted blood and the strip - so displaying hbCounter immediately showed
+        // "5" prematurely, well before the device's own on-screen countdown had started.
+        // The visible countdown should be driven ONLY by decreaseHbCounterByOne(), which
+        // fires once per real "2224" response - i.e. only once the device's own countdown is
+        // genuinely running - so the result field now stays exactly as it already was
+        // (typically empty) until that actually happens.
         hbTimerJob = viewLifecycleOwner.lifecycleScope.launch {
-            while (hbCounter > 0) {
-
-                println("HB_COUNTER Counter  : : $hbCounter")
-
+            // Pure safety bound, no UI side effects: if the device never sends enough "2224"
+            // responses to bring hbCounter to 0 on its own, this just lets the job end after
+            // `seconds` ticks rather than leaving hbCounter in a stale non-zero state forever.
+            repeat(seconds) {
                 delay(1000)
-
-                showHbMessage("HB checking process completed")
-                if (hbCounter != 5) binding.editHemoglobinValue.setText(hbCounter.toString())
-//                hbCounter--
+                println("HB_COUNTER Counter  : : $hbCounter")
+                if (hbCounter <= 0) return@launch
             }
 
             println("HB_COUNTER Countdown finished :: ")
@@ -436,12 +527,35 @@ class HemoglobinTestFragment() : BaseFragment() {
     }
 
     private fun decreaseHbCounterByOne() {
+        // DEBUG-HB: if hbCounter is already 0 here, this is a no-op - meaning "2224" arrived
+        // without "2222" ever starting the counter (or it already ran out), so the on-device
+        // countdown has nothing to decrement and the UI number won't move. Remove once
+        // diagnosed.
+        println("DEBUG-HB decreaseHbCounterByOne() called, hbCounter=$hbCounter")
         if (hbCounter > 0) {
+            // Display the current value BEFORE decrementing, not after - the first real
+            // "2224" tick should show "5" (the genuine start of the on-device countdown),
+            // not skip straight to "4". This is still only ever reached from a real "2224"
+            // event, never at connect time, so it doesn't reintroduce the premature-"5"
+            // bug startHbCheckCounter()'s own comment describes above.
+            binding.editHemoglobinValue.setText(hbCounter.toString())
+
             hbCounter--
             Log.e("HB_COUNTER", "Decreased counter by 1 → $hbCounter")
-
-            binding.editHemoglobinValue.setText(hbCounter.toString())
+        } else {
+            println("DEBUG-HB decreaseHbCounterByOne() NO-OP - hbCounter already <= 0")
         }
+    }
+
+    /** Clears any status message on screen - used for the device's "idle"/no-message codes
+     *  ("2223", "2235"), which previously called showHbMessage("") and silently did nothing
+     *  (that function's own isNotEmpty() guard skipped it), leaving tv_message stuck showing
+     *  whatever it last displayed - or, on the very first such code, stuck in its initial
+     *  `visibility="gone"` state with nothing ever shown at all. */
+    private fun clearHbMessage() {
+        println("DEBUG-HB clearHbMessage() called")
+        binding.tvMessage.text = ""
+        binding.tvMessage.visibility = View.GONE
     }
 
     private fun showHbMessage(message: String) {

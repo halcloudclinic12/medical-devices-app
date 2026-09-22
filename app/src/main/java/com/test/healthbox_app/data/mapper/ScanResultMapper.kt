@@ -48,7 +48,13 @@ private fun resolveDeviceType(scanResult: ScanResult): DeviceType? {
         deviceName.contains("A1cEZ", ignoreCase = true) ||
                 deviceName.contains("HbA1c", ignoreCase = true) -> DeviceType.HBA1C_METER
 
-        deviceName.contains("HbCheck", ignoreCase = true) -> DeviceType.HB_CHECK
+        // Confirmed against a real meter (adv name "HbChek", address 00:A0:50:97:25:89) on
+        // 2026-09-21 via DEBUG-DEVICESAVE logs - the real device's advertised name is missing
+        // a 'c' compared to "HbCheck", so it never matched here and deviceType stayed null,
+        // which meant saveDevice() persisted it under a null key instead of "HB_CHECK" and it
+        // could never be found again by type. Kept both spellings in case some units do
+        // advertise the fully-spelled "HbCheck".
+        deviceName.contains("HbChek", ignoreCase = true) || deviceName.contains("HbCheck", ignoreCase = true) -> DeviceType.HB_CHECK
 
         deviceName.contains("LYSUN", ignoreCase = true) || deviceName.contains("LYSUN BGM", ignoreCase = true) -> DeviceType.GLUCOSE_METER
 

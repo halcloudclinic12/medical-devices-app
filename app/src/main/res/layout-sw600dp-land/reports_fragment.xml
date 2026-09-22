@@ -9,97 +9,102 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_login_gradient">
 
-        <ImageView
-            android:id="@+id/iv_back"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_marginHorizontal="10dp"
-            android:src="@drawable/ic_back_arrow"
-            app:layout_constraintBottom_toBottomOf="@+id/userInfoView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/userInfoView" />
-
-        <com.test.healthbox_app.presentation.view.UserInfoView
-            android:id="@+id/userInfoView"
-            android:layout_width="wrap_content"
+        <!-- Header row: back arrow + user card on the left, report actions on the
+             right (same pattern as the Results screen). -->
+        <LinearLayout
+            android:id="@+id/header_row"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="10dp"
-            app:layout_constraintStart_toEndOf="@+id/iv_back"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_dates_list"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="10dp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@+id/userInfoView"
-            app:layout_constraintEnd_toStartOf="@+id/layout_buttons"
-            app:layout_constraintStart_toEndOf="@+id/userInfoView"
-            app:layout_constraintTop_toTopOf="@+id/userInfoView" />
-
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_buttons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@+id/userInfoView"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/userInfoView">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                android:src="@drawable/ic_back_arrow" />
+
+            <com.test.healthbox_app.presentation.view.UserInfoView
+                android:id="@+id/userInfoView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- button_view_report / button_connect_printer_layout / button_print_layout
+                 stay ConstraintLayouts - ReportsFragment calls setOnClickListener/
+                 visibility on the containers directly, and the Lottie spinners are
+                 children that must stay nested inside the button they animate for. -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/button_view_report"
-                style="@style/ButtonTextStyle"
-                android:layout_width="125dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:background="@drawable/button_next_style"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_connect_printer_layout"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_btn_outline"
+                android:paddingHorizontal="16dp"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/iv_view_report"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_reports"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_view_report"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/app_color" />
 
                 <TextView
                     android:id="@+id/tv_view_report"
-                    style="@style/TextStyleCustomSize"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="@font/roboto_semibold"
                     android:gravity="center"
                     android:text="View Report"
+                    android:textAllCaps="false"
+                    android:textColor="@color/app_color"
+                    android:textSize="14sp"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/iv_view_report"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/button_connect_printer_layout"
-                style="@style/ButtonTextStyle"
-                android:layout_width="160dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:background="@drawable/button_next_style"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_print_layout"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/button_view_report"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_btn_teal"
+                android:paddingHorizontal="16dp"
+                android:visibility="visible">
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/lottieAnimationView_connect_printer"
-                    android:layout_width="3dp"
-                    android:layout_height="0dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/tv_connect_printer"
-                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:lottie_autoPlay="true"
@@ -108,11 +113,14 @@
 
                 <TextView
                     android:id="@+id/tv_connect_printer"
-                    style="@style/TextStyleCustomSize"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_semibold"
                     android:gravity="center"
                     android:text="Connect Printer"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -123,22 +131,20 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/button_print_layout"
-                style="@style/ButtonTextStyle"
-                android:layout_width="125dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:background="@drawable/button_next_style"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/button_connect_printer_layout"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_btn_teal"
+                android:paddingHorizontal="16dp"
+                android:visibility="visible">
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/lottieAnimationView"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_print"
+                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:lottie_autoPlay="true"
@@ -147,166 +153,113 @@
 
                 <TextView
                     android:id="@+id/tv_print"
-                    style="@style/TextStyleCustomSize"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_semibold"
                     android:gravity="center"
                     android:text="Print"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/lottieAnimationView"
                     app:layout_constraintTop_toTopOf="parent" />
-
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
+        <!-- Filter row: report-type chips on the left, date chips right-aligned on the
+             right (directly below the action buttons, same row) - both RecyclerViews
+             share one row instead of stacking, per the requested layout. -->
+        <LinearLayout
+            android:id="@+id/filter_row"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header_row">
 
-        <!--        ****************-->
+            <!-- Report-type filter: horizontal chip row (rvTestTypeList's LayoutManager
+                 is set to HORIZONTAL in Kotlin - see ReportsFragment.onCreateView()).
+                 Filled pill = selected, outline pill = not
+                 (ReportsTypesListAdapter.bind()). -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_test_type_list"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:visibility="visible" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Date picker: horizontal chip row, one per saved report for the selected
+                 type (ReportsDatesListAdapter). Fixed width so at most 3 chips show at
+                 once (more scroll into view); same 46dp height as the type chips. -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_dates_list"
+                android:layout_width="290dp"
+                android:layout_height="46dp"
+                android:clipToPadding="false"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <!-- Results card: single full-width card holding the scrollable parameter
+             list for the selected report - same structure as the Results screen's
+             card_outer (rv_reports_list scrolls on its own, header/chips/footer stay
+             fixed). -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_reports"
-            android:layout_width="match_parent"
+            android:id="@+id/card_outer"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:visibility="visible"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="22dp"
+            android:background="@drawable/bg_solid_card"
+            android:clipToOutline="true"
+            android:elevation="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/userInfoView">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_steps_list"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/blur_background"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/view2"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_test_type_list"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginVertical="10dp"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintTop_toBottomOf="@+id/filter_row">
 
             <View
-                android:id="@+id/view2"
-                android:layout_width="1px"
-                android:layout_height="0dp"
-                android:layout_marginVertical="10dp"
-                android:background="@color/app_color"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/layout_test_reports"
-                app:layout_constraintStart_toEndOf="@+id/layout_steps_list"
+                android:id="@+id/card_outer_accent"
+                android:layout_width="0dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_card_accent_top_teal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_test_reports"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_reports_list"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="18dp"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="3"
-                app:layout_constraintStart_toEndOf="@+id/view2"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_headers"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="10dp"
-                    android:background="@color/app_color"
-                    android:paddingVertical="5dp"
-                    android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:id="@+id/tv_parameter"
-                        style="@style/TextStyleCustomSize"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Parameter"
-                        android:textColor="@color/white"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/tv_result"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_result"
-                        style="@style/TextStyleCustomSize"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Result"
-                        android:textColor="@color/white"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/tv_value"
-                        app:layout_constraintStart_toEndOf="@+id/tv_parameter"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-
-                    <TextView
-                        android:id="@+id/tv_value"
-                        style="@style/TextStyleCustomSize"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Value"
-                        android:textColor="@color/white"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/tv_range"
-                        app:layout_constraintStart_toEndOf="@+id/tv_result"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_range"
-                        style="@style/TextStyleCustomSize"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Range"
-                        android:textColor="@color/white"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/tv_value"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_reports_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_headers" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/card_outer_accent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
